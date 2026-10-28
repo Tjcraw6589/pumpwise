@@ -94,8 +94,11 @@ export function useLiveController(): void {
     if (loading.current || !isInUK(target.lat, target.lng)) return;
     if (!force && !needsReload(live.loadedFor, live.loadedAt, target, radius, Date.now())) return;
     loading.current = true;
-    const hasData = live.stations.length > 0;
-    live.set(hasData ? { refreshing: true } : { feedStatus: 'loading', refreshing: true });
+    // Prices for somewhere far away (a different city) are no use here: show the loading cards
+    // instead of a misleading "nothing nearby" while the new area downloads.
+    const sameArea = live.loadedFor !== null && distanceMiles(live.loadedFor, target) < 10;
+    const hasData = live.stations.length > 0 && sameArea;
+    live.set(hasData ? { refreshing: true } : { feedStatus: 'loading', stations: [], refreshing: true });
     try {
       const { meta, stations } = await loadArea(target, radius);
       useLive.getState().set({
