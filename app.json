@@ -86,7 +86,11 @@
         {
           "locationWhenInUsePermission": "Pumpwise uses your location while the app is open to show the nearest fuel stations and the cheapest ones around you. Your exact location stays on your iPhone.",
           "isIosBackgroundLocationEnabled": false,
-          "isAndroidBackgroundLocationEnabled": false
+          "isAndroidBackgroundLocationEnabled": false,
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": false,
+          "locationFullAccuracyPermission": false
         }
       ],
       "expo-asset",
