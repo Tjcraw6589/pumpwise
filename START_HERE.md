@@ -12,14 +12,9 @@ The code is at https://github.com/Tjcraw6589/pumpwise. A GitHub job collects eve
 
 FuelWatch allows apps to use its data as long as FuelWatch is credited with a link to www.fuelwatch.wa.gov.au. The app does this on every price screen, station page and the About page, and the store description does too. Keep it that way.
 
-## 2. Create the app in App Store Connect (you, or Claude in the browser panel with your OK)
+## 2. Create the app in App Store Connect (done 29 October 2026)
 
-https://appstoreconnect.apple.com → Apps → **+** → New App:
-- Platform iOS, Name **Pumpwise: Fuel Prices Near Me**, Primary language **English (Australia)**
-- Bundle ID **com.tyjcraw.pumpwise** (if it isn't in the list, step 3 registers it; come back after)
-- SKU **pumpwise**, User Access: Full Access
-
-Then copy the number in the page address (the app's "Apple ID") into `eas.json` as `"ascAppId"` under `submit.production.ios`.
+App ID `com.tyjcraw.pumpwise` is registered on the Apple developer site, and the app exists in App Store Connect as **Pumpwise: Fuel Prices Near Me** (Apple ID 6828174153, SKU `pumpwise`, primary language English (Australia)). `eas.json` already points uploads at it. Team ID: JA885J7PGW.
 
 ## 3. Build and upload the real app (you, about 5 minutes of typing, then 20 to 40 minutes of waiting)
 
@@ -29,7 +24,7 @@ Open a terminal in the project folder (`cd C:\Users\Tyjcr\Documents\Pumpwise`) a
 eas build -p ios --profile production
 ```
 
-It asks you to sign in to your Apple account once, so it can make Pumpwise's signing certificate and register the bundle ID. Type your Apple password yourself. Then:
+It asks you to sign in to your Apple account once, so it can make Pumpwise's signing certificate and provisioning profile. Type your Apple password yourself. Then:
 
 ```
 eas submit -p ios --latest
