@@ -4,7 +4,7 @@ import { act, fireEvent, renderRouter, screen, waitFor } from 'expo-router/testi
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 
-import { mockFeedFetch, notLiveMeta, resetStores } from '../helpers';
+import { mockFeedFetch, resetStores, waDownMeta } from '../helpers';
 
 jest.setTimeout(30_000);
 
@@ -32,34 +32,39 @@ describe('Pumpwise end to end (router)', () => {
   beforeEach(() => {
     resetStores({ onboardingComplete: false });
     permission(true);
-    at(51.5072, -0.1276);
+    at(-31.9523, 115.8613);
   });
 
-  test('first run: onboarding, fuel, location, then the cheapest and nearest stations', async () => {
+  test("first run in Perth: onboarding, fuel, location, cheapest and nearest, tomorrow's prices", async () => {
     mockFeedFetch();
     await renderRouter('./src/app', { initialUrl: '/' });
 
     await screen.findByTestId('onboarding');
     await press('onboarding-next');
-    await press('onboarding-fuel-B7');
-    expect(useStore.getState().settings.fuel).toBe('B7');
+    await press('onboarding-fuel-diesel');
+    expect(useStore.getState().settings.fuel).toBe('diesel');
     await press('onboarding-next');
     await press('onboarding-allow');
     expect(mockedLocation.requestForegroundPermissionsAsync).toHaveBeenCalled();
 
     await screen.findByTestId('nearby-screen');
     await screen.findByTestId('cheapest-card');
-    const cheapest = useLive.getState();
-    expect(cheapest.feedStatus).toBe('ready');
-    expect(cheapest.areaName).toBe('Westminster');
-    expect(screen.getByTestId('station-count').props.children.join('')).toMatch(/stations · 5 mi/);
-    expect(screen.getByText('Diesel · B7')).toBeTruthy();
+    expect(useLive.getState().feedStatus).toBe('ready');
+    expect(useLive.getState().areaName).toBe('Perth');
+    expect(screen.getByText('Diesel · DSL')).toBeTruthy();
+    expect(screen.getByText('Within 8 km')).toBeTruthy();
+    expect(screen.getByTestId('station-count').props.children.join('')).toMatch(/stations · 8 km/);
+    // The fixture's tomorrow prices mostly drop 3c.
+    expect(screen.getByTestId('trend-notice')).toBeTruthy();
+    expect(screen.getAllByTestId('tomorrow-tag').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('source-link')).toBeTruthy();
 
-    // The cheapest card's station page shows the full price board.
+    // The cheapest card's station page shows today's and tomorrow's prices.
     await press('cheapest-details');
     await screen.findByTestId('station-screen');
     expect(screen.getByTestId('price-board')).toBeTruthy();
-    expect(screen.getByTestId('station-freshness')).toBeTruthy();
+    expect(screen.getByText('Tomorrow')).toBeTruthy();
+    expect(screen.getByTestId('station-source')).toBeTruthy();
     await press('header-dismiss');
     await screen.findByTestId('nearby-screen');
 
@@ -67,11 +72,24 @@ describe('Pumpwise end to end (router)', () => {
     await press('sort-distance');
     expect(useStore.getState().settings.sortBy).toBe('distance');
     await press('radius-chip');
-    await press('radius-sheet-10');
-    expect(useStore.getState().settings.radiusMiles).toBe(10);
+    await press('radius-sheet-15');
+    expect(useStore.getState().settings.radiusKm).toBe(15);
   });
 
-  test('location refused for good: choose a city instead', async () => {
+  test('members-only stations are hidden until the driver says they are a member', async () => {
+    mockFeedFetch();
+    useStore.getState().completeOnboarding();
+    useStore.getState().updateSettings({ radiusKm: 15 });
+    await renderRouter('./src/app', { initialUrl: '/' });
+    await screen.findByTestId('cheapest-card');
+    expect(screen.getByTestId('cheapest-name').props.children).not.toBe('Bulk Club Perth Airport');
+    await act(async () => {
+      useStore.getState().updateSettings({ includeMembersOnly: true });
+    });
+    await waitFor(() => expect(screen.getByTestId('cheapest-name').props.children).toBe('Bulk Club Perth Airport'));
+  });
+
+  test('location refused for good: choose a suburb instead', async () => {
     mockFeedFetch();
     permission(false, false);
     useStore.getState().completeOnboarding();
@@ -81,27 +99,34 @@ describe('Pumpwise end to end (router)', () => {
     expect(screen.getByTestId('open-settings')).toBeTruthy();
     await press('choose-place');
     await screen.findByTestId('place-screen');
-    await press('city-Leeds');
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('place-search'), 'Cannington');
+    });
+    const result = await screen.findByTestId('place-result-Cannington', {}, { timeout: 3000 });
+    await act(async () => {
+      fireEvent.press(result);
+    });
     await screen.findByTestId('cheapest-card');
-    expect(useStore.getState().settings).toMatchObject({ locationMode: 'place', place: { name: 'Leeds' } });
-    expect(screen.getByTestId('place-chip')).toBeTruthy();
+    expect(useStore.getState().settings).toMatchObject({ locationMode: 'place', place: { name: 'Cannington' } });
   });
 
-  test('outside the UK: offers a UK city', async () => {
+  test('somewhere not covered yet: offers Perth', async () => {
     mockFeedFetch();
     at(40.7128, -74.006);
     useStore.getState().completeOnboarding();
     await renderRouter('./src/app', { initialUrl: '/' });
-    await screen.findByTestId('state-outside-uk');
-    await press('try-london');
+    await screen.findByTestId('state-not-covered');
+    expect(screen.getByText('Pumpwise covers Western Australia')).toBeTruthy();
+    await press('try-city');
     await screen.findByTestId('cheapest-card');
+    expect(useStore.getState().settings.place?.name).toBe('Perth');
   });
 
-  test('the feed is not switched on yet', async () => {
-    mockFeedFetch({ meta: notLiveMeta() });
+  test('the region could not be collected', async () => {
+    mockFeedFetch({ meta: waDownMeta() });
     useStore.getState().completeOnboarding();
     await renderRouter('./src/app', { initialUrl: '/' });
-    await screen.findByTestId('state-not-live');
+    await screen.findByTestId('state-region-down');
   });
 
   test('no connection, then it comes back', async () => {
@@ -122,16 +147,18 @@ describe('Pumpwise end to end (router)', () => {
     await screen.findByTestId('map-card');
     expect(screen.getByTestId('station-map')).toBeTruthy();
 
-    await act(async () => {
-      useStore.getState().updateSettings({ theme: 'dark' });
-    });
     await renderRouter('./src/app', { initialUrl: '/settings' });
     await screen.findByTestId('settings-screen');
-    await press('settings-fuel-E5');
-    await press('settings-mpg-60');
-    expect(useStore.getState().settings).toMatchObject({ fuel: 'E5', mpg: 60 });
+    await screen.findByText('Showing Western Australia fuels and units.');
+    await press('settings-fuel-super');
+    await press('settings-economy-10');
+    await press('settings-radius-25');
+    expect(useStore.getState().settings).toMatchObject({ fuel: 'super', economyL100: 10, radiusKm: 25 });
+    await act(async () => {
+      fireEvent(screen.getByTestId('settings-members'), 'valueChange', true);
+    });
+    expect(useStore.getState().settings.includeMembersOnly).toBe(true);
     await press('settings-privacy');
     await screen.findByTestId('legal-screen');
-    await waitFor(() => expect(screen.getByText(/never sent to us or stored by us/)).toBeTruthy());
   });
 });

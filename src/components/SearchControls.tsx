@@ -2,49 +2,49 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { fuelChipLabel, FUELS } from '@/lib/fuels';
-import { RADIUS_OPTIONS, useStore } from '@/store/useStore';
+import { useRegion } from '@/hooks/useRegion';
+import { fuelChipLabel } from '@/lib/regions';
+import { radiusLabel, sameRadius, toKm } from '@/lib/units';
+import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
 import { Chip } from './Chip';
 import { OptionSheet } from './OptionSheet';
 
+function areaHint(km: number): string {
+  if (km <= 3.5) return 'Just around here';
+  if (km <= 8.5) return 'A short drive';
+  if (km <= 16.5) return 'Worth a detour';
+  return 'Wide search';
+}
+
 /** The fuel, search-area and (optionally) place chips shown above the list and the map. */
 export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: string; showPlace?: boolean }) {
   const router = useRouter();
   const { spacing } = useTheme();
+  const region = useRegion();
   const fuel = useStore((s) => s.settings.fuel);
-  const radiusMiles = useStore((s) => s.settings.radiusMiles);
+  const radiusKm = useStore((s) => s.settings.radiusKm);
   const locationMode = useStore((s) => s.settings.locationMode);
   const updateSettings = useStore((s) => s.updateSettings);
   const [sheet, setSheet] = useState<'fuel' | 'radius' | null>(null);
+  const unit = region.distanceUnit;
+  const selectedRadius = region.radiusOptions.find((r) => sameRadius(radiusKm, r, unit)) ?? -1;
 
   return (
     <>
       <View style={[styles.row, { gap: spacing.sm }]}>
-        <Chip
-          label={fuelChipLabel(fuel)}
-          icon="water"
-          picker
-          onPress={() => setSheet('fuel')}
-          testID="fuel-chip"
-        />
-        <Chip label={`Within ${radiusMiles} mi`} icon="radio-button-on" picker onPress={() => setSheet('radius')} testID="radius-chip" />
+        <Chip label={fuelChipLabel(region, fuel)} icon="water" picker onPress={() => setSheet('fuel')} testID="fuel-chip" />
+        <Chip label={`Within ${radiusLabel(radiusKm, unit)}`} icon="radio-button-on" picker onPress={() => setSheet('radius')} testID="radius-chip" />
         {showPlace ? (
-          <Chip
-            label={areaLabel}
-            icon={locationMode === 'gps' ? 'locate' : 'map'}
-            picker
-            onPress={() => router.push('/place')}
-            testID="place-chip"
-          />
+          <Chip label={areaLabel} icon={locationMode === 'gps' ? 'locate' : 'map'} picker onPress={() => router.push('/place')} testID="place-chip" />
         ) : null}
       </View>
       <OptionSheet
         visible={sheet === 'fuel'}
         title="Fuel"
-        value={fuel}
-        options={FUELS.map((f) => ({ key: f.code, label: f.label, detail: f.description, badge: f.pumpCode }))}
+        value={region.fuels.some((f) => f.kind === fuel) ? fuel : (region.fuels[0]?.kind ?? fuel)}
+        options={region.fuels.map((f) => ({ key: f.kind, label: f.label, detail: f.description, badge: f.pumpCode }))}
         onSelect={(key) => updateSettings({ fuel: key })}
         onClose={() => setSheet(null)}
         testID="fuel-sheet"
@@ -52,13 +52,9 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
       <OptionSheet
         visible={sheet === 'radius'}
         title="Search area"
-        value={radiusMiles}
-        options={RADIUS_OPTIONS.map((r) => ({
-          key: r,
-          label: `Within ${r} ${r === 1 ? 'mile' : 'miles'}`,
-          detail: r <= 2 ? 'Just around here' : r <= 5 ? 'A short drive' : r <= 10 ? 'Worth a detour' : 'Wide search',
-        }))}
-        onSelect={(key) => updateSettings({ radiusMiles: key })}
+        value={selectedRadius}
+        options={region.radiusOptions.map((r) => ({ key: r, label: `Within ${r} ${unit}`, detail: areaHint(toKm(r, unit)) }))}
+        onSelect={(key) => updateSettings({ radiusKm: toKm(key, unit) })}
         onClose={() => setSheet(null)}
         testID="radius-sheet"
       />

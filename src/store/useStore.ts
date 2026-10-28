@@ -2,31 +2,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type { FuelCode } from '@/lib/feed';
-import { FUEL_CODES } from '@/lib/feed';
+import { FUEL_KINDS, type FuelKind } from '@/lib/feed';
 import type { Place } from '@/lib/places';
 import type { SortMode } from '@/lib/ranking';
+import { KM_PER_MILE } from '@/lib/units';
 
 /** Internal storage key; never shown to users and kept stable so saved settings survive updates. */
 export const STORAGE_KEY = 'pumpwise-settings';
-export const STORE_VERSION = 1;
+export const STORE_VERSION = 2;
 
-export const RADIUS_OPTIONS = [1, 2, 3, 5, 10, 15, 25] as const;
 export const FILL_OPTIONS = [10, 20, 30, 40, 50, 60, 70] as const;
-export const MPG_OPTIONS = [25, 30, 35, 40, 45, 50, 55, 60, 65, 70] as const;
 
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type DirectionsApp = 'apple' | 'google' | 'waze';
 /** Where searches are centred: the phone's location, or a place the driver picked. */
 export type LocationMode = 'gps' | 'place';
 
+/** Distances and fuel economy are stored in km and L/100km and shown in each region's units. */
 export interface Settings {
-  fuel: FuelCode;
-  radiusMiles: number;
-  /** Litres in a typical fill-up, for "you save £x" and best value. */
+  fuel: FuelKind;
+  radiusKm: number;
+  /** Litres in a typical fill-up, for "you save $x" and best value. */
   fillLitres: number;
-  /** The car's miles per (UK) gallon, for the cost of driving to a station. */
-  mpg: number;
+  /** The car's fuel use, for the cost of driving to a station. */
+  economyL100: number;
+  /** Show members-only stations (like Costco) and let them be the cheapest. */
+  includeMembersOnly: boolean;
   sortBy: SortMode;
   theme: ThemePreference;
   directionsApp: DirectionsApp;
@@ -38,10 +39,11 @@ export interface Settings {
 
 export function createDefaultSettings(): Settings {
   return {
-    fuel: 'E10',
-    radiusMiles: 5,
+    fuel: 'regular',
+    radiusKm: 8,
     fillLitres: 40,
-    mpg: 45,
+    economyL100: 8,
+    includeMembersOnly: false,
     sortBy: 'price',
     theme: 'system',
     directionsApp: 'apple',
@@ -52,16 +54,31 @@ export function createDefaultSettings(): Settings {
   };
 }
 
-/** Repairs anything odd in saved settings (older versions, hand-edited storage) by falling back to defaults. */
+const V1_FUELS: Record<string, FuelKind> = { E10: 'regular', E5: 'premium', B7: 'diesel', SDV: 'premium-diesel', B10: 'b10', HVO: 'hvo' };
+
+/** Version 1 (UK only) stored miles, mpg and UK pump codes. */
+export function migrateSettings(saved: Record<string, unknown> | undefined, fromVersion: number): Partial<Settings> | undefined {
+  if (!saved || fromVersion >= 2) return saved as Partial<Settings> | undefined;
+  const { radiusMiles, mpg, fuel, ...rest } = saved;
+  return {
+    ...(rest as Partial<Settings>),
+    fuel: V1_FUELS[String(fuel)] ?? 'regular',
+    ...(typeof radiusMiles === 'number' ? { radiusKm: radiusMiles * KM_PER_MILE } : {}),
+    ...(typeof mpg === 'number' && mpg > 0 ? { economyL100: Math.round((282.481 / mpg) * 10) / 10 } : {}),
+  };
+}
+
+/** Repairs anything odd in saved settings by falling back to defaults. */
 export function sanitizeSettings(saved: Partial<Settings> | undefined): Settings {
   const defaults = createDefaultSettings();
   const s = { ...defaults, ...saved };
   return {
     ...s,
-    fuel: FUEL_CODES.includes(s.fuel) ? s.fuel : defaults.fuel,
-    radiusMiles: (RADIUS_OPTIONS as readonly number[]).includes(s.radiusMiles) ? s.radiusMiles : defaults.radiusMiles,
+    fuel: FUEL_KINDS.includes(s.fuel) ? s.fuel : defaults.fuel,
+    radiusKm: s.radiusKm >= 0.5 && s.radiusKm <= 100 ? s.radiusKm : defaults.radiusKm,
     fillLitres: s.fillLitres >= 5 && s.fillLitres <= 150 ? s.fillLitres : defaults.fillLitres,
-    mpg: s.mpg >= 10 && s.mpg <= 150 ? s.mpg : defaults.mpg,
+    economyL100: s.economyL100 >= 2 && s.economyL100 <= 40 ? s.economyL100 : defaults.economyL100,
+    includeMembersOnly: s.includeMembersOnly === true,
     sortBy: ['price', 'distance', 'value'].includes(s.sortBy) ? s.sortBy : defaults.sortBy,
     theme: ['system', 'light', 'dark'].includes(s.theme) ? s.theme : defaults.theme,
     directionsApp: ['apple', 'google', 'waze'].includes(s.directionsApp) ? s.directionsApp : defaults.directionsApp,
@@ -105,6 +122,10 @@ export const useStore = create<StoreState>()(
       version: STORE_VERSION,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ settings: state.settings }),
+      migrate: (persisted, version) => {
+        const saved = (persisted as { settings?: Record<string, unknown> } | undefined)?.settings;
+        return { settings: migrateSettings(saved, version) } as unknown as StoreState;
+      },
       merge: (persisted, current) => ({
         ...current,
         settings: sanitizeSettings((persisted as { settings?: Partial<Settings> } | undefined)?.settings),

@@ -15,9 +15,10 @@ import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useDirections } from '@/hooks/useDirections';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNearby } from '@/hooks/useNearby';
-import { fuelInfo } from '@/lib/fuels';
-import { formatMiles } from '@/lib/format';
+import { useRegion } from '@/hooks/useRegion';
 import { priceBands } from '@/lib/ranking';
+import { fuelOption } from '@/lib/regions';
+import { formatDistance, radiusLabel } from '@/lib/units';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -31,6 +32,7 @@ export default function MapScreen() {
   const permission = useLive((s) => s.permission);
   const directions = useDirections();
   const areaLabel = useAreaLabel();
+  const region = useRegion();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [recenterToken, setRecenterToken] = useState(0);
 
@@ -46,7 +48,7 @@ export default function MapScreen() {
       {showMap ? (
         <StationMap
           center={center}
-          radiusMiles={settings.radiusMiles}
+          radiusKm={settings.radiusKm}
           stations={stations}
           band={band}
           selectedId={selected?.station.id ?? null}
@@ -103,18 +105,18 @@ export default function MapScreen() {
                 onPress={() => router.push({ pathname: '/station/[id]', params: { id: selected.station.id } })}
                 style={styles.row}
               >
-                <PriceSign pence={selected.price.p} size="md" tone={isCheapest ? 'cheap' : 'normal'} label={fuelInfo(settings.fuel).pumpCode} />
+                <PriceSign pence={selected.price.p} size="md" tone={isCheapest ? 'cheap' : 'normal'} label={fuelOption(region, settings.fuel).pumpCode} />
                 <View style={[styles.flex, { marginLeft: spacing.md }]}>
                   <AppText variant="overline" tone={isCheapest ? 'cheap' : 'muted'}>
-                    {isCheapest ? `Cheapest within ${settings.radiusMiles} mi` : 'Selected station'}
+                    {isCheapest ? `Cheapest within ${radiusLabel(settings.radiusKm, region.distanceUnit)}` : 'Selected station'}
                   </AppText>
                   <AppText variant="bodyBold" numberOfLines={1} testID="map-card-name">
                     {selected.station.name}
                   </AppText>
                   <AppText variant="caption" tone="muted" numberOfLines={1}>
-                    {[formatMiles(selected.distance), selected.open.label].filter(Boolean).join(' · ')}
+                    {[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(' · ')}
                   </AppText>
-                  <FreshnessTag at={selected.price.at} now={now} />
+                  <FreshnessTag at={selected.price.at} region={selected.station.region} now={now} />
                 </View>
               </Pressable>
               <Button
@@ -129,7 +131,7 @@ export default function MapScreen() {
             </View>
           ) : phase === 'empty' ? (
             <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.xl, padding: spacing.lg }]}>
-              <AppText variant="bodyBold">Nothing within {settings.radiusMiles} mi</AppText>
+              <AppText variant="bodyBold">Nothing within {radiusLabel(settings.radiusKm, region.distanceUnit)}</AppText>
               <AppText variant="caption" tone="muted">
                 Try a wider area with the chip at the top.
               </AppText>

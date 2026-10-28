@@ -2,18 +2,18 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, View } from 'react-native';
 
-import { fuelInfo } from '@/lib/fuels';
+import { useCoverage, useRegion } from '@/hooks/useRegion';
 import type { NearbyPhase } from '@/lib/nearby';
-import { CITY_PRESETS, type Place } from '@/lib/places';
+import type { Place } from '@/lib/places';
+import { fuelOption, REGIONS, regionList } from '@/lib/regions';
+import { radiusLabel, sameRadius, toKm } from '@/lib/units';
 import { currentPosition, openAppSettings, requestPermission } from '@/services/location';
 import { useLive } from '@/store/useLive';
-import { RADIUS_OPTIONS, useStore } from '@/store/useStore';
+import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
 import { Button } from './Button';
 import { EmptyState } from './EmptyState';
-
-const LONDON = CITY_PRESETS[0] as Place;
 
 export async function askForLocation(): Promise<void> {
   const result = await requestPermission();
@@ -58,8 +58,10 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
   const feedError = useLive((s) => s.feedError);
   const requestRefresh = useLive((s) => s.requestRefresh);
   const fuel = useStore((s) => s.settings.fuel);
-  const radiusMiles = useStore((s) => s.settings.radiusMiles);
+  const radiusKm = useStore((s) => s.settings.radiusKm);
   const updateSettings = useStore((s) => s.updateSettings);
+  const region = useRegion();
+  const coverage = useCoverage();
   const choosePlace = useStore((s) => s.choosePlace);
   const choose = () => router.push('/place');
 
@@ -122,25 +124,28 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
           <Button label="Choose a place" variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
-    case 'outside-uk':
+    case 'not-covered': {
+      const firstLive = REGIONS[coverage.live[0] ?? 'wa'];
+      const city = firstLive.cities[0] as Place;
       return (
         <EmptyState
           icon="earth"
-          title="Pumpwise covers the UK"
-          body="Prices come from the UK's official Fuel Finder scheme, so stations elsewhere aren't included. Pick a UK town to look around."
-          testID="state-outside-uk"
+          title={`Pumpwise covers ${regionList(coverage.live)}`}
+          body="Prices come from official government schemes, and this place isn't covered yet. Pick somewhere that is to look around."
+          testID="state-not-covered"
         >
-          <Button label="Look around London" size="lg" fullWidth onPress={() => choosePlace(LONDON)} testID="try-london" />
-          <Button label="Choose a UK place" variant="secondary" size="lg" fullWidth onPress={choose} />
+          <Button label={`Look around ${city.name}`} size="lg" fullWidth onPress={() => choosePlace(city)} testID="try-city" />
+          <Button label="Choose a place" variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
-    case 'not-live':
+    }
+    case 'region-down':
       return (
         <EmptyState
           icon="time-outline"
           title="Prices are on their way"
-          body="The live UK price feed is being switched on. Check back soon."
-          testID="state-not-live"
+          body={`${region.name} prices couldn't be collected just now. They usually come back within the hour.`}
+          testID="state-region-down"
         >
           <Button label="Check again" size="lg" fullWidth onPress={requestRefresh} />
         </EmptyState>
@@ -161,16 +166,18 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
         </EmptyState>
       );
     case 'empty': {
-      const wider = RADIUS_OPTIONS.find((r) => r > radiusMiles);
+      const unit = region.distanceUnit;
+      const wider = region.radiusOptions.find((r) => toKm(r, unit) > radiusKm && !sameRadius(radiusKm, r, unit));
+      const f = fuelOption(region, fuel);
       return (
         <EmptyState
           icon="search"
-          title={`Nothing within ${radiusMiles} mi`}
-          body={`No station in this area has reported a ${fuelInfo(fuel).label.toLowerCase()} (${fuelInfo(fuel).pumpCode}) price. Try a wider area or another fuel.`}
+          title={`Nothing within ${radiusLabel(radiusKm, unit)}`}
+          body={`No station in this area has a ${f.label} (${f.pumpCode}) price right now. Try a wider area or another fuel.`}
           testID="state-empty"
         >
           {wider ? (
-            <Button label={`Search within ${wider} mi`} size="lg" fullWidth onPress={() => updateSettings({ radiusMiles: wider })} testID="widen" />
+            <Button label={`Search within ${wider} ${unit}`} size="lg" fullWidth onPress={() => updateSettings({ radiusKm: toKm(wider, unit) })} testID="widen" />
           ) : null}
         </EmptyState>
       );

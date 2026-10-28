@@ -3,7 +3,7 @@ import type { PriceBand, RankedStation } from '@/lib/ranking';
 
 export interface StationMapProps {
   center: LatLng;
-  radiusMiles: number;
+  radiusKm: number;
   /** Stations to pin, already filtered to the search area. */
   stations: RankedStation[];
   band: (pence: number) => PriceBand;

@@ -1,39 +1,61 @@
 /**
- * The Pumpwise price feed: the files the GitHub job publishes and the app reads, and the code
- * that turns raw UK Fuel Finder records into them.
+ * The Pumpwise price feed: the files the GitHub job publishes and the app reads, plus helpers
+ * shared by every country's data source.
  *
  * This file has no imports on purpose: the feed job runs it directly with Node
  * (`node scripts/feed/build.ts`), and the app imports the same code, so both always agree.
  */
 
-export const FEED_VERSION = 1;
+export const FEED_VERSION = 2;
 /** Stations are grouped into square tiles of this many degrees, so the app downloads only its area. */
 export const TILE_DEG = 0.5;
 
-export type FuelCode = 'E10' | 'E5' | 'B7' | 'SDV' | 'B10' | 'HVO';
-export const FUEL_CODES: readonly FuelCode[] = ['E10', 'E5', 'B7', 'SDV', 'B10', 'HVO'];
+/**
+ * Fuels by what they are, not by each country's pump label. Each region names them its own way
+ * (UK "E10" and WA "ULP" are both `regular`), so a driver's choice carries across borders.
+ */
+export type FuelKind = 'regular' | 'premium' | 'super' | 'diesel' | 'premium-diesel' | 'lpg' | 'e85' | 'b10' | 'hvo';
+export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'hvo'];
 
-/** Fuel Finder fuel type names mapped to the short codes drivers see on UK pumps. */
-const API_FUEL_CODES: Record<string, FuelCode> = {
-  E10: 'E10',
-  E5: 'E5',
-  B7: 'B7',
-  B7_STANDARD: 'B7',
-  B7_PREMIUM: 'SDV',
-  SDV: 'SDV',
-  B10: 'B10',
-  HVO: 'HVO',
+/** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
+export type RegionId = 'wa' | 'uk';
+export const REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
+
+export interface Bounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+
+/** Generous boxes around each region. WA's eastern edge is the 129th meridian. */
+export const REGION_BOUNDS: Record<RegionId, Bounds> = {
+  wa: { minLat: -35.6, maxLat: -13.4, minLng: 112.5, maxLng: 129.0 },
+  uk: { minLat: 49.1, maxLat: 61.0, minLng: -8.7, maxLng: 2.1 },
 };
 
+export function inBounds(b: Bounds, lat: number, lng: number): boolean {
+  return lat >= b.minLat && lat <= b.maxLat && lng >= b.minLng && lng <= b.maxLng;
+}
+
+export function regionAt(lat: number, lng: number): RegionId | null {
+  return REGION_IDS.find((id) => inBounds(REGION_BOUNDS[id], lat, lng)) ?? null;
+}
+
 export interface FeedPrice {
-  /** Pence per litre, one decimal place (139.9 means £1.399 a litre). */
+  /** Pence or cents per litre, one decimal place (139.9 means 1.399 a litre). */
   p: number;
-  /** When the forecourt last reported this price (ISO 8601, UTC). */
+  /**
+   * When the price was reported (UK) or the start of the day it applies to (WA, where prices are
+   * fixed from 6am for 24 hours). ISO 8601.
+   */
   at: string;
 }
 
 export interface FeedStation {
+  /** Unique across regions: "uk-<node id>", "wa-<hash>". */
   id: string;
+  region: RegionId;
   name: string;
   brand: string;
   address: string;
@@ -41,11 +63,13 @@ export interface FeedStation {
   postcode: string;
   lat: number;
   lng: number;
-  /** Monday to Sunday: "0600-2200", "24h" or "closed". Null when the forecourt gave no hours. */
+  /** Monday to Sunday: "0600-2200", "24h", "closed" or "unknown". Null when the station gave no hours. */
   hours: string[] | null;
-  /** "motorway", "supermarket" and amenity codes such as "toilets" or "car-wash". */
+  /** "motorway", "supermarket", "members-only", "permit-required", "unmanned" and amenity codes. */
   tags: string[];
-  prices: Partial<Record<FuelCode, FeedPrice>>;
+  prices: Partial<Record<FuelKind, FeedPrice>>;
+  /** Tomorrow's fixed prices, where the region publishes them in advance (WA after 2:30pm). */
+  tomorrow?: Partial<Record<FuelKind, number>>;
 }
 
 export interface FeedTile {
@@ -55,38 +79,34 @@ export interface FeedTile {
   stations: FeedStation[];
 }
 
+export interface RegionStatus {
+  status: 'live' | 'error';
+  /** When this region's prices were last fetched from its source. */
+  updatedAt: string;
+  stationCount: number;
+  /** Tomorrow's prices are included. */
+  tomorrow: boolean;
+}
+
 export interface FeedMeta {
   v: number;
   generatedAt: string;
-  /** "awaiting-credentials" until the Fuel Finder keys are added to the GitHub repository. */
-  status: 'live' | 'awaiting-credentials';
   tileDeg: number;
   stationCount: number;
   priceCount: number;
   /** Tile key to number of stations, for every tile that has at least one station. */
   tiles: Record<string, number>;
-  source: string;
-  licence: string;
+  regions: Partial<Record<RegionId, RegionStatus>>;
 }
-
-export const FEED_SOURCE = 'UK Government Fuel Finder scheme';
-export const FEED_LICENCE = 'Contains public sector information licensed under the Open Government Licence v3.0.';
-
-/** Prices outside this range (pence per litre) are reporting mistakes, such as 13p or £15 a litre. */
-export const MIN_PENCE = 80;
-export const MAX_PENCE = 300;
-
-/** A generous box around the UK, Northern Ireland, the Channel Islands and Shetland. */
-export const UK_BOUNDS = { minLat: 49.1, maxLat: 61.0, minLng: -8.7, maxLng: 2.1 } as const;
 
 export function tileKey(lat: number, lng: number): string {
   return `${Math.floor(lat / TILE_DEG)}_${Math.floor(lng / TILE_DEG)}`;
 }
 
-/** Every tile key that overlaps a circle of `radiusMiles` around a point. */
-export function tilesForArea(lat: number, lng: number, radiusMiles: number): string[] {
-  const dLat = radiusMiles / 69.0;
-  const dLng = radiusMiles / Math.max(1, 69.172 * Math.cos((lat * Math.PI) / 180));
+/** Every tile key that overlaps a circle of `radiusKm` around a point. */
+export function tilesForArea(lat: number, lng: number, radiusKm: number): string[] {
+  const dLat = radiusKm / 111.0;
+  const dLng = radiusKm / Math.max(1, 111.32 * Math.cos((lat * Math.PI) / 180));
   const keys: string[] = [];
   for (let y = Math.floor((lat - dLat) / TILE_DEG); y <= Math.floor((lat + dLat) / TILE_DEG); y++) {
     for (let x = Math.floor((lng - dLng) / TILE_DEG); x <= Math.floor((lng + dLng) / TILE_DEG); x++) {
@@ -96,31 +116,27 @@ export function tilesForArea(lat: number, lng: number, radiusMiles: number): str
   return keys;
 }
 
-export function isInUK(lat: number, lng: number): boolean {
-  return lat >= UK_BOUNDS.minLat && lat <= UK_BOUNDS.maxLat && lng >= UK_BOUNDS.minLng && lng <= UK_BOUNDS.maxLng;
-}
-
 // ---------------------------------------------------------------------------------------------
-// Raw record parsing. The Fuel Finder API is young and its records are not always tidy, so every
-// field is read defensively: anything missing or odd is skipped rather than trusted.
+// Helpers for reading government data, which is not always tidy: anything missing or odd is
+// skipped rather than trusted.
 // ---------------------------------------------------------------------------------------------
 
-type Raw = Record<string, unknown>;
+export type Raw = Record<string, unknown>;
 
-function asRecord(value: unknown): Raw | null {
+export function asRecord(value: unknown): Raw | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value) ? (value as Raw) : null;
 }
 
-function asString(value: unknown): string {
+export function asString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : typeof value === 'number' ? String(value) : '';
 }
 
-function asNumber(value: unknown): number | null {
+export function asNumber(value: unknown): number | null {
   const n = typeof value === 'number' ? value : typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN;
   return Number.isFinite(n) ? n : null;
 }
 
-const KEEP_UPPER = new Set(['BP', 'MFG', 'JET', 'EG', 'UK', 'MSA', 'A1', 'M1', 'M6', 'M25', 'II', 'III', 'HVO', 'BWOC', 'CO-OP']);
+const KEEP_UPPER = new Set(['BP', 'MFG', 'JET', 'EG', 'UK', 'MSA', 'A1', 'M1', 'M6', 'M25', 'II', 'III', 'HVO', 'BWOC', 'CO-OP', 'IOR', 'OPT', 'WA', 'UGO', 'OMG', 'CGL', 'FDWA']);
 
 /** "TESCO EXTRA ST. ALBANS" becomes "Tesco Extra St. Albans"; mixed-case names are left alone. */
 export function tidyName(value: string): string {
@@ -141,125 +157,59 @@ export function tidyName(value: string): string {
     .join(' ');
 }
 
-const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
-
-function hhmm(value: unknown): string | null {
-  const match = /^(\d{1,2}):(\d{2})/.exec(asString(value));
-  if (!match) return null;
-  const h = Number(match[1]);
-  const m = Number(match[2]);
-  if (h > 24 || m > 59) return null;
-  return `${String(h).padStart(2, '0')}${String(m).padStart(2, '0')}`;
+/** Rounds a reported price to one decimal, or null when it falls outside `[min, max]` (a reporting mistake). */
+export function cleanPrice(value: unknown, min: number, max: number): number | null {
+  let price = asNumber(value);
+  if (price === null) return null;
+  if (price > 0 && price < 10) price *= 100; // reported in pounds or dollars (1.399) rather than pence or cents
+  price = Math.round(price * 10) / 10;
+  return price >= min && price <= max ? price : null;
 }
 
-export function parseHours(openingTimes: unknown): string[] | null {
-  const usual = asRecord(asRecord(openingTimes)?.usual_days);
-  if (!usual) return null;
-  let known = 0;
-  const hours = DAYS.map((day) => {
-    const entry = asRecord(usual[day]);
-    if (!entry) return 'unknown';
-    if (entry.is_24_hours === true) {
-      known++;
-      return '24h';
-    }
-    const open = hhmm(entry.open ?? entry.open_time);
-    const close = hhmm(entry.close ?? entry.close_time);
-    if (!open || !close) return 'unknown';
-    known++;
-    if (open === close) return open === '0000' ? '24h' : 'closed';
-    return `${open}-${close}`;
-  });
-  return known === 0 ? null : hours;
-}
-
-const AMENITY_CODES: Record<string, string> = {
-  customer_toilets: 'toilets',
-  toilets: 'toilets',
-  car_wash: 'car-wash',
-  twenty_four_hour_fuel: '24h-fuel',
-  adblue_pumps: 'adblue',
-  adblue_packaged: 'adblue',
-  lpg_pumps: 'lpg',
-  air_pump_or_screenwash: 'air',
-  water_filling: 'water',
-};
-
-export type StationInfo = Omit<FeedStation, 'prices'>;
-
-/** One forecourt record from `/pfs`. Returns null for closed sites and records without a usable location. */
-export function normalizeStation(raw: unknown): StationInfo | null {
-  const record = asRecord(raw);
-  if (!record) return null;
-  const id = asString(record.node_id);
-  if (!id) return null;
-  if (record.permanent_closure === true || record.temporary_closure === true) return null;
-  const location = asRecord(record.location) ?? record;
-  const lat = asNumber(location.latitude);
-  const lng = asNumber(location.longitude);
-  if (lat === null || lng === null || !isInUK(lat, lng)) return null;
-
-  const brand = tidyName(asString(record.brand_name));
-  const name = tidyName(asString(record.trading_name)) || brand || 'Fuel station';
-  const address = [location.address_line_1, location.address_line_2]
-    .map((part) => tidyName(asString(part)))
-    .filter(Boolean)
-    .join(', ');
-
-  const tags: string[] = [];
-  if (record.is_motorway_service_station === true) tags.push('motorway');
-  if (record.is_supermarket_service_station === true) tags.push('supermarket');
-  if (Array.isArray(record.amenities)) {
-    for (const amenity of record.amenities) {
-      const code = AMENITY_CODES[asString(amenity).toLowerCase()];
-      if (code && !tags.includes(code)) tags.push(code);
-    }
+/** Short, stable id from text (FNV-1a), for sources that give stations no id of their own. */
+export function hashId(text: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
   }
-
-  return {
-    id,
-    name,
-    brand,
-    address,
-    town: tidyName(asString(location.city)),
-    postcode: asString(location.postcode).toUpperCase(),
-    lat: Math.round(lat * 1e5) / 1e5,
-    lng: Math.round(lng * 1e5) / 1e5,
-    hours: parseHours(record.opening_times),
-    tags,
-  };
+  return hash.toString(36);
 }
 
-/** Converts a reported price to pence per litre, or null when it cannot be right. */
-export function normalizePence(value: unknown): number | null {
-  let pence = asNumber(value);
-  if (pence === null) return null;
-  if (pence > 0 && pence < 10) pence *= 100; // reported in pounds (1.399) rather than pence (139.9)
-  pence = Math.round(pence * 10) / 10;
-  return pence >= MIN_PENCE && pence <= MAX_PENCE ? pence : null;
+export function roundCoord(value: number): number {
+  return Math.round(value * 1e5) / 1e5;
 }
 
-/** One record from `/pfs/fuel-prices`: a forecourt id and its latest price for each fuel. */
-export function normalizePrices(raw: unknown, now: Date): { id: string; prices: Partial<Record<FuelCode, FeedPrice>> } | null {
-  const record = asRecord(raw);
-  if (!record) return null;
-  const id = asString(record.node_id);
-  if (!id || !Array.isArray(record.fuel_prices)) return null;
-  const prices: Partial<Record<FuelCode, FeedPrice>> = {};
-  for (const entry of record.fuel_prices) {
-    const item = asRecord(entry);
-    if (!item) continue;
-    const code = API_FUEL_CODES[asString(item.fuel_type).toUpperCase()];
-    const pence = normalizePence(item.price);
-    if (!code || pence === null) continue;
-    const stamp = Date.parse(asString(item.price_last_updated) || asString(item.price_change_effective_timestamp));
-    if (!Number.isFinite(stamp)) continue;
-    // A time in the future is a clock mistake on the forecourt's side; treat it as "now".
-    const at = new Date(Math.min(stamp, now.getTime())).toISOString();
-    const existing = prices[code];
-    if (!existing || existing.at < at) prices[code] = { p: pence, at };
+export interface Tiled {
+  tiles: FeedTile[];
+  counts: Record<string, number>;
+  stationCount: number;
+  priceCount: number;
+}
+
+/** Groups stations into tiles, dropping duplicates and stations with no price. */
+export function groupIntoTiles(stations: FeedStation[], generatedAt: string): Tiled {
+  const byTile = new Map<string, FeedStation[]>();
+  const seen = new Set<string>();
+  let priceCount = 0;
+  for (const station of stations) {
+    const count = Object.keys(station.prices).length;
+    if (count === 0 || seen.has(station.id)) continue;
+    seen.add(station.id);
+    priceCount += count;
+    const key = tileKey(station.lat, station.lng);
+    const list = byTile.get(key) ?? [];
+    list.push(station);
+    byTile.set(key, list);
   }
-  return { id, prices };
+  const tiles: FeedTile[] = [];
+  const counts: Record<string, number> = {};
+  for (const key of [...byTile.keys()].sort()) {
+    const list = (byTile.get(key) ?? []).sort((a, b) => a.id.localeCompare(b.id));
+    counts[key] = list.length;
+    tiles.push({ v: FEED_VERSION, generatedAt, tile: key, stations: list });
+  }
+  return { tiles, counts, stationCount: seen.size, priceCount };
 }
 
 export interface BuiltFeed {
@@ -267,67 +217,20 @@ export interface BuiltFeed {
   tiles: FeedTile[];
 }
 
-/** Joins forecourts with their prices and groups them into tiles. Forecourts with no valid price are left out. */
-export function buildFeed(stationRecords: unknown[], priceRecords: unknown[], now: Date): BuiltFeed {
+/** The whole feed from every region's stations and status. */
+export function buildFeed(stations: FeedStation[], regions: Partial<Record<RegionId, RegionStatus>>, now: Date): BuiltFeed {
   const generatedAt = now.toISOString();
-  const prices = new Map<string, Partial<Record<FuelCode, FeedPrice>>>();
-  for (const raw of priceRecords) {
-    const parsed = normalizePrices(raw, now);
-    if (!parsed) continue;
-    prices.set(parsed.id, { ...prices.get(parsed.id), ...parsed.prices });
-  }
-
-  const byTile = new Map<string, FeedStation[]>();
-  const seen = new Set<string>();
-  let priceCount = 0;
-  for (const raw of stationRecords) {
-    const info = normalizeStation(raw);
-    if (!info || seen.has(info.id)) continue;
-    const stationPrices = prices.get(info.id);
-    const count = stationPrices ? Object.keys(stationPrices).length : 0;
-    if (!stationPrices || count === 0) continue;
-    seen.add(info.id);
-    priceCount += count;
-    const key = tileKey(info.lat, info.lng);
-    const list = byTile.get(key) ?? [];
-    list.push({ ...info, prices: stationPrices });
-    byTile.set(key, list);
-  }
-
-  const tiles: FeedTile[] = [];
-  const counts: Record<string, number> = {};
-  for (const key of [...byTile.keys()].sort()) {
-    const stations = (byTile.get(key) ?? []).sort((a, b) => a.id.localeCompare(b.id));
-    counts[key] = stations.length;
-    tiles.push({ v: FEED_VERSION, generatedAt, tile: key, stations });
-  }
-
+  const tiled = groupIntoTiles(stations, generatedAt);
   return {
     meta: {
       v: FEED_VERSION,
       generatedAt,
-      status: 'live',
       tileDeg: TILE_DEG,
-      stationCount: seen.size,
-      priceCount,
-      tiles: counts,
-      source: FEED_SOURCE,
-      licence: FEED_LICENCE,
+      stationCount: tiled.stationCount,
+      priceCount: tiled.priceCount,
+      tiles: tiled.counts,
+      regions,
     },
-    tiles,
-  };
-}
-
-export function emptyMeta(now: Date): FeedMeta {
-  return {
-    v: FEED_VERSION,
-    generatedAt: now.toISOString(),
-    status: 'awaiting-credentials',
-    tileDeg: TILE_DEG,
-    stationCount: 0,
-    priceCount: 0,
-    tiles: {},
-    source: FEED_SOURCE,
-    licence: FEED_LICENCE,
+    tiles: tiled.tiles,
   };
 }

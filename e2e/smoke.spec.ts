@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * End-to-end smoke test against the exported web build (the same JavaScript that ships in the
@@ -6,57 +6,50 @@ import { expect, type Page, test } from '@playwright/test';
  * Build it first with `npm run export:web:test`.
  */
 
-const WESTMINSTER = { latitude: 51.5072, longitude: -0.1276 };
-
-async function mockPlaceSearch(page: Page) {
-  await page.route('https://api.postcodes.io/**', async (route) => {
-    const url = route.request().url();
-    if (url.includes('/postcodes/')) {
-      await route.fulfill({ json: { status: 200, result: { postcode: 'LS1 4AP', latitude: 53.7981, longitude: -1.5472, admin_district: 'Leeds' } } });
-    } else {
-      await route.fulfill({ json: { status: 200, result: [] } });
-    }
-  });
-}
+const PERTH = { latitude: -31.9523, longitude: 115.8613 };
 
 test.describe('Pumpwise smoke', () => {
-  test.use({ geolocation: WESTMINSTER, permissions: ['geolocation'] });
+  test.use({ geolocation: PERTH, permissions: ['geolocation'] });
 
   test('first run through every screen', async ({ page }) => {
-    await mockPlaceSearch(page);
     await page.goto('/');
 
     // Onboarding: what it does, which fuel, location.
     await expect(page.getByTestId('onboarding')).toBeVisible();
     await expect(page.getByText('Cheap fuel,')).toBeVisible();
     await page.getByTestId('onboarding-next').click();
-    await page.getByTestId('onboarding-fuel-E10').click();
+    await page.getByTestId('onboarding-fuel-regular').click();
     await page.getByTestId('onboarding-next').click();
     await expect(page.getByText('Find stations around you')).toBeVisible();
     await page.getByTestId('onboarding-allow').click();
 
-    // Nearby: the cheapest within 5 miles and the list.
-    await expect(page.getByTestId('nearby-screen')).toBeVisible();
-    await expect(page.getByTestId('cheapest-card')).toBeVisible();
-    await expect(page.getByText('Cheapest within 5 mi')).toBeVisible();
-    await expect(page.getByTestId('station-count')).toContainText('stations · 5 mi');
-    await expect(page.getByText(/Reported .* ago/).first()).toBeVisible();
-    await expect(page.getByTestId('report-link')).toBeVisible();
+    // Nearby: the cheapest within 8 km, tomorrow's prices and the list.
+    const nearby = page.getByTestId('nearby-screen');
+    await expect(nearby).toBeVisible();
+    await expect(nearby.getByTestId('cheapest-card')).toBeVisible();
+    await expect(nearby.getByText('Cheapest within 8 km')).toBeVisible();
+    await expect(nearby.getByTestId('fuel-chip')).toContainText('Unleaded 91');
+    await expect(nearby.getByTestId('station-count')).toContainText('stations · 8 km');
+    await expect(nearby.getByTestId('trend-notice')).toContainText('Tomorrow');
+    await expect(nearby.getByTestId('tomorrow-tag').first()).toBeVisible();
+    await expect(nearby.getByText("Today's price").first()).toBeVisible();
+    await expect(nearby.getByTestId('source-link')).toContainText('fuelwatch.wa.gov.au');
 
-    // Station page with every fuel.
-    const name = await page.getByTestId('cheapest-name').innerText();
-    await page.getByTestId('cheapest-details').click();
+    // Station page with today's and tomorrow's prices.
+    const name = await nearby.getByTestId('cheapest-name').innerText();
+    await nearby.getByTestId('cheapest-details').click();
     await expect(page.getByTestId('station-screen')).toBeVisible();
     await expect(page.getByTestId('station-name')).toHaveText(name);
-    await expect(page.getByTestId('price-board')).toContainText('Unleaded');
-    await expect(page.getByTestId('station-report')).toBeVisible();
+    await expect(page.getByTestId('price-board')).toContainText('Unleaded 91');
+    await expect(page.getByTestId('price-board')).toContainText('Tomorrow');
+    await expect(page.getByTestId('station-source')).toBeVisible();
     await page.getByTestId('header-dismiss').click();
 
     // Switch fuel from the chip.
-    await page.getByTestId('nearby-screen').getByTestId('fuel-chip').click();
-    await page.getByTestId('fuel-sheet-B7').click();
-    await expect(page.getByTestId('nearby-screen').getByTestId('fuel-chip')).toContainText('Diesel');
-    await expect(page.getByTestId('cheapest-card')).toBeVisible();
+    await nearby.getByTestId('fuel-chip').click();
+    await page.getByTestId('fuel-sheet-diesel').click();
+    await expect(nearby.getByTestId('fuel-chip')).toContainText('Diesel');
+    await expect(nearby.getByTestId('cheapest-card')).toBeVisible();
 
     // Map tab: pins and the card for the cheapest.
     await page.getByRole('tab', { name: 'Map' }).click();
@@ -64,34 +57,38 @@ test.describe('Pumpwise smoke', () => {
     await expect(page.getByTestId('map-card')).toBeVisible();
     const pins = page.locator('[data-testid^="map-pin-"]');
     expect(await pins.count()).toBeGreaterThan(3);
-    await pins.nth(2).click();
-    await expect(page.getByTestId('map-card')).toContainText('Selected station');
+    // Pins can overlap; the last one drawn is on top, so it can always be tapped.
+    const target = pins.last();
+    const label = ((await target.getAttribute('aria-label')) ?? '').replace(/ pin$/, '');
+    await target.click();
+    await expect(page.getByTestId('map-card-name')).toHaveText(label);
 
-    // Settings: dark mode, then search around a postcode.
+    // Settings: WA units, dark mode, then search around Fremantle.
     await page.getByRole('tab', { name: 'Settings' }).click();
     await expect(page.getByTestId('settings-screen')).toBeVisible();
+    await expect(page.getByText('Showing Western Australia fuels and units.')).toBeVisible();
+    await page.getByTestId('settings-economy-10').click();
     await page.getByTestId('theme-dark').click();
     await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(10, 15, 21)');
     await page.getByTestId('theme-light').click();
     await expect(page.getByTestId('settings-screen')).toHaveCSS('background-color', 'rgb(244, 241, 234)');
     await page.getByTestId('settings-place').click();
     await expect(page.getByTestId('place-screen')).toBeVisible();
-    await page.getByTestId('place-search').fill('LS1 4AP');
-    await page.getByTestId('place-result-LS1 4AP').click();
+    await page.getByTestId('city-Fremantle').click();
 
     await page.getByRole('tab', { name: 'Nearby' }).click();
-    const nearby = page.getByTestId('nearby-screen');
-    await expect(nearby.getByTestId('place-chip')).toContainText('LS1 4AP');
+    await expect(nearby.getByTestId('place-chip')).toContainText('Fremantle');
     await expect(nearby.getByTestId('cheapest-card')).toBeVisible();
 
-    // Settings survive a reload; onboarding is not shown again.
-    await page.reload();
+    // Settings survive a fresh start; onboarding is not shown again. (Let the tab switch finish first.)
+    await page.waitForLoadState('networkidle');
+    await page.goto('/');
     await expect(page.getByTestId('onboarding')).toHaveCount(0);
     await expect(nearby.getByTestId('fuel-chip')).toContainText('Diesel');
-    await expect(nearby.getByTestId('place-chip')).toContainText('LS1 4AP');
+    await expect(nearby.getByTestId('place-chip')).toContainText('Fremantle');
   });
 
-  test('legal pages open from settings', async ({ page }) => {
+  test('legal and about pages open from settings', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('onboarding-skip').click();
     await page.getByRole('tab', { name: 'Settings' }).click();
@@ -101,7 +98,22 @@ test.describe('Pumpwise smoke', () => {
     await page.getByTestId('header-dismiss').click();
     await page.getByTestId('settings-about').click();
     await expect(page.getByTestId('about-screen')).toBeVisible();
-    await expect(page.getByTestId('about-feed')).toContainText('54 forecourts');
+    await expect(page.getByTestId('about-feed')).toContainText('100 stations');
+    await expect(page.getByTestId('about-source-wa')).toContainText('fuelwatch.wa.gov.au');
+  });
+});
+
+test.describe('elsewhere', () => {
+  test.use({ geolocation: { latitude: 40.7128, longitude: -74.006 }, permissions: ['geolocation'] });
+
+  test('outside the covered regions: look around Perth', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('onboarding-skip').click();
+    // The browser already allows location here, so the app goes straight to the search.
+    await expect(page.getByTestId('nearby-screen').getByTestId('state-not-covered')).toBeVisible();
+    await expect(page.getByText('Pumpwise covers Western Australia')).toBeVisible();
+    await page.getByTestId('nearby-screen').getByTestId('try-city').click();
+    await expect(page.getByTestId('nearby-screen').getByTestId('cheapest-card')).toBeVisible();
   });
 });
 
@@ -111,12 +123,10 @@ test.describe('without location', () => {
   test('location blocked: pick a city instead', async ({ page }) => {
     await page.goto('/');
     await page.getByTestId('onboarding-skip').click();
-    // The browser denies location, so the app offers a place instead.
-    const allow = page.getByTestId('allow-location');
-    const denied = page.getByTestId('state-denied');
-    await expect(allow.or(denied)).toBeVisible();
-    await page.getByTestId('choose-place').click();
-    await page.getByTestId('city-London').click();
-    await expect(page.getByTestId('cheapest-card')).toBeVisible();
+    const nearby = page.getByTestId('nearby-screen');
+    await expect(nearby.getByTestId('allow-location').or(nearby.getByTestId('state-denied'))).toBeVisible();
+    await nearby.getByTestId('choose-place').click();
+    await page.getByTestId('city-Perth').click();
+    await expect(nearby.getByTestId('cheapest-card')).toBeVisible();
   });
 });

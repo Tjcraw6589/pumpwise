@@ -1,24 +1,16 @@
 /**
- * Opening hours, worked out in UK time (GMT in winter, BST in summer) whatever time zone the
- * phone is set to, because forecourts publish their hours in UK local time.
+ * Opening hours in the station's own local time, whatever time zone the phone is set to.
+ * Each region supplies its UTC offset (Perth is always +8; the UK is +0 or +1 in summer).
  */
 
-/** Last Sunday of a month at 01:00 UTC, when the UK clocks change. */
-function lastSundayUtc(year: number, monthIndex: number): number {
-  const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0, 1));
-  return lastDay.getTime() - lastDay.getUTCDay() * 86_400_000;
-}
-
-export function isBritishSummerTime(date: Date): boolean {
-  const year = date.getUTCFullYear();
-  const t = date.getTime();
-  return t >= lastSundayUtc(year, 2) && t < lastSundayUtc(year, 9);
-}
-
-/** Day of week (0 = Monday) and minutes past midnight in the UK. */
-export function ukClock(date: Date): { day: number; minutes: number } {
-  const local = new Date(date.getTime() + (isBritishSummerTime(date) ? 3_600_000 : 0));
-  return { day: (local.getUTCDay() + 6) % 7, minutes: local.getUTCHours() * 60 + local.getUTCMinutes() };
+/** Day of week (0 = Monday) and minutes past midnight at a UTC offset. */
+export function localClock(date: Date, offsetMinutes: number): { day: number; minutes: number; dateKey: string } {
+  const local = new Date(date.getTime() + offsetMinutes * 60_000);
+  return {
+    day: (local.getUTCDay() + 6) % 7,
+    minutes: local.getUTCHours() * 60 + local.getUTCMinutes(),
+    dateKey: local.toISOString().slice(0, 10),
+  };
 }
 
 interface Span {
@@ -50,9 +42,24 @@ export interface OpenState {
   label: string;
 }
 
-export function openState(hours: string[] | null, date: Date): OpenState {
+const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+function nextOpening(hours: string[], today: number): string {
+  for (let offset = 1; offset <= 7; offset++) {
+    const index = (today + offset) % 7;
+    const day = parseDay(hours[index]);
+    if (day === null) return 'Closed now';
+    if (day === 'closed') continue;
+    const when = offset === 1 ? 'tomorrow' : DAY_NAMES[index];
+    if (day === '24h') return `Closed · opens ${when}`;
+    return `Closed · opens ${when} ${formatClock(day.open)}`;
+  }
+  return 'Closed';
+}
+
+export function openState(hours: string[] | null, date: Date, offsetMinutes: number): OpenState {
   if (!hours) return { status: 'unknown', label: '' };
-  const { day, minutes } = ukClock(date);
+  const { day, minutes } = localClock(date, offsetMinutes);
   const today = parseDay(hours[day]);
   const yesterday = parseDay(hours[(day + 6) % 7]);
 
@@ -69,21 +76,6 @@ export function openState(hours: string[] | null, date: Date): OpenState {
   if (open) return { status: 'open', label: `Open until ${formatClock(today.close)}` };
   if (minutes < today.open) return { status: 'closed', label: `Closed · opens ${formatClock(today.open)}` };
   return { status: 'closed', label: nextOpening(hours, day) };
-}
-
-const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-function nextOpening(hours: string[], today: number): string {
-  for (let offset = 1; offset <= 7; offset++) {
-    const index = (today + offset) % 7;
-    const day = parseDay(hours[index]);
-    if (day === null) return 'Closed now';
-    if (day === 'closed') continue;
-    const when = offset === 1 ? 'tomorrow' : DAY_NAMES[index];
-    if (day === '24h') return `Closed · opens ${when}`;
-    return `Closed · opens ${when} ${formatClock(day.open)}`;
-  }
-  return 'Closed';
 }
 
 /** Rows for the station screen: "Monday" → "06:00–22:00". */

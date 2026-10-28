@@ -38,9 +38,9 @@ jest.mock('expo-haptics', () => ({
   NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
 
-// Location: granted by default, at Westminster. Tests change these mocks to cover other states.
+// Location: granted by default, in central Perth. Tests change these mocks to cover other states.
 jest.mock('expo-location', () => {
-  const position = { coords: { latitude: 51.5072, longitude: -0.1276, accuracy: 20 }, timestamp: 0 };
+  const position = { coords: { latitude: -31.9523, longitude: 115.8613, accuracy: 20 }, timestamp: 0 };
   return {
     Accuracy: { Balanced: 3, High: 4 },
     getForegroundPermissionsAsync: jest.fn(async () => ({ granted: true, status: 'granted', canAskAgain: true })),
@@ -48,7 +48,19 @@ jest.mock('expo-location', () => {
     getCurrentPositionAsync: jest.fn(async () => position),
     getLastKnownPositionAsync: jest.fn(async () => position),
     watchPositionAsync: jest.fn(async () => ({ remove: jest.fn() })),
-    reverseGeocodeAsync: jest.fn(async () => [{ district: 'Westminster', city: 'London' }]),
+    // Apple's geocoder: a couple of WA places, and a same-named town in another country.
+    geocodeAsync: jest.fn(async (query: string) => {
+      if (/cannington/i.test(query)) return [{ latitude: -32.0167, longitude: 115.9333 }];
+      if (/6000/.test(query)) return [{ latitude: -31.9535, longitude: 115.857 }];
+      if (/^perth$/i.test(query)) return [{ latitude: 56.395, longitude: -3.43 }];
+      if (/perth, western australia/i.test(query)) return [{ latitude: -31.9523, longitude: 115.8613 }];
+      return [];
+    }),
+    reverseGeocodeAsync: jest.fn(async ({ latitude }: { latitude: number }) => {
+      if (latitude < -32) return [{ district: 'Cannington', city: 'Perth', region: 'WA' }];
+      if (latitude < 0) return [{ district: 'Perth', city: 'Perth', region: 'WA' }];
+      return [{ district: 'Westminster', city: 'London', region: 'England' }];
+    }),
   };
 });
 

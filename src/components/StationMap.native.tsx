@@ -10,24 +10,23 @@ import type { StationMapProps } from './StationMap.types';
 
 export type { StationMapProps } from './StationMap.types';
 
-const METRES_PER_MILE = 1609.344;
 
 /** Apple Maps with a price sign on every station in the search area. */
-export function StationMap({ center, radiusMiles, stations, band, selectedId, onSelect, showsUserLocation, recenterToken }: StationMapProps) {
+export function StationMap({ center, radiusKm, stations, band, selectedId, onSelect, showsUserLocation, recenterToken }: StationMapProps) {
   const { colors, scheme } = useTheme();
   const map = useRef<MapView>(null);
 
   useEffect(() => {
-    map.current?.animateToRegion(regionForRadius(center, radiusMiles), 450);
+    map.current?.animateToRegion(regionForRadius(center, radiusKm), 450);
     // Fly back when the area changes or the driver taps "recentre"; small GPS moves don't move the map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [radiusMiles, recenterToken, Math.round(center.lat * 50), Math.round(center.lng * 50)]);
+  }, [radiusKm, recenterToken, Math.round(center.lat * 50), Math.round(center.lng * 50)]);
 
   return (
     <MapView
       ref={map}
       style={StyleSheet.absoluteFill}
-      initialRegion={regionForRadius(center, radiusMiles)}
+      initialRegion={regionForRadius(center, radiusKm)}
       showsUserLocation={showsUserLocation}
       showsPointsOfInterests={false}
       showsCompass={false}
@@ -38,7 +37,7 @@ export function StationMap({ center, radiusMiles, stations, band, selectedId, on
     >
       <Circle
         center={{ latitude: center.lat, longitude: center.lng }}
-        radius={radiusMiles * METRES_PER_MILE}
+        radius={radiusKm * 1000}
         strokeColor={colors.mapCircle}
         fillColor={colors.mapCircleFill}
         strokeWidth={1.5}

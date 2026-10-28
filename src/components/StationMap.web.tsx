@@ -13,11 +13,11 @@ export type { StationMapProps } from './StationMap.types';
  * Web preview only (the iPhone app uses Apple Maps): stations placed by their real offsets from the
  * search centre on a plain grid, so the map screen can be checked in a browser.
  */
-export function StationMap({ center, radiusMiles, stations, band, selectedId, onSelect }: StationMapProps) {
+export function StationMap({ center, radiusKm, stations, band, selectedId, onSelect }: StationMapProps) {
   const { colors } = useTheme();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const half = Math.min(size.width, size.height) / 2;
-  const scale = half / (radiusMiles * 1.15);
+  const scale = half / (radiusKm * 1.15);
   const cos = Math.cos((center.lat * Math.PI) / 180);
 
   return (
@@ -33,11 +33,11 @@ export function StationMap({ center, radiusMiles, stations, band, selectedId, on
             pointerEvents="none"
             style={{
               position: 'absolute',
-              left: size.width / 2 - radiusMiles * scale,
-              top: size.height / 2 - radiusMiles * scale,
-              width: radiusMiles * scale * 2,
-              height: radiusMiles * scale * 2,
-              borderRadius: radiusMiles * scale,
+              left: size.width / 2 - radiusKm * scale,
+              top: size.height / 2 - radiusKm * scale,
+              width: radiusKm * scale * 2,
+              height: radiusKm * scale * 2,
+              borderRadius: radiusKm * scale,
               borderWidth: 1.5,
               borderColor: colors.mapCircle,
               backgroundColor: colors.mapCircleFill,
@@ -45,8 +45,8 @@ export function StationMap({ center, radiusMiles, stations, band, selectedId, on
           />
           <View pointerEvents="none" style={[styles.me, { left: size.width / 2 - 8, top: size.height / 2 - 8, backgroundColor: '#2F80ED' }]} />
           {stations.map((item) => {
-            const x = size.width / 2 + (item.station.lng - center.lng) * 69.172 * cos * scale;
-            const y = size.height / 2 - (item.station.lat - center.lat) * 69.0 * scale;
+            const x = size.width / 2 + (item.station.lng - center.lng) * 111.32 * cos * scale;
+            const y = size.height / 2 - (item.station.lat - center.lat) * 111.0 * scale;
             const selected = item.station.id === selectedId;
             return (
               <Pressable

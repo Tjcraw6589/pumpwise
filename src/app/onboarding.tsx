@@ -8,7 +8,7 @@ import { Button } from '@/components/Button';
 import { askForLocation } from '@/components/PhaseState';
 import { PriceSign } from '@/components/PriceSign';
 import { PumpMark } from '@/components/PumpMark';
-import { FUELS } from '@/lib/fuels';
+import { DEFAULT_REGION, REGIONS } from '@/lib/regions';
 import { selectionHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -54,20 +54,20 @@ export default function OnboardingScreen() {
               Cheap fuel,{'\n'}close by.
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.md, maxWidth: 340 }}>
-              Open Pumpwise anywhere in the UK and see the nearest station and the cheapest one around you, with directions in one tap.
+              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Starting with Western Australia.
             </AppText>
             <View style={[styles.signs, { marginTop: spacing.xl, gap: spacing.md }]}>
               <View style={styles.center}>
-                <PriceSign pence={139.9} size="lg" tone="cheap" label="CHEAPEST" />
+                <PriceSign pence={189.9} size="lg" tone="cheap" label="CHEAPEST" />
               </View>
               <View style={styles.center}>
-                <PriceSign pence={146.9} size="lg" label="NEAREST" />
+                <PriceSign pence={204.5} size="lg" label="NEAREST" />
               </View>
             </View>
             <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.xl }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                Official prices from the UK Government Fuel Finder scheme. By law, forecourts report every change within 30 minutes.
+                Official government prices. In WA every station&apos;s price is fixed for the day, and tomorrow&apos;s are out by 2:30pm.
               </AppText>
             </View>
           </View>
@@ -79,17 +79,17 @@ export default function OnboardingScreen() {
             <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm, marginBottom: spacing.lg }}>
               You can switch any time from the top of the screen.
             </AppText>
-            {FUELS.filter((f) => f.common).map((f) => {
-              const selected = f.code === fuel;
+            {REGIONS[DEFAULT_REGION].fuels.filter((f) => f.common).map((f) => {
+              const selected = f.kind === fuel;
               return (
                 <Pressable
-                  key={f.code}
+                  key={f.kind}
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
-                  testID={`onboarding-fuel-${f.code}`}
+                  testID={`onboarding-fuel-${f.kind}`}
                   onPress={() => {
                     selectionHaptic();
-                    updateSettings({ fuel: f.code });
+                    updateSettings({ fuel: f.kind });
                   }}
                   style={[
                     styles.fuel,

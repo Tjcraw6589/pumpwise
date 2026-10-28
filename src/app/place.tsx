@@ -7,9 +7,12 @@ import { AppText } from '@/components/AppText';
 import { Header } from '@/components/Header';
 import { askForLocation } from '@/components/PhaseState';
 import { Screen } from '@/components/Screen';
-import { CITY_PRESETS, classifyQuery, type Place } from '@/lib/places';
+import { useCoverage } from '@/hooks/useRegion';
+import type { RegionId } from '@/lib/feed';
+import { classifyQuery, type Place } from '@/lib/places';
+import { regionList } from '@/lib/regions';
 import { openAppSettings } from '@/services/location';
-import { searchPlaces } from '@/services/placeSearch';
+import { citiesFor, searchPlaces } from '@/services/placeSearch';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -46,6 +49,8 @@ export default function PlaceScreen() {
   const followMyLocation = useStore((s) => s.followMyLocation);
   const permission = useLive((s) => s.permission);
   const canAskAgain = useLive((s) => s.canAskAgain);
+  const coverage = useCoverage();
+  const liveKey = coverage.live.join(',');
   const [query, setQuery] = useState('');
   // Results belong to the query they were found for, so stale results never show for new text.
   const [search, setSearch] = useState<{ query: string; results: Place[]; status: 'searching' | 'done' | 'error' } | null>(null);
@@ -58,7 +63,7 @@ export default function PlaceScreen() {
     const text = query;
     const timer = setTimeout(() => {
       setSearch({ query: text, results: [], status: 'searching' });
-      searchPlaces(text)
+      searchPlaces(text, liveKey.split(',') as RegionId[])
         .then((results) => {
           if (ticket === latest.current) setSearch({ query: text, results, status: 'done' });
         })
@@ -67,7 +72,7 @@ export default function PlaceScreen() {
         });
     }, 350);
     return () => clearTimeout(timer);
-  }, [query, searchable]);
+  }, [query, searchable, liveKey]);
 
   const current = search && search.query === query ? search : null;
   const results = current?.results ?? [];
@@ -100,14 +105,14 @@ export default function PlaceScreen() {
         <TextInput
           value={query}
           onChangeText={setQuery}
-          placeholder="Town or postcode"
+          placeholder="Suburb, town or postcode"
           placeholderTextColor={colors.textFaint}
           autoCapitalize="words"
           autoCorrect={false}
           returnKeyType="search"
           style={[styles.input, { color: colors.text, marginLeft: spacing.sm }]}
           testID="place-search"
-          accessibilityLabel="Town or postcode"
+          accessibilityLabel="Suburb, town or postcode"
         />
         {status === 'searching' ? <ActivityIndicator color={colors.textMuted} /> : null}
       </View>
@@ -119,7 +124,7 @@ export default function PlaceScreen() {
           ))}
           {status === 'done' && results.length === 0 ? (
             <AppText variant="body" tone="muted" style={{ paddingVertical: spacing.md }}>
-              No UK town or postcode matches “{query.trim()}”.
+              Nothing in {regionList(coverage.live)} matches “{query.trim()}”.
             </AppText>
           ) : null}
           {status === 'error' ? (
@@ -171,12 +176,12 @@ export default function PlaceScreen() {
         <AppText variant="overline" tone="muted">
           Cities
         </AppText>
-        {CITY_PRESETS.map((place) => (
+        {citiesFor(coverage.live).map((place) => (
           <PlaceRow key={place.name} place={place} icon="business-outline" onPress={() => pick(place)} testID={`city-${place.name}`} />
         ))}
       </View>
       <AppText variant="caption" tone="faint" style={{ marginTop: spacing.lg }}>
-        Town and postcode search uses postcodes.io, built on Ordnance Survey and ONS open data. Only what you type is sent.
+        Search uses Apple&apos;s map service (and postcodes.io for UK postcodes). Only what you type is sent.
       </AppText>
     </Screen>
   );

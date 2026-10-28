@@ -1,6 +1,6 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
-import { formatPence } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -9,6 +9,7 @@ export type SignTone = 'cheap' | 'normal' | 'muted';
 export type SignSize = 'xl' | 'lg' | 'md' | 'sm';
 
 interface PriceSignProps {
+  /** Price per litre in pence or cents. */
   pence: number;
   tone?: SignTone;
   size?: SignSize;
@@ -32,13 +33,13 @@ const SIZES: Record<SignSize, { digits: number; tenth: number; padH: number; pad
 export function PriceSign({ pence, tone = 'normal', size = 'md', label, style, testID }: PriceSignProps) {
   const { colors, fonts, radius } = useTheme();
   const s = SIZES[size];
-  const [whole, tenth] = formatPence(pence).split('.');
+  const [whole, tenth] = formatPrice(pence).split('.');
   const digitColor = tone === 'cheap' ? colors.signCheap : tone === 'muted' ? colors.signLabel : colors.signDigits;
   return (
     <View
       testID={testID}
       accessible
-      accessibilityLabel={`${formatPence(pence)} pence per litre`}
+      accessibilityLabel={`${formatPrice(pence)} per litre`}
       style={[
         styles.panel,
         {

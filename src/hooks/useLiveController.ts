@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 
-import { isInUK } from '@/lib/feed';
-import { distanceMiles, type LatLng } from '@/lib/geo';
+import { regionAt } from '@/lib/feed';
+import { distanceKm, type LatLng } from '@/lib/geo';
 import { needsReload } from '@/lib/nearby';
 import { FeedError, loadArea } from '@/services/feedClient';
 import { areaNameFor, checkPermission, currentPosition, watchPosition } from '@/services/location';
@@ -20,12 +20,12 @@ export function useSearchCenter(): LatLng | null {
 
 /**
  * Keeps location and prices up to date while the app is open: follows the phone as it moves,
- * re-downloads prices when the driver has moved a couple of miles or every five minutes, and
+ * re-downloads prices when the driver has moved a few kilometres or every five minutes, and
  * checks again whenever the app comes back to the foreground. Mounted once, under the tabs.
  */
 export function useLiveController(): void {
   const mode = useStore((s) => s.settings.locationMode);
-  const radiusMiles = useStore((s) => s.settings.radiusMiles);
+  const radiusKm = useStore((s) => s.settings.radiusKm);
   const permission = useLive((s) => s.permission);
   const refreshToken = useLive((s) => s.refreshToken);
   const center = useSearchCenter();
@@ -83,20 +83,20 @@ export function useLiveController(): void {
       namedFor.current = place;
       return;
     }
-    if (namedFor.current && distanceMiles(namedFor.current, center) < 0.5) return;
+    if (namedFor.current && distanceKm(namedFor.current, center) < 0.8) return;
     namedFor.current = center;
     void areaNameFor(center).then((name) => useLive.getState().set({ areaName: name }));
   }, [center, mode, place]);
 
   const load = useCallback(async (target: LatLng, radius: number, force: boolean) => {
     const live = useLive.getState();
-    // Nothing to download outside the UK; the screen offers UK places instead.
-    if (loading.current || !isInUK(target.lat, target.lng)) return;
+    // Nothing to download outside the regions Pumpwise covers; the screen offers places that are.
+    if (loading.current || !regionAt(target.lat, target.lng)) return;
     if (!force && !needsReload(live.loadedFor, live.loadedAt, target, radius, Date.now())) return;
     loading.current = true;
     // Prices for somewhere far away (a different city) are no use here: show the loading cards
     // instead of a misleading "nothing nearby" while the new area downloads.
-    const sameArea = live.loadedFor !== null && distanceMiles(live.loadedFor, target) < 10;
+    const sameArea = live.loadedFor !== null && distanceKm(live.loadedFor, target) < 15;
     const hasData = live.stations.length > 0 && sameArea;
     live.set(hasData ? { refreshing: true } : { feedStatus: 'loading', stations: [], refreshing: true });
     try {
@@ -104,9 +104,9 @@ export function useLiveController(): void {
       useLive.getState().set({
         meta,
         stations,
-        feedStatus: meta.status === 'live' ? 'ready' : 'not-live',
+        feedStatus: 'ready',
         feedError: null,
-        loadedFor: { ...target, radiusMiles: radius },
+        loadedFor: { ...target, radiusKm: radius },
         loadedAt: Date.now(),
       });
     } catch (error) {
@@ -121,21 +121,21 @@ export function useLiveController(): void {
 
   // Download when the centre moves, the area grows, or prices get old.
   useEffect(() => {
-    if (center) void load(center, radiusMiles, false);
-  }, [center, radiusMiles, load]);
+    if (center) void load(center, radiusKm, false);
+  }, [center, radiusKm, load]);
 
   // Pull to refresh and "Try again".
   useEffect(() => {
     if (refreshToken === 0) return;
     const target = centerRef.current;
-    if (target) void load(target, useStore.getState().settings.radiusMiles, true);
+    if (target) void load(target, useStore.getState().settings.radiusKm, true);
   }, [refreshToken, load]);
 
   // Check age once a minute and when returning to the app.
   useEffect(() => {
     const tick = () => {
       const target = centerRef.current;
-      if (target && AppState.currentState === 'active') void load(target, useStore.getState().settings.radiusMiles, false);
+      if (target && AppState.currentState === 'active') void load(target, useStore.getState().settings.radiusKm, false);
     };
     const timer = setInterval(tick, 60_000);
     const subscription = AppState.addEventListener('change', (next) => {

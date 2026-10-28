@@ -1,72 +1,97 @@
 import {
   buildFeed,
-  emptyMeta,
-  isInUK,
-  normalizePence,
-  normalizePrices,
-  normalizeStation,
-  parseHours,
+  cleanPrice,
+  groupIntoTiles,
+  hashId,
+  regionAt,
   TILE_DEG,
   tileKey,
   tilesForArea,
   tidyName,
 } from '@/lib/feed';
 
-import { fixtureFeed, fixtureRecords } from '../../scripts/feed/fixture-data.ts';
+import { fixtureFeed, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
+import { buildUkStations, normalizeUkPrices, normalizeUkStation, parseUkHours } from '../../scripts/feed/sources/uk.ts';
+import {
+  buildWaStations,
+  decodeEntities,
+  parseRss,
+  parseWaHours,
+  tomorrowPublished,
+  waPriceStart,
+  waTags,
+} from '../../scripts/feed/sources/wa.ts';
 
 const NOW = new Date('2026-10-28T12:00:00Z');
 
-function station(overrides: Record<string, unknown> = {}) {
-  return {
-    node_id: 'abc',
-    trading_name: 'TESCO EXTRA ST. ALBANS',
-    brand_name: 'TESCO',
-    temporary_closure: false,
-    permanent_closure: false,
-    is_motorway_service_station: false,
-    is_supermarket_service_station: true,
-    amenities: ['customer_toilets', 'car_wash', 'something_new'],
-    location: { address_line_1: '1 HIGH STREET', address_line_2: '', city: 'ST ALBANS', postcode: 'al1 1aa', latitude: '51.7520', longitude: -0.33601234 },
-    opening_times: { usual_days: { monday: { open: '06:00:00', close: '22:00:00', is_24_hours: false } } },
-    ...overrides,
-  };
-}
-
-describe('tidyName', () => {
-  test('title-cases names sent in capitals and keeps short brand codes', () => {
+describe('shared helpers', () => {
+  test('tidyName title-cases capitals and keeps short brand codes', () => {
     expect(tidyName('TESCO EXTRA ST. ALBANS')).toBe('Tesco Extra St. Albans');
     expect(tidyName('BP CONNECT M25 J10')).toBe('BP Connect M25 J10');
     expect(tidyName("SAINSBURY'S PETROL")).toBe("Sainsbury's Petrol");
     expect(tidyName("O'NEILL'S GARAGE")).toBe("O'Neill's Garage");
     expect(tidyName('ESSO (ON THE RUN)')).toBe('Esso (On The Run)');
-  });
-  test('leaves mixed case alone and squashes spaces', () => {
+    expect(tidyName('VIBE KWINANA OPT')).toBe('Vibe Kwinana OPT');
     expect(tidyName('  Esso   Kings Cross ')).toBe('Esso Kings Cross');
   });
+
+  test('cleanPrice keeps sensible prices and drops reporting mistakes', () => {
+    expect(cleanPrice(139.9, 80, 300)).toBe(139.9);
+    expect(cleanPrice('142.94', 80, 300)).toBe(142.9);
+    expect(cleanPrice(1.999, 100, 500)).toBe(199.9);
+    expect(cleanPrice(13, 80, 300)).toBeNull();
+    expect(cleanPrice(1500, 80, 300)).toBeNull();
+    expect(cleanPrice('', 80, 300)).toBeNull();
+    expect(cleanPrice(null, 80, 300)).toBeNull();
+  });
+
+  test('hashId is stable and short', () => {
+    expect(hashId('BURK MALAGA|1 HARLOND AVE|MALAGA')).toBe(hashId('BURK MALAGA|1 HARLOND AVE|MALAGA'));
+    expect(hashId('a')).not.toBe(hashId('b'));
+    expect(hashId('anything').length).toBeLessThanOrEqual(7);
+  });
+
+  test('regions by location', () => {
+    expect(regionAt(-31.95, 115.86)).toBe('wa'); // Perth
+    expect(regionAt(-17.96, 122.24)).toBe('wa'); // Broome
+    expect(regionAt(-33.87, 151.21)).toBeNull(); // Sydney: not covered yet
+    expect(regionAt(51.5, -0.12)).toBe('uk');
+    expect(regionAt(54.6, -5.93)).toBe('uk'); // Belfast
+    expect(regionAt(48.85, 2.35)).toBeNull(); // Paris
+  });
+
+  test('tiles are half-degree squares and cover every point of an area', () => {
+    expect(TILE_DEG).toBe(0.5);
+    expect(tileKey(51.5072, -0.1276)).toBe('103_-1');
+    expect(tileKey(-31.9523, 115.8613)).toBe('-64_231');
+    const center = { lat: -31.98, lng: 115.99 };
+    const keys = tilesForArea(center.lat, center.lng, 16);
+    for (const [dLat, dLng] of [
+      [0.14, 0],
+      [-0.14, 0],
+      [0, 0.16],
+      [0, -0.16],
+    ] as const) {
+      expect(keys).toContain(tileKey(center.lat + dLat, center.lng + dLng));
+    }
+  });
 });
 
-describe('parseHours', () => {
-  test('reads usual days, 24 hours and closed days', () => {
-    const hours = parseHours({
-      usual_days: {
-        monday: { open: '06:00:00', close: '22:00:00', is_24_hours: false },
-        tuesday: { is_24_hours: true },
-        wednesday: { open: '00:00:00', close: '00:00:00', is_24_hours: false },
-        thursday: { open: '07:30', close: '07:30' },
-      },
-    });
-    expect(hours).toEqual(['0600-2200', '24h', '24h', 'closed', 'unknown', 'unknown', 'unknown']);
-  });
-  test('returns null when nothing usable is given', () => {
-    expect(parseHours(undefined)).toBeNull();
-    expect(parseHours({ usual_days: { monday: { open: 'later' } } })).toBeNull();
-  });
-});
+describe('UK source', () => {
+  const record = {
+    node_id: 'abc',
+    trading_name: 'TESCO EXTRA ST. ALBANS',
+    brand_name: 'TESCO',
+    is_supermarket_service_station: true,
+    amenities: ['customer_toilets', 'car_wash', 'something_new'],
+    location: { address_line_1: '1 HIGH STREET', city: 'ST ALBANS', postcode: 'al1 1aa', latitude: '51.7520', longitude: -0.33601234 },
+    opening_times: { usual_days: { monday: { open: '06:00:00', close: '22:00:00', is_24_hours: false } } },
+  };
 
-describe('normalizeStation', () => {
-  test('tidies a forecourt record', () => {
-    expect(normalizeStation(station())).toEqual({
-      id: 'abc',
+  test('reads a forecourt', () => {
+    expect(normalizeUkStation(record)).toMatchObject({
+      id: 'uk-abc',
+      region: 'uk',
       name: 'Tesco Extra St. Albans',
       brand: 'Tesco',
       address: '1 High Street',
@@ -74,41 +99,28 @@ describe('normalizeStation', () => {
       postcode: 'AL1 1AA',
       lat: 51.752,
       lng: -0.33601,
-      hours: ['0600-2200', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown', 'unknown'],
       tags: ['supermarket', 'toilets', 'car-wash'],
     });
+    expect(normalizeUkStation({ ...record, permanent_closure: true })).toBeNull();
+    expect(normalizeUkStation({ ...record, location: { latitude: 48.5, longitude: -5.5 } })).toBeNull();
   });
-  test('drops closed sites, missing ids and locations outside the UK', () => {
-    expect(normalizeStation(station({ permanent_closure: true }))).toBeNull();
-    expect(normalizeStation(station({ temporary_closure: true }))).toBeNull();
-    expect(normalizeStation(station({ node_id: '' }))).toBeNull();
-    expect(normalizeStation(station({ location: { latitude: 48.5, longitude: -5.5 } }))).toBeNull();
-    expect(normalizeStation(station({ location: { latitude: 'x', longitude: 1 } }))).toBeNull();
-    expect(normalizeStation('nonsense')).toBeNull();
-  });
-  test('falls back to the brand when there is no trading name', () => {
-    expect(normalizeStation(station({ trading_name: '' }))?.name).toBe('Tesco');
-  });
-});
 
-describe('normalizePence', () => {
-  test('accepts pence and pounds, numbers and strings', () => {
-    expect(normalizePence(139.9)).toBe(139.9);
-    expect(normalizePence('142.94')).toBe(142.9);
-    expect(normalizePence(1.399)).toBe(139.9);
+  test('reads opening hours', () => {
+    expect(
+      parseUkHours({
+        usual_days: {
+          monday: { open: '06:00:00', close: '22:00:00' },
+          tuesday: { is_24_hours: true },
+          wednesday: { open: '00:00:00', close: '00:00:00' },
+          thursday: { open: '07:30', close: '07:30' },
+        },
+      }),
+    ).toEqual(['0600-2200', '24h', '24h', 'closed', 'unknown', 'unknown', 'unknown']);
+    expect(parseUkHours(undefined)).toBeNull();
   });
-  test('rejects reporting mistakes', () => {
-    expect(normalizePence(13)).toBeNull();
-    expect(normalizePence(1500)).toBeNull();
-    expect(normalizePence(0)).toBeNull();
-    expect(normalizePence('')).toBeNull();
-    expect(normalizePence(null)).toBeNull();
-  });
-});
 
-describe('normalizePrices', () => {
-  test('maps fuel types to pump codes and keeps the newest of each', () => {
-    const result = normalizePrices(
+  test('maps fuel types to fuel kinds and keeps the newest price', () => {
+    const result = normalizeUkPrices(
       {
         node_id: 'abc',
         fuel_prices: [
@@ -116,80 +128,121 @@ describe('normalizePrices', () => {
           { fuel_type: 'E10', price: 138.9, price_last_updated: '2026-10-28T11:00:00Z' },
           { fuel_type: 'B7_STANDARD', price: '145.9', price_last_updated: '2026-10-27T09:00:00Z' },
           { fuel_type: 'B7_PREMIUM', price: 159.9, price_change_effective_timestamp: '2026-10-27T09:00:00Z' },
-          { fuel_type: 'LPG', price: 89.9, price_last_updated: '2026-10-27T09:00:00Z' },
           { fuel_type: 'E5', price: 13, price_last_updated: '2026-10-27T09:00:00Z' },
-          { fuel_type: 'HVO', price: 170, price_last_updated: 'not a date' },
+          { fuel_type: 'HVO', price: 170, price_last_updated: '2027-01-01T00:00:00Z' },
         ],
       },
       NOW,
     );
-    expect(result).toEqual({
-      id: 'abc',
-      prices: {
-        E10: { p: 138.9, at: '2026-10-28T11:00:00.000Z' },
-        B7: { p: 145.9, at: '2026-10-27T09:00:00.000Z' },
-        SDV: { p: 159.9, at: '2026-10-27T09:00:00.000Z' },
-      },
+    expect(result?.prices).toEqual({
+      regular: { p: 138.9, at: '2026-10-28T11:00:00.000Z' },
+      diesel: { p: 145.9, at: '2026-10-27T09:00:00.000Z' },
+      'premium-diesel': { p: 159.9, at: '2026-10-27T09:00:00.000Z' },
+      hvo: { p: 170, at: NOW.toISOString() },
     });
   });
-  test('treats a time in the future as now', () => {
-    const result = normalizePrices({ node_id: 'x', fuel_prices: [{ fuel_type: 'E10', price: 140, price_last_updated: '2027-01-01T00:00:00Z' }] }, NOW);
-    expect(result?.prices.E10?.at).toBe(NOW.toISOString());
-  });
-  test('ignores records without an id or price list', () => {
-    expect(normalizePrices({ fuel_prices: [] }, NOW)).toBeNull();
-    expect(normalizePrices({ node_id: 'x' }, NOW)).toBeNull();
+
+  test('joins forecourts and prices, rejecting bad records', () => {
+    const { stations, prices } = ukFixtureRecords(NOW);
+    const built = buildUkStations(stations, prices, NOW);
+    expect(built).toHaveLength(54);
+    expect(built.find((s) => s.id === 'uk-fixture-closed')).toBeUndefined();
+    expect(built.find((s) => s.id === 'uk-fixture-001')?.prices.premium).toBeUndefined();
+    expect(buildUkStations(stations, [], NOW)).toHaveLength(0);
   });
 });
 
-describe('tiles', () => {
-  test('tile keys are half-degree squares', () => {
-    expect(TILE_DEG).toBe(0.5);
-    expect(tileKey(51.5072, -0.1276)).toBe('103_-1');
-    expect(tileKey(53.8008, -1.5491)).toBe('107_-4');
+describe('WA source (FuelWatch RSS)', () => {
+  test('parses items and decodes entities', () => {
+    const items = parseRss(waFixtureRss(1, 'today', NOW));
+    expect(items.length).toBeGreaterThan(40);
+    expect(items[0]).toMatchObject({ brand: expect.any(String), tradingName: expect.any(String), date: waPriceDate(NOW) });
+    expect(decodeEntities('Fish &amp; Chips &#39;n&#x27; more &lt;3')).toBe("Fish & Chips 'n' more <3");
+    expect(decodeEntities('<![CDATA[A & B]]>')).toBe('A & B');
   });
-  test('the tiles for an area cover every point inside it', () => {
-    const center = { lat: 51.49, lng: -0.01 };
-    const keys = tilesForArea(center.lat, center.lng, 10);
-    for (const [dLat, dLng] of [
-      [0.14, 0],
-      [-0.14, 0],
-      [0, 0.23],
-      [0, -0.23],
-    ] as const) {
-      expect(keys).toContain(tileKey(center.lat + dLat, center.lng + dLng));
-    }
+
+  test('reads opening hours in each FuelWatch style', () => {
+    expect(parseWaHours('Open 24 hours')).toEqual(Array(7).fill('24h'));
+    expect(parseWaHours('Open Mon-Fri: 05:30-21:00, Sat: 06:00-21:00, Sun: -')).toEqual([
+      '0530-2100',
+      '0530-2100',
+      '0530-2100',
+      '0530-2100',
+      '0530-2100',
+      '0600-2100',
+      'closed',
+    ]);
+    expect(parseWaHours('Open Mon: 06:00-20:30, Tue: 06:00-20:30, Wed: 06:00-20:30, Thu: 06:00-20:30, Fri: 06:00-20:30, Sat: 07:00-19:00, Sun: 07:00-19:00, Toilets ATM')?.[6]).toBe('0700-1900');
+    expect(parseWaHours('Fuel Cards ATM EFTPOS')).toBeNull();
+    expect(parseWaHours('')).toBeNull();
   });
-  test('UK bounds include Shetland and Belfast but not France', () => {
-    expect(isInUK(60.15, -1.15)).toBe(true);
-    expect(isInUK(54.6, -5.93)).toBe(true);
-    expect(isInUK(48.85, 2.35)).toBe(false);
+
+  test('turns restrictions and features into tags', () => {
+    expect(waTags('Toilets Carwash Pumped AdBlue Air ATM Truck Friendly', 'Membership Required;')).toEqual([
+      'members-only',
+      'toilets',
+      'car-wash',
+      'adblue',
+      'air',
+      'atm',
+      'truck',
+    ]);
+    expect(waTags('', 'Unmanned site (credit card charges may apply); Entry Permit Required; Low Aromatic Fuel')).toEqual([
+      'permit-required',
+      'unmanned',
+      'low-aromatic',
+    ]);
+  });
+
+  test('a daily price starts at 6am Perth time', () => {
+    expect(waPriceStart('2026-10-29')).toBe('2026-10-28T22:00:00.000Z');
+    expect(waPriceStart('29/10/2026')).toBeNull();
+  });
+
+  test("tomorrow's prices come out at 2:30pm Perth time", () => {
+    expect(tomorrowPublished(new Date('2026-10-29T06:29:00Z'))).toBe(false); // 14:29 in Perth
+    expect(tomorrowPublished(new Date('2026-10-29T06:30:00Z'))).toBe(true);
+    expect(tomorrowPublished(new Date('2026-10-29T15:59:00Z'))).toBe(true); // 23:59
+    expect(tomorrowPublished(new Date('2026-10-29T16:00:00Z'))).toBe(false); // midnight
+  });
+
+  test('joins products into stations with tomorrow prices', () => {
+    const { today, tomorrow } = waFixtureFeeds(NOW);
+    const stations = buildWaStations(today, tomorrow);
+    expect(stations).toHaveLength(46);
+    const first = stations[0];
+    expect(first?.id).toMatch(/^wa-/);
+    expect(first?.region).toBe('wa');
+    expect(Object.keys(first?.prices ?? {})).toEqual(expect.arrayContaining(['regular', 'premium', 'super', 'diesel']));
+    expect(first?.tomorrow?.regular).toBeDefined();
+    // Same id every time for the same station.
+    expect(buildWaStations(today, [])[0]?.id).toBe(first?.id);
+    expect(stations.find((s) => s.tags.includes('members-only'))?.name).toBe('Bulk Club Perth Airport');
+    // "Independent" is not shown as a brand.
+    expect(stations.find((s) => s.name === 'Desert Roadhouse')?.brand).toBe('');
+    expect(buildWaStations(today, [])[0]?.tomorrow).toBeUndefined();
   });
 });
 
 describe('buildFeed', () => {
-  test('joins forecourts with prices, groups them in tiles and rejects bad records', () => {
+  test('groups every region into tiles with a status for each', () => {
     const feed = fixtureFeed(NOW);
-    expect(feed.meta.status).toBe('live');
-    expect(feed.meta.stationCount).toBe(54);
-    expect(feed.meta.generatedAt).toBe(NOW.toISOString());
-    const all = feed.tiles.flatMap((t) => t.stations);
-    expect(all).toHaveLength(54);
-    expect(all.find((s) => s.id === 'fixture-closed')).toBeUndefined();
-    expect(all.find((s) => s.id === 'fixture-sea')).toBeUndefined();
-    // The 13p super unleaded mistake for fixture-001 is dropped, not merged.
-    const first = all.find((s) => s.id === 'fixture-001');
-    expect(first?.prices.E5).toBeUndefined();
+    expect(feed.meta.v).toBe(2);
+    expect(feed.meta.stationCount).toBe(100);
+    expect(feed.meta.regions.wa).toMatchObject({ status: 'live', stationCount: 46, tomorrow: true });
+    expect(feed.meta.regions.uk).toMatchObject({ status: 'live', stationCount: 54, tomorrow: false });
     for (const tile of feed.tiles) {
       expect(feed.meta.tiles[tile.tile]).toBe(tile.stations.length);
       for (const s of tile.stations) expect(tileKey(s.lat, s.lng)).toBe(tile.tile);
     }
   });
-  test('leaves out forecourts with no valid price', () => {
-    const { stations } = fixtureRecords(NOW);
-    expect(buildFeed(stations, [], NOW).meta.stationCount).toBe(0);
-  });
-  test('an empty feed says it is waiting for credentials', () => {
-    expect(emptyMeta(NOW)).toMatchObject({ status: 'awaiting-credentials', stationCount: 0, tiles: {} });
+
+  test('drops duplicates and stations without prices', () => {
+    const { today } = waFixtureFeeds(NOW);
+    const wa = buildWaStations(today, []);
+    const noPrice = { ...(wa[0] as (typeof wa)[number]), id: 'wa-empty', prices: {} };
+    const tiled = groupIntoTiles([...wa, ...wa, noPrice], NOW.toISOString());
+    expect(tiled.stationCount).toBe(wa.length);
+    expect(buildFeed([], {}, NOW).meta.stationCount).toBe(0);
   });
 });

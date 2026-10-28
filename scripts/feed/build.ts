@@ -1,105 +1,73 @@
-// Builds the public Pumpwise price feed from the UK Government Fuel Finder API and writes the
-// whole GitHub Pages site (legal pages + data) to out/site.
+// Builds the public Pumpwise price feed from every country's free official source and writes the
+// whole GitHub Pages site (landing page, legal pages and data) to out/site.
 //
-// GitHub runs this every 15 minutes (.github/workflows/feed.yml). To run it by hand:
-//   FUEL_FINDER_CLIENT_ID=... FUEL_FINDER_CLIENT_SECRET=... npm run feed
-// Without the two keys it still writes the site, with an empty feed marked "awaiting-credentials".
+// GitHub runs this every 15 minutes (.github/workflows/feed.yml). By hand: `npm run feed`.
+// Each source refreshes on its own schedule. When a source is not due, or fails, its previous
+// prices are carried over from the live site, so one bad source never wipes the others.
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildFeed, emptyMeta, type BuiltFeed, type FeedMeta } from '../../src/lib/feed.ts';
+import { buildFeed, type FeedMeta, type FeedStation, type FeedTile, FEED_VERSION, type RegionId, type RegionStatus } from '../../src/lib/feed.ts';
+import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
+import { fetchWa, WA_MIN_STATIONS } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = process.env.FEED_OUT_DIR ?? join(root, 'out', 'site');
-const BASE = (process.env.FUEL_FINDER_BASE_URL ?? 'https://www.fuel-finder.service.gov.uk').replace(/\/$/, '');
-const USER_AGENT = 'Pumpwise-feed/1.0 (+https://tjcraw6589.github.io/pumpwise/)';
-/** Requests are spaced out and sent one at a time, well inside the API's 60-a-minute limit. */
-const MIN_GAP_MS = 1100;
-const BATCH_SIZE = 500;
-const MAX_BATCHES = 100;
-/** Fewer forecourts than this means something broke upstream: fail and keep the last good feed online. */
-const MIN_STATIONS = 1000;
+const PUBLIC_FEED = (process.env.FEED_PUBLIC_URL ?? 'https://tjcraw6589.github.io/pumpwise/data/v2').replace(/\/$/, '');
+const FORCE = process.env.FEED_FORCE === '1';
 
-let lastRequestAt = 0;
-
-async function pause(ms: number): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, ms));
+interface Source {
+  id: RegionId;
+  /** Minutes between real fetches; in between, the previous prices are reused. */
+  everyMinutes: number;
+  minStations: number;
+  enabled: () => boolean;
+  fetch: (now: Date) => Promise<{ stations: FeedStation[]; tomorrow: boolean }>;
 }
 
-async function request(url: string, init: RequestInit, attempt = 1): Promise<Response> {
-  const wait = lastRequestAt + MIN_GAP_MS - Date.now();
-  if (wait > 0) await pause(wait);
-  lastRequestAt = Date.now();
+const SOURCES: Source[] = [
+  // FuelWatch prices change once a day (6am) and tomorrow's appear at 2:30pm, so hourly is plenty.
+  { id: 'wa', everyMinutes: 55, minStations: WA_MIN_STATIONS, enabled: () => true, fetch: fetchWa },
+  {
+    id: 'uk',
+    everyMinutes: 0,
+    minStations: UK_MIN_STATIONS,
+    enabled: () => ukCredentials() !== null,
+    fetch: async (now) => ({ stations: await fetchUk(ukCredentials() as { id: string; secret: string }, now), tomorrow: false }),
+  },
+];
+
+interface Previous {
+  meta: FeedMeta;
+  byRegion: Map<RegionId, FeedStation[]>;
+}
+
+/** The feed that is online now, so sources that are not due (or fail) keep their prices. */
+async function loadPrevious(): Promise<Previous | null> {
   try {
-    const response = await fetch(url, {
-      ...init,
-      headers: { 'User-Agent': USER_AGENT, Accept: 'application/json', ...init.headers },
-      signal: AbortSignal.timeout(60_000),
-    });
-    if ((response.status === 429 || response.status >= 500) && attempt < 4) {
-      console.warn(`${response.status} from ${url}, retrying (attempt ${attempt + 1})`);
-      await pause(5000 * 2 ** (attempt - 1));
-      return request(url, init, attempt + 1);
+    const metaResponse = await fetch(`${PUBLIC_FEED}/meta.json?t=${Date.now()}`, { signal: AbortSignal.timeout(30_000) });
+    if (!metaResponse.ok) return null;
+    const meta = (await metaResponse.json()) as FeedMeta;
+    if (meta.v !== FEED_VERSION) return null;
+    const byRegion = new Map<RegionId, FeedStation[]>();
+    for (const key of Object.keys(meta.tiles)) {
+      const response = await fetch(`${PUBLIC_FEED}/tiles/${key}.json?v=${encodeURIComponent(meta.generatedAt)}`, {
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!response.ok) return null;
+      const tile = (await response.json()) as FeedTile;
+      for (const station of tile.stations) {
+        const list = byRegion.get(station.region) ?? [];
+        list.push(station);
+        byRegion.set(station.region, list);
+      }
     }
-    return response;
+    return { meta, byRegion };
   } catch (error) {
-    if (attempt < 4) {
-      console.warn(`Network error for ${url}: ${String(error)}, retrying`);
-      await pause(5000 * 2 ** (attempt - 1));
-      return request(url, init, attempt + 1);
-    }
-    throw error;
+    console.warn(`Could not read the previous feed: ${String(error)}`);
+    return null;
   }
-}
-
-function unwrap(body: unknown): unknown {
-  if (body && typeof body === 'object' && !Array.isArray(body) && 'data' in body) {
-    return (body as { data: unknown }).data;
-  }
-  return body;
-}
-
-async function getToken(clientId: string, clientSecret: string): Promise<string> {
-  const url = `${BASE}/api/v1/oauth/generate_access_token`;
-  const bodies = [
-    { client_id: clientId, client_secret: clientSecret },
-    { grant_type: 'client_credentials', client_id: clientId, client_secret: clientSecret, scope: 'fuelfinder.read' },
-  ];
-  let lastError = '';
-  for (const body of bodies) {
-    const response = await request(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (response.status === 429) throw new Error('Token endpoint locked us out (429). Check the client id and secret.');
-    if (response.ok) {
-      const data = unwrap(await response.json()) as { access_token?: unknown } | null;
-      if (data && typeof data.access_token === 'string') return data.access_token;
-      lastError = 'token response had no access_token';
-      continue;
-    }
-    lastError = `${response.status} ${response.statusText}`;
-  }
-  throw new Error(`Could not get a Fuel Finder token: ${lastError}`);
-}
-
-async function fetchAll(path: string, token: string): Promise<unknown[]> {
-  const rows: unknown[] = [];
-  for (let batch = 1; batch <= MAX_BATCHES; batch++) {
-    const response = await request(`${BASE}${path}?batch-number=${batch}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (response.status === 404) break;
-    if (!response.ok) throw new Error(`${path} batch ${batch}: ${response.status} ${response.statusText}`);
-    const page = unwrap(await response.json());
-    if (!Array.isArray(page) || page.length === 0) break;
-    rows.push(...page);
-    if (page.length < BATCH_SIZE) break;
-  }
-  console.log(`${path}: ${rows.length} records`);
-  return rows;
 }
 
 function writeJson(file: string, value: unknown): void {
@@ -107,38 +75,71 @@ function writeJson(file: string, value: unknown): void {
   writeFileSync(file, JSON.stringify(value));
 }
 
-export function writeSite(meta: FeedMeta, feed: BuiltFeed | null, target = outDir): void {
+export function writeSite(feed: { meta: FeedMeta; tiles: FeedTile[] }, target = outDir): void {
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target, { recursive: true });
   const siteSource = join(root, 'site');
   if (existsSync(siteSource)) cpSync(siteSource, target, { recursive: true });
   writeFileSync(join(target, '.nojekyll'), '');
-  const dataDir = join(target, 'data', 'v1');
-  writeJson(join(dataDir, 'meta.json'), meta);
-  for (const tile of feed?.tiles ?? []) writeJson(join(dataDir, 'tiles', `${tile.tile}.json`), tile);
+  const dataDir = join(target, 'data', `v${FEED_VERSION}`);
+  writeJson(join(dataDir, 'meta.json'), feed.meta);
+  for (const tile of feed.tiles) writeJson(join(dataDir, 'tiles', `${tile.tile}.json`), tile);
 }
 
 async function main(): Promise<void> {
-  const clientId = process.env.FUEL_FINDER_CLIENT_ID?.trim();
-  const clientSecret = process.env.FUEL_FINDER_CLIENT_SECRET?.trim();
-  if (!clientId || !clientSecret) {
-    console.warn('No Fuel Finder keys set: publishing the site with an empty feed (status awaiting-credentials).');
-    writeSite(emptyMeta(new Date()), null);
-    return;
+  const now = new Date();
+  const previous = await loadPrevious();
+  const stations: FeedStation[] = [];
+  const regions: Partial<Record<RegionId, RegionStatus>> = {};
+  let fetchedSomething = false;
+  let failures = 0;
+
+  for (const source of SOURCES) {
+    if (!source.enabled()) {
+      console.log(`${source.id}: off`);
+      continue;
+    }
+    const before = previous?.meta.regions[source.id];
+    const kept = previous?.byRegion.get(source.id) ?? [];
+    const ageMinutes = before ? (now.getTime() - Date.parse(before.updatedAt)) / 60_000 : Infinity;
+    if (!FORCE && before?.status === 'live' && kept.length > 0 && ageMinutes < source.everyMinutes) {
+      console.log(`${source.id}: reusing prices from ${Math.round(ageMinutes)} min ago`);
+      stations.push(...kept);
+      regions[source.id] = before;
+      continue;
+    }
+    try {
+      const result = await source.fetch(now);
+      const withPrices = result.stations.filter((s) => Object.keys(s.prices).length > 0);
+      if (withPrices.length < source.minStations) {
+        throw new Error(`only ${withPrices.length} stations with prices (expected at least ${source.minStations})`);
+      }
+      stations.push(...withPrices);
+      regions[source.id] = { status: 'live', updatedAt: now.toISOString(), stationCount: withPrices.length, tomorrow: result.tomorrow };
+      fetchedSomething = true;
+      console.log(`${source.id}: ${withPrices.length} stations${result.tomorrow ? ', with tomorrow\'s prices' : ''}`);
+    } catch (error) {
+      failures++;
+      console.error(`${source.id}: ${error instanceof Error ? error.message : String(error)}`);
+      if (before && kept.length > 0) {
+        console.warn(`${source.id}: keeping the previous prices from ${before.updatedAt}`);
+        stations.push(...kept);
+        regions[source.id] = before;
+      } else {
+        regions[source.id] = { status: 'error', updatedAt: now.toISOString(), stationCount: 0, tomorrow: false };
+      }
+    }
   }
 
-  const token = await getToken(clientId, clientSecret);
-  const stations = await fetchAll('/api/v1/pfs', token);
-  const prices = await fetchAll('/api/v1/pfs/fuel-prices', token);
-  const feed = buildFeed(stations, prices, new Date());
-  console.log(
-    `Feed: ${feed.meta.stationCount} forecourts with prices, ${feed.meta.priceCount} prices, ${feed.tiles.length} tiles`,
-  );
-  if (feed.meta.stationCount < MIN_STATIONS) {
-    throw new Error(`Only ${feed.meta.stationCount} forecourts came back; keeping the previous feed online.`);
+  if (stations.length === 0 && failures > 0) {
+    throw new Error('No prices from any source; keeping the previous site online.');
   }
-  writeSite(feed.meta, feed);
-  console.log(`Wrote ${outDir}`);
+  const feed = buildFeed(stations, regions, now);
+  writeSite(feed);
+  console.log(
+    `Feed: ${feed.meta.stationCount} stations, ${feed.meta.priceCount} prices, ${feed.tiles.length} tiles` +
+      (fetchedSomething ? '' : ' (all reused)'),
+  );
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

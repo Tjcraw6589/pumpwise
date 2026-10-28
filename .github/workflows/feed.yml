@@ -1,7 +1,8 @@
-# Fetches UK fuel prices every 15 minutes and publishes them, with the legal pages, on GitHub Pages.
-# Free on a public repository. Needs two repository secrets, added by the owner:
-#   FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET (from the GOV.UK Fuel Finder developer portal).
-# Without them the site still deploys, with an empty feed the app reports as "prices coming soon".
+# Collects official fuel prices and publishes them, with the website and legal pages, on GitHub Pages.
+# Free on a public repository. Runs every 15 minutes; each source refreshes on its own schedule
+# (FuelWatch, Western Australia: about hourly, no key needed). The UK Fuel Finder source only runs
+# when FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET secrets exist, and that service refuses
+# connections from outside the UK, so it stays off on GitHub's servers.
 name: Price feed
 
 on:

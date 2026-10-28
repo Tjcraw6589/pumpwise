@@ -6,7 +6,7 @@ import { useTheme } from '@/theme/useTheme';
 import { AppText } from './AppText';
 
 interface NoticeProps {
-  tone?: 'info' | 'warning';
+  tone?: 'info' | 'warning' | 'good';
   icon?: keyof typeof Ionicons.glyphMap;
   text: string;
   action?: { label: string; onPress: () => void };
@@ -16,8 +16,8 @@ interface NoticeProps {
 /** A slim banner for things worth knowing but not blocking, such as "prices could not be updated". */
 export function Notice({ tone = 'info', icon, text, action, testID }: NoticeProps) {
   const { colors, spacing, radius } = useTheme();
-  const bg = tone === 'warning' ? colors.warningSoft : colors.accentSoft;
-  const fg = tone === 'warning' ? colors.warning : colors.accentText;
+  const bg = tone === 'warning' ? colors.warningSoft : tone === 'good' ? colors.cheapSoft : colors.accentSoft;
+  const fg = tone === 'warning' ? colors.warning : tone === 'good' ? colors.cheap : colors.accentText;
   return (
     <View
       testID={testID}

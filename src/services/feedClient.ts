@@ -18,8 +18,8 @@ export class FeedError extends Error {
 }
 
 const TIMEOUT_MS = 15_000;
-/** Extra miles loaded beyond the search area, so "nearest" can still be found when the area is small. */
-export const NEAREST_MARGIN_MILES = 4;
+/** Extra kilometres loaded beyond the search area, so "nearest" can still be found when the area is small. */
+export const NEAREST_MARGIN_KM = 6;
 
 const tileCache = new Map<string, FeedTile>();
 
@@ -56,11 +56,9 @@ export interface AreaResult {
   stations: FeedStation[];
 }
 
-export async function loadArea(center: LatLng, radiusMiles: number): Promise<AreaResult> {
+export async function loadArea(center: LatLng, radiusKm: number): Promise<AreaResult> {
   const meta = await fetchMeta();
-  if (meta.status !== 'live') return { meta, stations: [] };
-
-  const keys = tilesForArea(center.lat, center.lng, radiusMiles + NEAREST_MARGIN_MILES).filter((key) => meta.tiles[key]);
+  const keys = tilesForArea(center.lat, center.lng, radiusKm + NEAREST_MARGIN_KM).filter((key) => meta.tiles[key]);
   const tiles = await Promise.all(
     keys.map(async (key) => {
       const cached = tileCache.get(key);

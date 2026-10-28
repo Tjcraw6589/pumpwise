@@ -25,16 +25,17 @@ const DEVICES =
       ]
     : [{ name: 'review', width: 390, height: 844, scale: 2 }];
 const THEMES = mode === 'store' ? ['light'] : ['light', 'dark'];
-const STORE_SKIP = new Set(['03-location', '05-list', '07-map', '10-about', '11-outside-uk']);
+const STORE_SKIP = new Set(['03-location', '05-list', '07-map', '10-about', '11-not-covered']);
 
 function settings(theme, extra = {}) {
   return JSON.stringify({
     state: {
       settings: {
-        fuel: 'E10',
-        radiusMiles: 5,
+        fuel: 'regular',
+        radiusKm: 8,
         fillLitres: 40,
-        mpg: 45,
+        economyL100: 8,
+        includeMembersOnly: false,
         sortBy: 'price',
         theme,
         directionsApp: 'apple',
@@ -45,7 +46,7 @@ function settings(theme, extra = {}) {
         ...extra,
       },
     },
-    version: 1,
+    version: 2,
   });
 }
 
@@ -64,7 +65,7 @@ try {
         isMobile: true,
         hasTouch: true,
         colorScheme: theme,
-        geolocation: { latitude: 51.5072, longitude: -0.1276 },
+        geolocation: { latitude: -31.9523, longitude: 115.8613 },
         permissions: ['geolocation'],
       });
       const page = await context.newPage();
@@ -88,12 +89,12 @@ try {
       // Main screens with settings in place.
       await page.evaluate((value) => localStorage.setItem('pumpwise-settings', value), settings(theme));
       await page.goto(BASE);
-      await page.getByTestId('cheapest-card').waitFor();
+      await page.getByTestId('nearby-screen').getByTestId('cheapest-card').waitFor();
       await shot('04-nearby');
       await page.getByTestId('nearby-screen').getByTestId('sort').scrollIntoViewIfNeeded();
       await page.mouse.wheel(0, 420);
       await shot('05-list');
-      await page.getByTestId('cheapest-details').click();
+      await page.getByTestId('nearby-screen').getByTestId('cheapest-details').click();
       await page.getByTestId('price-board').waitFor();
       await shot('06-station');
       await page.getByTestId('header-dismiss').click();
@@ -109,11 +110,11 @@ try {
       await page.getByTestId('about-screen').waitFor();
       await shot('10-about');
 
-      // States: not in the UK.
+      // States: somewhere not covered yet.
       await context.setGeolocation({ latitude: 40.7128, longitude: -74.006 });
       await page.goto(BASE);
-      await page.getByTestId('state-outside-uk').waitFor();
-      await shot('11-outside-uk');
+      await page.getByTestId('state-not-covered').waitFor();
+      await shot('11-not-covered');
       await context.close();
     }
   }

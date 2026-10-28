@@ -1,5 +1,5 @@
 import type { BuiltFeed, FeedMeta } from '@/lib/feed';
-import { emptyMeta } from '@/lib/feed';
+import { FEED_VERSION } from '@/lib/feed';
 import { clearFeedCache } from '@/services/feedClient';
 import { useLive } from '@/store/useLive';
 import { createDefaultSettings, useStore } from '@/store/useStore';
@@ -7,6 +7,8 @@ import { createDefaultSettings, useStore } from '@/store/useStore';
 import { fixtureFeed } from '../scripts/feed/fixture-data.ts';
 
 export const FIXTURE_NOW = new Date();
+export const PERTH = { lat: -31.9523, lng: 115.8613 };
+export const LONDON = { lat: 51.5072, lng: -0.1276 };
 
 export interface FetchLog {
   urls: string[];
@@ -52,8 +54,17 @@ export function mockFeedFetch(options: { feed?: BuiltFeed; meta?: FeedMeta; offl
   return log;
 }
 
-export function notLiveMeta(): FeedMeta {
-  return emptyMeta(FIXTURE_NOW);
+/** A feed where WA could not be collected and has no prices at all. */
+export function waDownMeta(): FeedMeta {
+  return {
+    v: FEED_VERSION,
+    generatedAt: FIXTURE_NOW.toISOString(),
+    tileDeg: 0.5,
+    stationCount: 0,
+    priceCount: 0,
+    tiles: {},
+    regions: { wa: { status: 'error', updatedAt: FIXTURE_NOW.toISOString(), stationCount: 0, tomorrow: false } },
+  };
 }
 
 /** Puts both stores back to a known state. Call in beforeEach. */

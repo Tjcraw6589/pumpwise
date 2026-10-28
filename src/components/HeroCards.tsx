@@ -1,32 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { fuelInfo } from '@/lib/fuels';
-import { formatMiles, formatPounds } from '@/lib/format';
+import type { FuelKind } from '@/lib/feed';
+import { formatMoney } from '@/lib/format';
 import type { RankedStation, Savings } from '@/lib/ranking';
-import type { FuelCode } from '@/lib/feed';
+import { fuelOption, REGIONS } from '@/lib/regions';
+import { formatDistance, radiusLabel } from '@/lib/units';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
 import { Button } from './Button';
 import { FreshnessTag } from './FreshnessTag';
 import { PriceSign } from './PriceSign';
-
-interface CheapestCardProps {
-  item: RankedStation;
-  radiusMiles: number;
-  fuel: FuelCode;
-  fillLitres: number;
-  savings: Savings | null;
-  alsoNearest: boolean;
-  now: Date;
-  onDirections: () => void;
-  onDetails: () => void;
-}
+import { TomorrowTag } from './TomorrowTag';
 
 function Meta({ item }: { item: RankedStation }) {
   const { colors, spacing } = useTheme();
-  const parts = [formatMiles(item.distance), item.open.label].filter(Boolean);
+  const unit = REGIONS[item.station.region].distanceUnit;
+  const parts = [formatDistance(item.distance, unit), item.open.label].filter(Boolean);
   return (
     <View style={[styles.metaRow, { marginTop: spacing.xs }]}>
       <Ionicons name="navigate" size={13} color={colors.accentText} />
@@ -37,12 +28,24 @@ function Meta({ item }: { item: RankedStation }) {
   );
 }
 
-function SavingsLine({ savings, fillLitres }: { savings: Savings; fillLitres: number }) {
+function PriceInfo({ item, now }: { item: RankedStation; now: Date }) {
+  const { spacing } = useTheme();
+  return (
+    <View style={{ marginTop: spacing.xs, gap: 2 }}>
+      <FreshnessTag at={item.price.at} region={item.station.region} now={now} />
+      {item.tomorrow !== null ? <TomorrowTag today={item.price.p} tomorrow={item.tomorrow} testID="tomorrow-tag" /> : null}
+    </View>
+  );
+}
+
+function SavingsLine({ savings, fillLitres, item }: { savings: Savings; fillLitres: number; item: RankedStation }) {
   const { colors, spacing, radius } = useTheme();
-  const extra = savings.extraMiles >= 0.1 ? `, even after the extra ${savings.extraMiles.toFixed(1)} mi there and back` : '';
+  const region = REGIONS[item.station.region];
+  const extra =
+    savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
   const text = savings.worthIt
-    ? `Saves ${formatPounds(savings.pounds)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
-    : `Only ${formatPounds(Math.max(0, savings.pumpSaving))} cheaper on ${fillLitres} L than the nearest, and the extra driving eats most of that.`;
+    ? `Saves ${formatMoney(savings.amount, region.currency)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
+    : `Only ${formatMoney(Math.max(0, savings.pumpSaving), region.currency)} cheaper on ${fillLitres} L than the nearest, and the extra driving eats most of that.`;
   return (
     <View
       testID="savings-line"
@@ -64,10 +67,23 @@ function SavingsLine({ savings, fillLitres }: { savings: Savings; fillLitres: nu
   );
 }
 
+interface CheapestCardProps {
+  item: RankedStation;
+  radiusKm: number;
+  fuel: FuelKind;
+  fillLitres: number;
+  savings: Savings | null;
+  alsoNearest: boolean;
+  now: Date;
+  onDirections: () => void;
+  onDetails: () => void;
+}
+
 /** The headline: the cheapest open station inside the search area. */
-export function CheapestCard({ item, radiusMiles, fuel, fillLitres, savings, alsoNearest, now, onDirections, onDetails }: CheapestCardProps) {
+export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, now, onDirections, onDetails }: CheapestCardProps) {
   const { colors, spacing, radius } = useTheme();
   const { station } = item;
+  const region = REGIONS[station.region];
   return (
     <View
       testID="cheapest-card"
@@ -75,7 +91,7 @@ export function CheapestCard({ item, radiusMiles, fuel, fillLitres, savings, als
     >
       <View style={styles.headerRow}>
         <AppText variant="overline" tone="accent" style={styles.flex}>
-          Cheapest within {radiusMiles} mi
+          Cheapest within {radiusLabel(radiusKm, region.distanceUnit)}
         </AppText>
         {alsoNearest ? (
           <View style={[styles.pill, { backgroundColor: colors.cheapSoft, borderRadius: radius.pill }]}>
@@ -86,7 +102,7 @@ export function CheapestCard({ item, radiusMiles, fuel, fillLitres, savings, als
         ) : null}
       </View>
       <Pressable accessibilityRole="button" accessibilityLabel={`${station.name} details`} onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
-        <PriceSign pence={item.price.p} size="lg" tone="cheap" label={fuelInfo(fuel).pumpCode} testID="cheapest-price" />
+        <PriceSign pence={item.price.p} size="lg" tone="cheap" label={fuelOption(region, fuel).pumpCode} testID="cheapest-price" />
         <View style={[styles.flex, { marginLeft: spacing.lg }]}>
           <AppText variant="h2" numberOfLines={2} testID="cheapest-name">
             {station.name}
@@ -97,12 +113,10 @@ export function CheapestCard({ item, radiusMiles, fuel, fillLitres, savings, als
             </AppText>
           ) : null}
           <Meta item={item} />
-          <View style={{ marginTop: spacing.xs }}>
-            <FreshnessTag at={item.price.at} now={now} />
-          </View>
+          <PriceInfo item={item} now={now} />
         </View>
       </Pressable>
-      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} /> : null}
+      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} /> : null}
       <View style={[styles.actions, { marginTop: spacing.lg, gap: spacing.sm }]}>
         <Button
           label="Directions"
@@ -121,7 +135,7 @@ export function CheapestCard({ item, radiusMiles, fuel, fillLitres, savings, als
 
 interface NearestCardProps {
   item: RankedStation;
-  fuel: FuelCode;
+  fuel: FuelKind;
   now: Date;
   insideArea: boolean;
   onDirections: () => void;
@@ -153,15 +167,13 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
         Nearest{insideArea ? '' : ' (outside your area)'}
       </AppText>
       <View style={[styles.mainRow, { marginTop: spacing.sm }]}>
-        <PriceSign pence={item.price.p} size="md" label={fuelInfo(fuel).pumpCode} testID="nearest-price" />
+        <PriceSign pence={item.price.p} size="md" label={fuelOption(REGIONS[station.region], fuel).pumpCode} testID="nearest-price" />
         <View style={[styles.flex, { marginLeft: spacing.md }]}>
           <AppText variant="bodyBold" numberOfLines={1} testID="nearest-name">
             {station.name}
           </AppText>
           <Meta item={item} />
-          <View style={{ marginTop: 2 }}>
-            <FreshnessTag at={item.price.at} now={now} />
-          </View>
+          <PriceInfo item={item} now={now} />
         </View>
         <Pressable
           accessibilityRole="button"

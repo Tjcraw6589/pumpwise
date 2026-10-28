@@ -5,7 +5,7 @@ import type { LatLng } from '@/lib/geo';
 
 export type PermissionState = 'checking' | 'undetermined' | 'granted' | 'denied';
 
-export type FeedStatus = 'idle' | 'loading' | 'ready' | 'not-live' | 'error';
+export type FeedStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 export interface Position extends LatLng {
   at: number;
@@ -19,7 +19,7 @@ export interface LiveState {
   position: Position | null;
   locating: boolean;
   locationError: string | null;
-  /** Town or district name for the search centre, such as "Harrogate". */
+  /** Suburb or town name for the search centre, such as "Cannington". */
   areaName: string | null;
   feedStatus: FeedStatus;
   /** A download is running while older prices stay on screen. */
@@ -28,7 +28,7 @@ export interface LiveState {
   meta: FeedMeta | null;
   stations: FeedStation[];
   /** Search centre the stations were downloaded for. */
-  loadedFor: (LatLng & { radiusMiles: number }) | null;
+  loadedFor: (LatLng & { radiusKm: number }) | null;
   loadedAt: number | null;
   /** Bumped to ask the controller for a fresh download (pull to refresh). */
   refreshToken: number;

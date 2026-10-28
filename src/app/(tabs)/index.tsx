@@ -13,12 +13,14 @@ import { PumpMark } from '@/components/PumpMark';
 import { SearchControls } from '@/components/SearchControls';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { StationRow } from '@/components/StationRow';
-import { REPORT_PRICE_URL } from '@/config/app';
 import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useDirections } from '@/hooks/useDirections';
 import { useNearby } from '@/hooks/useNearby';
-import { formatMiles, formatPounds, timeAgo } from '@/lib/format';
-import { priceBands, type RankedStation, type SortMode, sortStations } from '@/lib/ranking';
+import { useRegion } from '@/hooks/useRegion';
+import { formatChange, formatMoney, timeAgo } from '@/lib/format';
+import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
+import { fuelOption, type RegionInfo } from '@/lib/regions';
+import { formatDistance, radiusLabel } from '@/lib/units';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -29,8 +31,21 @@ const SORTS: readonly { key: SortMode; label: string }[] = [
   { key: 'value', label: 'Best value' },
 ];
 
+function TrendNotice({ trend, region, fuelLabel }: { trend: Trend; region: RegionInfo; fuelLabel: string }) {
+  const unit = region.priceUnit;
+  const rises = trend.change > 0.5;
+  const drops = trend.change < -0.5;
+  const text = drops
+    ? `Tomorrow ${fuelLabel} drops about ${formatChange(trend.change).slice(1)}${unit} around here. Wait if you can.`
+    : rises
+      ? `Tomorrow ${fuelLabel} rises about ${formatChange(trend.change).slice(1)}${unit} around here. Fill up today.`
+      : `Tomorrow's ${fuelLabel} prices around here are about the same as today.`;
+  return <Notice tone={rises ? 'warning' : drops ? 'good' : 'info'} icon={drops ? 'trending-down' : rises ? 'trending-up' : 'calendar-outline'} text={text} testID="trend-notice" />;
+}
+
 function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => void }) {
   const { colors, spacing, radius } = useTheme();
+  const region = useRegion();
   return (
     <Pressable
       accessibilityRole="button"
@@ -55,7 +70,7 @@ function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => v
           {item.station.name}
         </AppText>
         <AppText variant="caption" tone="muted">
-          {formatMiles(item.distance)} · {formatPounds(item.realCost)} with the fuel to get there and back
+          {formatDistance(item.distance, region.distanceUnit)} · {formatMoney(item.realCost, region.currency)} with the fuel to get there and back
         </AppText>
       </View>
       <PriceSign pence={item.price.p} size="sm" />
@@ -76,6 +91,8 @@ export default function NearbyScreen() {
   const requestRefresh = useLive((s) => s.requestRefresh);
   const directions = useDirections();
   const areaLabel = useAreaLabel();
+  const region = useRegion();
+  const fuel = fuelOption(region, settings.fuel);
 
   const list = useMemo(() => (ranking ? sortStations(ranking.inArea, settings.sortBy) : []), [ranking, settings.sortBy]);
   const band = useMemo(() => priceBands(ranking?.inArea ?? []), [ranking]);
@@ -117,7 +134,7 @@ export default function NearbyScreen() {
           {areaLabel}
         </AppText>
         <Ionicons name="chevron-down" size={14} color={colors.textMuted} style={{ marginLeft: 2 }} />
-        {loadedAt && meta?.status === 'live' && phase === 'ready' ? (
+        {loadedAt && meta && phase === 'ready' ? (
           <AppText variant="caption" tone="muted" numberOfLines={1} style={{ marginLeft: 6 }} testID="checked-line">
             · checked {timeAgo(new Date(loadedAt).toISOString(), now)}
           </AppText>
@@ -134,6 +151,7 @@ export default function NearbyScreen() {
           testID="stale-notice"
         />
       ) : null}
+      {phase === 'ready' && ranking?.trend ? <TrendNotice trend={ranking.trend} region={region} fuelLabel={fuel.label} /> : null}
       {phase === 'ready' && feedAgeHours > 2 ? (
         <Notice
           tone="warning"
@@ -149,8 +167,8 @@ export default function NearbyScreen() {
           {cheapest ? (
             <CheapestCard
               item={cheapest}
-              radiusMiles={settings.radiusMiles}
-              fuel={settings.fuel}
+              radiusKm={settings.radiusKm}
+              fuel={fuel.kind}
               fillLitres={settings.fillLitres}
               savings={ranking?.savings ?? null}
               alsoNearest={nearest?.station.id === cheapest.station.id}
@@ -159,14 +177,17 @@ export default function NearbyScreen() {
               onDetails={() => openStation(cheapest.station.id)}
             />
           ) : (
-            <Notice icon="moon-outline" text={`Every station within ${settings.radiusMiles} mi is closed right now or hasn't confirmed its price lately.`} />
+            <Notice
+              icon="moon-outline"
+              text={`Every station within ${radiusLabel(settings.radiusKm, region.distanceUnit)} is closed right now, members only, or hasn't confirmed its price lately.`}
+            />
           )}
           {nearest && nearest.station.id !== cheapest?.station.id ? (
             <NearestCard
               item={nearest}
-              fuel={settings.fuel}
+              fuel={fuel.kind}
               now={now}
-              insideArea={nearest.distance <= settings.radiusMiles}
+              insideArea={nearest.distance <= settings.radiusKm}
               onDirections={() => directions(nearest.station)}
               onDetails={() => openStation(nearest.station.id)}
             />
@@ -180,7 +201,7 @@ export default function NearbyScreen() {
               All nearby
             </AppText>
             <AppText variant="caption" tone="muted" testID="station-count">
-              {list.length} {list.length === 1 ? 'station' : 'stations'} · {settings.radiusMiles} mi
+              {list.length} {list.length === 1 ? 'station' : 'stations'} · {radiusLabel(settings.radiusKm, region.distanceUnit)}
             </AppText>
           </View>
           <SegmentedControl options={SORTS} value={settings.sortBy} onChange={(sortBy) => updateSettings({ sortBy })} testID="sort" />
@@ -193,12 +214,20 @@ export default function NearbyScreen() {
   const footer =
     phase === 'ready' ? (
       <View style={{ paddingTop: spacing.md, paddingBottom: spacing.xxl }}>
-        <AppText variant="caption" tone="faint" align="center">
-          Prices from the UK Government Fuel Finder scheme. Distances are as the crow flies.
+        <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.source.url)} hitSlop={8} testID="source-link">
+          <AppText variant="caption" tone="faint" align="center">
+            {region.source.credit}.
+          </AppText>
+          <AppText variant="small" tone="accent" align="center" style={{ marginTop: 2 }}>
+            {region.source.url.replace(/^https:\/\//, '')}
+          </AppText>
+        </Pressable>
+        <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.sm }}>
+          Distances are in a straight line.
         </AppText>
-        <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(REPORT_PRICE_URL)} hitSlop={8} testID="report-link">
+        <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.report.url)} hitSlop={8} testID="report-link">
           <AppText variant="small" tone="accent" align="center" style={{ marginTop: spacing.sm }}>
-            Price wrong at the pump? Report it to GOV.UK
+            Price wrong at the pump? {region.report.label}
           </AppText>
         </Pressable>
       </View>

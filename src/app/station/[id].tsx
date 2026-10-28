@@ -9,20 +9,23 @@ import { FreshnessTag } from '@/components/FreshnessTag';
 import { Header } from '@/components/Header';
 import { Screen } from '@/components/Screen';
 import { SegmentedControl } from '@/components/SegmentedControl';
-import { REPORT_PRICE_URL } from '@/config/app';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNow } from '@/hooks/useNearby';
-import { FUEL_CODES } from '@/lib/feed';
-import { fuelInfo } from '@/lib/fuels';
-import { formatMiles, formatPence } from '@/lib/format';
-import { distanceMiles } from '@/lib/geo';
-import { openState, ukClock, weekRows } from '@/lib/hours';
+import { formatChange, formatPrice } from '@/lib/format';
+import { distanceKm } from '@/lib/geo';
+import { localClock, openState, weekRows } from '@/lib/hours';
+import { fuelOption, REGIONS } from '@/lib/regions';
+import { formatDistance } from '@/lib/units';
 import { DIRECTIONS_APPS, openDirections } from '@/services/directions';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
-const TAG_LABELS: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap }> = {
+const TAG_LABELS: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap; warn?: boolean }> = {
+  'members-only': { label: 'Members only', icon: 'card-outline', warn: true },
+  'permit-required': { label: 'Entry permit needed', icon: 'document-lock-outline', warn: true },
+  unmanned: { label: 'Unmanned, card only', icon: 'card-outline' },
+  'low-aromatic': { label: 'Low aromatic fuel', icon: 'leaf-outline' },
   motorway: { label: 'Motorway services', icon: 'car-sport-outline' },
   supermarket: { label: 'Supermarket', icon: 'cart-outline' },
   toilets: { label: 'Toilets', icon: 'man-outline' },
@@ -30,8 +33,10 @@ const TAG_LABELS: Record<string, { label: string; icon: keyof typeof Ionicons.gl
   '24h-fuel': { label: '24-hour pay at pump', icon: 'time-outline' },
   adblue: { label: 'AdBlue', icon: 'flask-outline' },
   lpg: { label: 'LPG', icon: 'flame-outline' },
-  air: { label: 'Air and screenwash', icon: 'speedometer-outline' },
+  air: { label: 'Air', icon: 'speedometer-outline' },
   water: { label: 'Water', icon: 'water-outline' },
+  atm: { label: 'ATM', icon: 'cash-outline' },
+  truck: { label: 'Truck friendly', icon: 'bus-outline' },
 };
 
 export default function StationScreen() {
@@ -53,11 +58,16 @@ export default function StationScreen() {
     );
   }
 
-  const open = openState(station.hours, now);
-  const today = ukClock(now).day;
-  const distance = center ? distanceMiles(center, station) : null;
-  const fuels = FUEL_CODES.filter((code) => station.prices[code]);
+  const region = REGIONS[station.region];
+  const offset = region.utcOffsetMinutes(now);
+  const open = openState(station.hours, now, offset);
+  const today = localClock(now, offset).day;
+  const distance = center ? distanceKm(center, station) : null;
+  const fuels = region.fuels.filter((f) => station.prices[f.kind]);
+  const chosen = fuelOption(region, fuel).kind;
+  const hasTomorrow = fuels.some((f) => station.tomorrow?.[f.kind] !== undefined);
   const address = [station.address, station.town, station.postcode].filter(Boolean).join(', ');
+  const chosenPrice = station.prices[chosen];
 
   return (
     <Screen scroll edges={['top', 'bottom']} testID="station-screen">
@@ -78,7 +88,7 @@ export default function StationScreen() {
           <View style={styles.inline}>
             <Ionicons name="navigate" size={14} color={colors.accentText} />
             <AppText variant="bodyBold" style={{ marginLeft: 4 }}>
-              {formatMiles(distance)}
+              {formatDistance(distance, region.distanceUnit)}
             </AppText>
           </View>
         ) : null}
@@ -89,49 +99,78 @@ export default function StationScreen() {
         ) : null}
       </View>
 
-      {/* The price board: every fuel this forecourt has reported, like the sign at the roadside. */}
+      {/* The price board: every fuel this station sells, like the sign at the roadside. */}
       <View
         testID="price-board"
         style={[styles.board, { backgroundColor: colors.sign, borderColor: colors.signBorder, borderRadius: radius.xl, padding: spacing.lg, marginTop: spacing.xl }]}
       >
-        {fuels.map((code, index) => {
-          const price = station.prices[code];
+        {hasTomorrow ? (
+          <View style={[styles.boardRow, { paddingBottom: spacing.xs }]}>
+            <View style={styles.flex} />
+            <AppText variant="overline" style={{ color: colors.signLabel, width: 92, textAlign: 'right' }}>
+              Today
+            </AppText>
+            <AppText variant="overline" style={{ color: colors.signLabel, width: 78, textAlign: 'right' }}>
+              Tomorrow
+            </AppText>
+          </View>
+        ) : null}
+        {fuels.map((f, index) => {
+          const price = station.prices[f.kind];
           if (!price) return null;
-          const info = fuelInfo(code);
-          const chosen = code === fuel;
+          const isChosen = f.kind === chosen;
+          const next = station.tomorrow?.[f.kind];
           return (
             <Pressable
-              key={code}
+              key={f.kind}
               accessibilityRole="button"
-              accessibilityLabel={`${info.label}, ${formatPence(price.p)} pence`}
-              onPress={() => updateSettings({ fuel: code })}
+              accessibilityLabel={`${f.label}, ${formatPrice(price.p)}`}
+              onPress={() => updateSettings({ fuel: f.kind })}
               style={[
                 styles.boardRow,
                 { paddingVertical: spacing.sm, borderTopColor: colors.signBorder, borderTopWidth: index === 0 ? 0 : StyleSheet.hairlineWidth },
               ]}
             >
               <View style={styles.flex}>
-                <AppText variant="bodyBold" style={{ color: chosen ? colors.signDigits : '#E9EDF2' }}>
-                  {info.label}
+                <AppText variant="bodyBold" style={{ color: isChosen ? colors.signDigits : '#E9EDF2' }}>
+                  {f.label}
                 </AppText>
                 <AppText variant="caption" style={{ color: colors.signLabel }}>
-                  {info.pumpCode} · {info.description}
+                  {f.pumpCode} · {f.description}
                 </AppText>
               </View>
-              <AppText variant="priceXL" style={{ color: chosen ? colors.signCheap : colors.signDigits, fontSize: 40, lineHeight: 44 }}>
-                {formatPence(price.p)}
+              <AppText variant="priceXL" style={{ color: isChosen ? colors.signCheap : colors.signDigits, fontSize: 38, lineHeight: 42, width: 92, textAlign: 'right' }}>
+                {formatPrice(price.p)}
               </AppText>
+              {hasTomorrow ? (
+                <View style={{ width: 78, alignItems: 'flex-end' }}>
+                  {next !== undefined ? (
+                    <>
+                      <AppText variant="stat" style={{ color: '#E9EDF2' }}>
+                        {formatPrice(next)}
+                      </AppText>
+                      <AppText variant="small" style={{ color: next < price.p ? colors.signCheap : next > price.p ? '#FF8A80' : colors.signLabel }}>
+                        {formatChange(next - price.p)}
+                      </AppText>
+                    </>
+                  ) : (
+                    <AppText variant="caption" style={{ color: colors.signLabel }}>
+                      –
+                    </AppText>
+                  )}
+                </View>
+              ) : null}
             </Pressable>
           );
         })}
       </View>
-      {station.prices[fuel] ? (
+      {chosenPrice ? (
         <View style={{ marginTop: spacing.sm }}>
-          <FreshnessTag at={station.prices[fuel].at} now={now} testID="station-freshness" />
+          <FreshnessTag at={chosenPrice.at} region={station.region} now={now} testID="station-freshness" />
         </View>
       ) : (
         <AppText variant="caption" tone="muted" style={{ marginTop: spacing.sm }}>
-          No {fuelInfo(fuel).label.toLowerCase()} price reported here.
+          No {fuelOption(region, chosen).label} price at this station.
         </AppText>
       )}
 
@@ -170,7 +209,7 @@ export default function StationScreen() {
         </View>
       ) : null}
 
-      {station.tags.length > 0 ? (
+      {station.tags.some((t) => TAG_LABELS[t]) ? (
         <View style={{ marginTop: spacing.xl }}>
           <AppText variant="overline" tone="muted" style={{ marginBottom: spacing.sm }}>
             At this station
@@ -180,8 +219,19 @@ export default function StationScreen() {
               const known = TAG_LABELS[tag];
               if (!known) return null;
               return (
-                <View key={tag} style={[styles.tag, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.pill }]}>
-                  <Ionicons name={known.icon} size={14} color={colors.accentText} />
+                <View
+                  key={tag}
+                  testID={`tag-${tag}`}
+                  style={[
+                    styles.tag,
+                    {
+                      backgroundColor: known.warn ? colors.warningSoft : colors.surface,
+                      borderColor: known.warn ? colors.warningSoft : colors.border,
+                      borderRadius: radius.pill,
+                    },
+                  ]}
+                >
+                  <Ionicons name={known.icon} size={14} color={known.warn ? colors.warning : colors.accentText} />
                   <AppText variant="small" style={{ marginLeft: 6 }}>
                     {known.label}
                   </AppText>
@@ -194,7 +244,7 @@ export default function StationScreen() {
 
       <Pressable
         accessibilityRole="link"
-        onPress={() => void Linking.openURL(REPORT_PRICE_URL)}
+        onPress={() => void Linking.openURL(region.report.url)}
         style={[styles.report, { borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.xl }]}
         testID="station-report"
       >
@@ -202,15 +252,19 @@ export default function StationScreen() {
         <View style={[styles.flex, { marginLeft: spacing.sm }]}>
           <AppText variant="bodyBold">Price wrong at the pump?</AppText>
           <AppText variant="caption" tone="muted">
-            Report it to GOV.UK. Forecourts must update prices within 30 minutes of a change.
+            {region.report.label}. {region.report.note}
           </AppText>
         </View>
         <Ionicons name="open-outline" size={16} color={colors.textFaint} />
       </Pressable>
-      <AppText variant="caption" tone="faint" style={{ marginTop: spacing.lg, marginBottom: spacing.xl }}>
-        Prices and details from the UK Government Fuel Finder scheme. Contains public sector information licensed under the Open
-        Government Licence v3.0.
-      </AppText>
+      <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.source.url)} style={{ marginTop: spacing.lg, marginBottom: spacing.xl }} testID="station-source">
+        <AppText variant="caption" tone="faint">
+          {region.source.credit}:{' '}
+          <AppText variant="caption" tone="accent">
+            {region.source.url.replace(/^https:\/\//, '')}
+          </AppText>
+        </AppText>
+      </Pressable>
     </Screen>
   );
 }

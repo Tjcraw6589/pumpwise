@@ -1,19 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/AppText';
 import { Chip } from '@/components/Chip';
 import { SegmentedControl } from '@/components/SegmentedControl';
-import { APP_VERSION, REPORT_PRICE_URL, SUPPORT_EMAIL } from '@/config/app';
+import { APP_VERSION, SUPPORT_EMAIL } from '@/config/app';
 import { useAreaLabel } from '@/hooks/useAreaLabel';
-import { fuelChipLabel, FUELS } from '@/lib/fuels';
-import { formatPounds } from '@/lib/format';
-import { LITRES_PER_UK_GALLON } from '@/lib/ranking';
+import { useRegion } from '@/hooks/useRegion';
+import { formatMoney } from '@/lib/format';
+import { fuelChipLabel, fuelOption } from '@/lib/regions';
+import { economyLabel, economyToL100, formatDistance, sameEconomy, sameRadius, toKm } from '@/lib/units';
 import { DIRECTIONS_APPS } from '@/services/directions';
-import { FILL_OPTIONS, MPG_OPTIONS, RADIUS_OPTIONS, type ThemePreference, useStore } from '@/store/useStore';
+import { FILL_OPTIONS, type ThemePreference, useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
 const THEMES: readonly { key: ThemePreference; label: string }[] = [
@@ -69,9 +70,13 @@ export default function SettingsScreen() {
   const updateSettings = useStore((s) => s.updateSettings);
   const resetSettings = useStore((s) => s.resetSettings);
   const areaLabel = useAreaLabel();
+  const region = useRegion();
+  const chosenFuel = fuelOption(region, settings.fuel).kind;
+  const distanceUnit = region.distanceUnit;
   const card = { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth };
-  // What a one-mile detour (there and back) costs at a typical 140p a litre, to make "best value" concrete.
-  const mileCost = ((2 * LITRES_PER_UK_GALLON) / settings.mpg) * 1.4;
+  // What one extra mile or kilometre (there and back) costs at a typical price, to make "best value" concrete.
+  const typicalPrice = region.id === 'wa' ? 2.0 : 1.4;
+  const unitCost = 2 * toKm(1, distanceUnit) * (settings.economyL100 / 100) * typicalPrice;
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={[styles.flex, { backgroundColor: colors.background }]} testID="settings-screen">
@@ -80,11 +85,15 @@ export default function SettingsScreen() {
           Settings
         </AppText>
 
+        <AppText variant="caption" tone="muted" style={{ marginTop: spacing.xs }}>
+          Showing {region.name} fuels and units.
+        </AppText>
+
         <Section title="Your fuel">
           <View style={styles.wrap}>
-            {FUELS.map((f) => (
-              <View key={f.code} style={styles.chipGap}>
-                <Chip label={fuelChipLabel(f.code)} selected={settings.fuel === f.code} onPress={() => updateSettings({ fuel: f.code })} testID={`settings-fuel-${f.code}`} />
+            {region.fuels.map((f) => (
+              <View key={f.kind} style={styles.chipGap}>
+                <Chip label={fuelChipLabel(region, f.kind)} selected={chosenFuel === f.kind} onPress={() => updateSettings({ fuel: f.kind })} testID={`settings-fuel-${f.kind}`} />
               </View>
             ))}
           </View>
@@ -92,15 +101,20 @@ export default function SettingsScreen() {
 
         <Section title="Search area" hint="How far to look for the cheapest station. The nearest one is always shown.">
           <View style={styles.wrap}>
-            {RADIUS_OPTIONS.map((r) => (
+            {region.radiusOptions.map((r) => (
               <View key={r} style={styles.chipGap}>
-                <Chip label={`${r} mi`} selected={settings.radiusMiles === r} onPress={() => updateSettings({ radiusMiles: r })} testID={`settings-radius-${r}`} />
+                <Chip
+                  label={`${r} ${distanceUnit}`}
+                  selected={sameRadius(settings.radiusKm, r, distanceUnit)}
+                  onPress={() => updateSettings({ radiusKm: toKm(r, distanceUnit) })}
+                  testID={`settings-radius-${r}`}
+                />
               </View>
             ))}
           </View>
         </Section>
 
-        <Section title="Typical fill-up" hint="Used to show what you save, in pounds.">
+        <Section title="Typical fill-up" hint="Used to show what you save.">
           <View style={styles.wrap}>
             {FILL_OPTIONS.map((l) => (
               <View key={l} style={styles.chipGap}>
@@ -111,15 +125,36 @@ export default function SettingsScreen() {
         </Section>
 
         <Section
-          title="Your car's miles per gallon"
-          hint={`"Best value" adds the fuel to drive there and back. At ${settings.mpg} mpg each extra mile costs about ${formatPounds(mileCost)} there and back.`}
+          title={region.economyUnit === 'mpg' ? "Your car's miles per gallon" : "Your car's fuel use"}
+          hint={`"Best value" adds the fuel to drive there and back. Each extra ${formatDistance(toKm(1, distanceUnit), distanceUnit).replace('1.0 ', '')} costs about ${formatMoney(unitCost, region.currency)} there and back.`}
         >
           <View style={styles.wrap}>
-            {MPG_OPTIONS.map((m) => (
+            {region.economyOptions.map((m) => (
               <View key={m} style={styles.chipGap}>
-                <Chip label={`${m}`} selected={settings.mpg === m} onPress={() => updateSettings({ mpg: m })} testID={`settings-mpg-${m}`} />
+                <Chip
+                  label={economyLabel(m, region.economyUnit)}
+                  selected={sameEconomy(settings.economyL100, m, region.economyUnit)}
+                  onPress={() => updateSettings({ economyL100: economyToL100(m, region.economyUnit) })}
+                  testID={`settings-economy-${m}`}
+                />
               </View>
             ))}
+          </View>
+        </Section>
+
+        <Section title="Members-only stations" hint="Some stations, like Costco, only sell to members. Turn this on if you are one.">
+          <View style={[card, styles.switchRow, { paddingHorizontal: spacing.md, paddingVertical: spacing.sm }]}>
+            <AppText variant="body" style={styles.flex}>
+              Include members-only stations
+            </AppText>
+            <Switch
+              value={settings.includeMembersOnly}
+              onValueChange={(includeMembersOnly) => updateSettings({ includeMembersOnly })}
+              trackColor={{ true: colors.accent, false: colors.border }}
+              thumbColor="#FFFFFF"
+              testID="settings-members"
+              accessibilityLabel="Include members-only stations"
+            />
           </View>
         </Section>
 
@@ -146,7 +181,7 @@ export default function SettingsScreen() {
         <Section title="About">
           <View style={card}>
             <LinkRow icon="information-circle-outline" label="Where the prices come from" onPress={() => router.push('/about')} testID="settings-about" />
-            <LinkRow icon="flag-outline" label="Report a wrong price" onPress={() => void Linking.openURL(REPORT_PRICE_URL)} />
+            <LinkRow icon="flag-outline" label="Report a wrong price" detail={region.source.name} onPress={() => void Linking.openURL(region.report.url)} />
             <LinkRow icon="shield-checkmark-outline" label="Privacy" onPress={() => router.push('/legal/privacy')} testID="settings-privacy" />
             <LinkRow icon="document-text-outline" label="Terms of use" onPress={() => router.push('/legal/terms')} testID="settings-terms" />
             <LinkRow
@@ -175,4 +210,5 @@ const styles = StyleSheet.create({
   wrap: { flexDirection: 'row', flexWrap: 'wrap' },
   chipGap: { marginRight: 8, marginBottom: 8 },
   linkRow: { flexDirection: 'row', alignItems: 'center' },
+  switchRow: { flexDirection: 'row', alignItems: 'center' },
 });
