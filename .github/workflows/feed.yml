@@ -1,0 +1,64 @@
+# Fetches UK fuel prices every 15 minutes and publishes them, with the legal pages, on GitHub Pages.
+# Free on a public repository. Needs two repository secrets, added by the owner:
+#   FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET (from the GOV.UK Fuel Finder developer portal).
+# Without them the site still deploys, with an empty feed the app reports as "prices coming soon".
+name: Price feed
+
+on:
+  schedule:
+    # Off the hour, when GitHub's scheduler is less busy.
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'scripts/feed/**'
+      - 'src/lib/feed.ts'
+      - '.github/workflows/feed.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Build the feed and site
+        run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/build.ts
+        env:
+          FUEL_FINDER_CLIENT_ID: ${{ secrets.FUEL_FINDER_CLIENT_ID }}
+          FUEL_FINDER_CLIENT_SECRET: ${{ secrets.FUEL_FINDER_CLIENT_SECRET }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: out/site
+      # GitHub pauses scheduled jobs on public repositories after 60 days without activity.
+      # Re-enabling the workflow on every run keeps the schedule alive.
+      - name: Keep the schedule alive
+        if: github.event_name == 'schedule'
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/feed.yml/enable" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,117 @@
+{
+  "expo": {
+    "name": "Pumpwise",
+    "slug": "pumpwise",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "pumpwise",
+    "platforms": [
+      "ios",
+      "web"
+    ],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#F4F1EA",
+    "primaryColor": "#FFB000",
+    "description": "The nearest UK fuel station and the cheapest one around you, from official Fuel Finder prices. No account, no adverts, no tracking.",
+    "ios": {
+      "bundleIdentifier": "com.tyjcraw.pumpwise",
+      "supportsTablet": false,
+      "icon": {
+        "light": "./assets/icon.png",
+        "dark": "./assets/icon-dark.png",
+        "tinted": "./assets/icon-tinted.png"
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Pumpwise uses your location while the app is open to show the nearest fuel stations and the cheapest ones around you. Your exact location stays on your iPhone.",
+        "LSApplicationQueriesSchemes": [
+          "comgooglemaps",
+          "waze"
+        ]
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1"
+            ]
+          }
+        ]
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#F4F1EA",
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#0A0F15"
+          }
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Pumpwise uses your location while the app is open to show the nearest fuel stations and the cheapest ones around you. Your exact location stays on your iPhone.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "feedUrl": "https://tjcraw6589.github.io/pumpwise/data/v1",
+      "support": {
+        "email": "tyjcraw@gmail.com",
+        "siteUrl": "https://tjcraw6589.github.io/pumpwise/",
+        "privacyUrl": "https://tjcraw6589.github.io/pumpwise/privacy.html",
+        "termsUrl": "https://tjcraw6589.github.io/pumpwise/terms.html"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "2db14350-2d55-40c8-894c-3aba8f411d63"
+      }
+    },
+    "owner": "tjcraw6589s-team"
+  }
+}

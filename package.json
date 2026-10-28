@@ -1,0 +1,86 @@
+{
+  "name": "pumpwise",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p scripts",
+    "lint": "expo lint",
+    "test": "jest --ci",
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "verify": "npm run typecheck && npm run lint && npm test",
+    "export:web": "expo export --platform web --clear",
+    "export:web:test": "node scripts/export-web-test.mjs",
+    "assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-assets.mjs",
+    "legal:html": "node scripts/build-legal.mjs",
+    "feed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/build.ts",
+    "feed:fixture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/fixture.ts"
+  },
+  "dependencies": {
+    "@expo-google-fonts/barlow-condensed": "^0.4.1",
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~58.0.17",
+    "expo-asset": "~58.0.18",
+    "expo-constants": "~58.0.13",
+    "expo-font": "~58.0.9",
+    "expo-haptics": "~58.0.7",
+    "expo-linking": "~58.0.14",
+    "expo-location": "~58.0.19",
+    "expo-router": "~58.0.25",
+    "expo-splash-screen": "~58.0.11",
+    "expo-status-bar": "~58.0.4",
+    "expo-system-ui": "~58.0.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-maps": "1.29.11",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0",
+    "react-native-svg": "15.16.0",
+    "react-native-web": "^0.21.4",
+    "zustand": "^5.0.16"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/jest": "30.0.0",
+    "@types/react": "~19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~58.0.4",
+    "jest": "~30.5.2",
+    "jest-expo": "~58.0.12",
+    "sharp": "^0.35.5",
+    "typescript": "~6.0.3"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/e2e/",
+      "/dist/"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|zustand|react-native-svg|react-native-maps))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ],
+    "collectCoverageFrom": [
+      "src/lib/**/*.ts",
+      "src/store/**/*.ts"
+    ],
+    "testMatch": [
+      "<rootDir>/__tests__/**/*.test.(ts|tsx)"
+    ]
+  },
+  "private": true
+}

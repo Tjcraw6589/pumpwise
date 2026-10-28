@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pumpwise · Cheap fuel, close by</title>
+<meta name="description" content="Pumpwise shows the nearest UK fuel station and the cheapest one around you, using official Fuel Finder prices.">
+<style>
+  :root { color-scheme: light dark; --bg:#F4F1EA; --fg:#121B26; --muted:#5A6372; --card:#FFFFFF; --border:#E0D9CB; --link:#9A5B00; --sign:#101820; --amber:#FFB000; --green:#3BE38C; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0A0F15; --fg:#F3F0E8; --muted:#A4ACB7; --card:#131B24; --border:#24303C; --link:#FFC54D; --sign:#05090D; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; }
+  .hero { display:flex; align-items:center; gap:16px; }
+  .hero svg { width:64px; height:64px; flex:none; }
+  h1 { font-size: 40px; line-height: 1.05; letter-spacing: -0.5px; margin: 0; }
+  .tag { color: var(--muted); margin: 4px 0 0; }
+  .signs { display:flex; gap:12px; margin: 28px 0; flex-wrap: wrap; }
+  .sign { background: var(--sign); border-radius: 14px; padding: 10px 18px; font: 700 40px/1 "Arial Narrow", "Roboto Condensed", sans-serif; color: var(--amber); letter-spacing: 1px; }
+  .sign.cheap { color: var(--green); }
+  .sign small { display:block; font-size: 11px; letter-spacing: 1.4px; color: #8C97A4; margin-top: 4px; }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px 24px; margin-top: 16px; }
+  h2 { font-size: 20px; margin: 0 0 8px; }
+  a { color: var(--link); }
+  ul { padding-left: 20px; margin: 8px 0 0; }
+  footer { color: var(--muted); font-size: 13px; margin-top: 28px; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <svg viewBox="120 100 760 820" aria-hidden="true">
+      <defs><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC93D"/><stop offset="1" stop-color="#F29A00"/></linearGradient></defs>
+      <path d="M500 118 C 322 118 186 254 186 430 C 186 612 404 806 500 892 C 596 806 814 612 814 430 C 814 254 678 118 500 118 Z" fill="url(#p)"/>
+      <path d="M500 252 C 462 318 382 404 382 478 C 382 548 434 598 500 598 C 566 598 618 548 618 478 C 618 404 538 318 500 252 Z" fill="#101820"/>
+      <path d="M444 452 L500 508 L556 452" fill="none" stroke="#FFB000" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <h1>Pumpwise</h1>
+      <p class="tag">Cheap fuel, close by. For iPhone, anywhere in the UK.</p>
+    </div>
+  </div>
+
+  <div class="signs" aria-hidden="true">
+    <div class="sign cheap">139.9<small>CHEAPEST</small></div>
+    <div class="sign">146.9<small>NEAREST</small></div>
+  </div>
+
+  <section>
+    <h2>What it does</h2>
+    <ul>
+      <li>Shows the nearest station and the cheapest one inside the area you choose, with directions in one tap.</li>
+      <li>Counts the fuel you'd burn getting there, so you can see whether the cheaper station is worth the drive.</li>
+      <li>Every price shows when the forecourt last reported it.</li>
+      <li>No account, no adverts, no tracking.</li>
+    </ul>
+  </section>
+
+  <section id="support">
+    <h2>Support</h2>
+    <p>Questions, ideas or a problem with the app? Email <a href="mailto:tyjcraw@gmail.com?subject=Pumpwise">tyjcraw@gmail.com</a>.</p>
+    <p>If a price is wrong at the pump, please report it to GOV.UK: <a href="https://www.gov.uk/guidance/report-an-error-in-fuel-prices-or-forecourt-details">Report an error in fuel prices or forecourt details</a>.</p>
+  </section>
+
+  <section>
+    <h2>Where the prices come from</h2>
+    <p>Prices come from the UK Government Fuel Finder scheme, which requires forecourts to report price changes within 30 minutes. Pumpwise collects them every 15 minutes.</p>
+    <p>Contains public sector information licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>. Pumpwise is not affiliated with the UK Government.</p>
+  </section>
+
+  <footer><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a></footer>
+</main>
+</body>
+</html>
