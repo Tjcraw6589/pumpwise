@@ -13,9 +13,9 @@ Steps marked **(you)** need your own login or a password, so only you can do the
 3. Register an application (it may be called an "Information Recipient"). Name: `Pumpwise`. Website: `https://tjcraw6589.github.io/pumpwise/`.
 4. You'll get a **client ID** and a **client secret**. Keep this page open; you'll paste both in step 3. Don't send the secret to anyone, including me.
 
-## 2. Put the project on GitHub (Claude, with your OK)
+## 2. Put the project on GitHub (done 28 October 2026)
 
-I create a public repository `Tjcraw6589/pumpwise`, upload the code, and turn on GitHub Pages ("Source: GitHub Actions"). It has to be public for Pages and the 15-minute price job to be free.
+The code is at https://github.com/Tjcraw6589/pumpwise (public, so Pages and the 15-minute price job are free), and GitHub Pages publishes from GitHub Actions. The site, privacy and terms pages are at https://tjcraw6589.github.io/pumpwise/.
 
 ## 3. Add the two keys to GitHub (you, 2 minutes)
 
