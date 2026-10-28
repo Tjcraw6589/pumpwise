@@ -25,6 +25,7 @@ const DEVICES =
       ]
     : [{ name: 'review', width: 390, height: 844, scale: 2 }];
 const THEMES = mode === 'store' ? ['light'] : ['light', 'dark'];
+const STORE_SKIP = new Set(['03-location', '05-list', '07-map', '10-about', '11-outside-uk']);
 
 function settings(theme, extra = {}) {
   return JSON.stringify({
@@ -68,6 +69,8 @@ try {
       });
       const page = await context.newPage();
       const shot = async (name) => {
+        // Store sets leave out the web-only map preview and the states nobody needs to see in a listing.
+        if (mode === 'store' && STORE_SKIP.has(name)) return;
         await page.waitForTimeout(400);
         await page.screenshot({ path: join(outDir, `${name}.png`) });
         console.log(`${device.name} ${theme} ${name}`);
