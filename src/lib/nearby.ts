@@ -1,6 +1,9 @@
 import { type RegionId, regionAt } from './feed';
+import { timeAgo } from './format';
 import { distanceKm, type LatLng } from './geo';
+import { localClock } from './hours';
 import type { Ranking } from './ranking';
+import type { RegionInfo } from './regions';
 
 /** Re-download prices when the feed may have moved on (it is rebuilt every 15 minutes). */
 export const RELOAD_AFTER_MS = 5 * 60_000;
@@ -67,4 +70,22 @@ export function nearbyPhase(input: PhaseInput): NearbyPhase {
   }
   if (!input.ranking || input.ranking.inArea.length === 0) return 'empty';
   return 'ready';
+}
+
+/**
+ * A warning when the feed is behind what drivers expect, or null. Where prices are fixed for the
+ * day (WA), the feed only needs a rebuild after the price day starts; elsewhere, two hours is enough.
+ */
+export function feedWarning(generatedAt: string, region: RegionInfo, now: Date): string | null {
+  const built = Date.parse(generatedAt);
+  if (!Number.isFinite(built)) return null;
+  if (region.priceMode === 'daily') {
+    const local = localClock(now, region.utcOffsetMinutes(now));
+    let since = local.minutes * 60 + now.getUTCSeconds() - (region.priceDayStartHour ?? 0) * 3600;
+    if (since < 0) since += 86_400;
+    const dayStart = now.getTime() - since * 1000;
+    return built < dayStart ? "Today's prices haven't come through yet. Showing the last ones we have." : null;
+  }
+  const hours = (now.getTime() - built) / 3_600_000;
+  return hours > 2 ? `The price feed last updated ${timeAgo(generatedAt, now)}. Prices may have changed since.` : null;
 }

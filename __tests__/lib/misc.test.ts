@@ -1,6 +1,6 @@
 import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, timeAgo } from '@/lib/format';
 import { distanceKm, regionForRadius } from '@/lib/geo';
-import { nearbyPhase, needsReload, RELOAD_AFTER_MS } from '@/lib/nearby';
+import { feedWarning, nearbyPhase, needsReload, RELOAD_AFTER_MS } from '@/lib/nearby';
 import { classifyQuery } from '@/lib/places';
 import { rankStations } from '@/lib/ranking';
 import { fuelChipLabel, fuelOption, regionInfoAt, regionList, REGIONS } from '@/lib/regions';
@@ -109,6 +109,23 @@ describe('places', () => {
     expect(classifyQuery('m1')).toEqual({ kind: 'uk-outcode', value: 'M1' });
     expect(classifyQuery('  Cannington ')).toEqual({ kind: 'name', value: 'Cannington' });
     expect(classifyQuery('a')).toBeNull();
+  });
+});
+
+describe('feedWarning', () => {
+  test('WA: only when the feed predates 6am Perth today', () => {
+    // 12:00 Perth on 29 Oct: the price day started at 22:00 UTC on 28 Oct.
+    expect(feedWarning('2026-10-28T22:30:00Z', REGIONS.wa, NOW)).toBeNull();
+    expect(feedWarning('2026-10-28T14:00:00Z', REGIONS.wa, NOW)).toMatch(/haven't come through/);
+    // 05:00 Perth: yesterday's price day is still running, so a feed from last night is fine.
+    const early = new Date('2026-10-28T21:00:00Z');
+    expect(feedWarning('2026-10-28T10:00:00Z', REGIONS.wa, early)).toBeNull();
+    expect(feedWarning('2026-10-27T10:00:00Z', REGIONS.wa, early)).not.toBeNull();
+  });
+  test('UK: after two hours', () => {
+    expect(feedWarning('2026-10-29T02:30:00Z', REGIONS.uk, NOW)).toBeNull();
+    expect(feedWarning('2026-10-29T01:00:00Z', REGIONS.uk, NOW)).toMatch(/3 h ago/);
+    expect(feedWarning('garbage', REGIONS.uk, NOW)).toBeNull();
   });
 });
 

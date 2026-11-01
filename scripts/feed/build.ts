@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import { buildFeed, type FeedMeta, type FeedStation, type FeedTile, FEED_VERSION, type RegionId, type RegionStatus } from '../../src/lib/feed.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
-import { fetchWa, WA_MIN_STATIONS } from './sources/wa.ts';
+import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = process.env.FEED_OUT_DIR ?? join(root, 'out', 'site');
@@ -24,11 +24,13 @@ interface Source {
   minStations: number;
   enabled: () => boolean;
   fetch: (now: Date) => Promise<{ stations: FeedStation[]; tomorrow: boolean }>;
+  /** Moments after which the previous prices must not be reused, such as the start of a new price day. */
+  refetchMoments?: (now: Date) => Date[];
 }
 
 const SOURCES: Source[] = [
   // FuelWatch prices change once a day (6am) and tomorrow's appear at 2:30pm, so hourly is plenty.
-  { id: 'wa', everyMinutes: 55, minStations: WA_MIN_STATIONS, enabled: () => true, fetch: fetchWa },
+  { id: 'wa', everyMinutes: 55, minStations: WA_MIN_STATIONS, enabled: () => true, fetch: fetchWa, refetchMoments: waRefetchMoments },
   {
     id: 'uk',
     everyMinutes: 0,
@@ -102,7 +104,8 @@ async function main(): Promise<void> {
     const before = previous?.meta.regions[source.id];
     const kept = previous?.byRegion.get(source.id) ?? [];
     const ageMinutes = before ? (now.getTime() - Date.parse(before.updatedAt)) / 60_000 : Infinity;
-    if (!FORCE && before?.status === 'live' && kept.length > 0 && ageMinutes < source.everyMinutes) {
+    const crossed = before ? (source.refetchMoments?.(now) ?? []).some((m) => Date.parse(before.updatedAt) < m.getTime()) : false;
+    if (!FORCE && before?.status === 'live' && kept.length > 0 && ageMinutes < source.everyMinutes && !crossed) {
       console.log(`${source.id}: reusing prices from ${Math.round(ageMinutes)} min ago`);
       stations.push(...kept);
       regions[source.id] = before;

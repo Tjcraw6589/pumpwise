@@ -28,8 +28,10 @@ export interface RegionInfo {
   radiusOptions: readonly number[];
   /** Car fuel economy choices, in the region's economy unit. */
   economyOptions: readonly number[];
-  /** "reported": each price has its own report time. "daily": prices are fixed for the day from 6am. */
+  /** "reported": each price has its own report time. "daily": prices are fixed for the day. */
   priceMode: 'reported' | 'daily';
+  /** Local hour the price day starts, for "daily" regions. */
+  priceDayStartHour?: number;
   /** Minutes ahead of UTC on a given date (for opening hours and "today"). */
   utcOffsetMinutes: (date: Date) => number;
   source: { name: string; url: string; credit: string };
@@ -71,6 +73,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'daily',
+    priceDayStartHour: 6,
     utcOffsetMinutes: () => 8 * 60,
     source: {
       name: 'FuelWatch',

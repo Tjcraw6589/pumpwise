@@ -189,6 +189,17 @@ export function perthClock(now: Date): { hour: number; minute: number } {
   return { hour: local.getUTCHours(), minute: local.getUTCMinutes() };
 }
 
+/** The last 6:00am and 2:30pm in Perth before `now`: when today's prices start and tomorrow's appear. */
+export function waRefetchMoments(now: Date): Date[] {
+  const { hour, minute } = perthClock(now);
+  const nowSecs = hour * 3600 + minute * 60 + now.getUTCSeconds();
+  return [6 * 3600, 14 * 3600 + 30 * 60].map((target) => {
+    let since = nowSecs - target;
+    if (since < 0) since += 86_400;
+    return new Date(now.getTime() - since * 1000);
+  });
+}
+
 export function tomorrowPublished(now: Date): boolean {
   const { hour, minute } = perthClock(now);
   return hour > 14 || (hour === 14 && minute >= 30);

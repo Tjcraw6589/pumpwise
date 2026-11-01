@@ -18,6 +18,7 @@ import { useDirections } from '@/hooks/useDirections';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
 import { formatChange, formatMoney, timeAgo } from '@/lib/format';
+import { feedWarning } from '@/lib/nearby';
 import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
 import { fuelOption, type RegionInfo } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
@@ -98,7 +99,7 @@ export default function NearbyScreen() {
   const band = useMemo(() => priceBands(ranking?.inArea ?? []), [ranking]);
   const openStation = (id: string) => router.push({ pathname: '/station/[id]', params: { id } });
 
-  const feedAgeHours = meta ? (now.getTime() - Date.parse(meta.generatedAt)) / 3_600_000 : 0;
+  const staleWarning = meta ? feedWarning(meta.generatedAt, region, now) : null;
   const cheapest = ranking?.cheapest ?? null;
   const nearest = ranking?.nearest ?? null;
   const bestValue = ranking?.bestValue ?? null;
@@ -152,13 +153,7 @@ export default function NearbyScreen() {
         />
       ) : null}
       {phase === 'ready' && ranking?.trend ? <TrendNotice trend={ranking.trend} region={region} fuelLabel={fuel.label} /> : null}
-      {phase === 'ready' && feedAgeHours > 2 ? (
-        <Notice
-          tone="warning"
-          icon="time-outline"
-          text={`The price feed last updated ${timeAgo(meta?.generatedAt ?? '', now)}. Prices may have changed since.`}
-        />
-      ) : null}
+      {phase === 'ready' && staleWarning ? <Notice tone="warning" icon="time-outline" text={staleWarning} testID="feed-warning" /> : null}
 
       {phase !== 'ready' ? (
         <PhaseState phase={phase} />

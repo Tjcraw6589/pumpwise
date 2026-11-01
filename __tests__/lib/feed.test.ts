@@ -19,6 +19,7 @@ import {
   parseWaHours,
   tomorrowPublished,
   waPriceStart,
+  waRefetchMoments,
   waTags,
 } from '../../scripts/feed/sources/wa.ts';
 
@@ -204,6 +205,15 @@ describe('WA source (FuelWatch RSS)', () => {
     expect(tomorrowPublished(new Date('2026-10-29T06:30:00Z'))).toBe(true);
     expect(tomorrowPublished(new Date('2026-10-29T15:59:00Z'))).toBe(true); // 23:59
     expect(tomorrowPublished(new Date('2026-10-29T16:00:00Z'))).toBe(false); // midnight
+  });
+
+  test('refetch moments are the last 6am and 2:30pm in Perth', () => {
+    // 10:00 Perth on 29 Oct.
+    const [six, halfTwo] = waRefetchMoments(new Date('2026-10-29T02:00:00Z'));
+    expect(six?.toISOString()).toBe('2026-10-28T22:00:00.000Z');
+    expect(halfTwo?.toISOString()).toBe('2026-10-28T06:30:00.000Z');
+    // 15:00 Perth: 2:30pm was half an hour ago.
+    expect(waRefetchMoments(new Date('2026-10-29T07:00:00Z'))[1]?.toISOString()).toBe('2026-10-29T06:30:00.000Z');
   });
 
   test('joins products into stations with tomorrow prices', () => {
