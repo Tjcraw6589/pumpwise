@@ -92,7 +92,7 @@ First release, covering Western Australia.
 
 ## Screenshots
 
-`store/screenshots/iphone-6.9/` (1320 x 2868) and `store/screenshots/iphone-6.5/` (1284 x 2778), made by `node scripts/screenshots.mjs store` from the web build. They show live FuelWatch prices around Perth on the day they were taken. iPad screenshots are not needed: the app is iPhone only.
+Made by `node scripts/screenshots.mjs store` from the web build, showing live FuelWatch prices around Perth on the day they were taken. App Store Connect's main iPhone slot ("iPhone with Dynamic Island", 6.1"/6.3") only accepts 1206 x 2622, so upload `store/screenshots/iphone-6.3/`; it says "file dimensions are invalid" for the 6.9" (1320 x 2868) and 6.5" (1284 x 2778) sets, which are kept for the optional larger-display slots in Media Manager. iPad screenshots are not needed: the app is iPhone only.
 
 ## App Privacy (App Store Connect → App Privacy)
 

@@ -20,6 +20,8 @@ const mode = process.argv[2] === 'store' ? 'store' : 'review';
 const DEVICES =
   mode === 'store'
     ? [
+        // App Store Connect's main iPhone slot (6.1"/6.3" Dynamic Island) takes 1206 x 2622.
+        { name: 'iphone-6.3', width: 402, height: 874, scale: 3 },
         { name: 'iphone-6.9', width: 440, height: 956, scale: 3 },
         { name: 'iphone-6.5', width: 428, height: 926, scale: 3 },
       ]
