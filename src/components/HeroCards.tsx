@@ -45,7 +45,9 @@ function SavingsLine({ savings, fillLitres, item }: { savings: Savings; fillLitr
     savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
   const text = savings.worthIt
     ? `Saves ${formatMoney(savings.amount, region.currency)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
-    : `Only ${formatMoney(Math.max(0, savings.pumpSaving), region.currency)} cheaper on ${fillLitres} L than the nearest, and the extra driving eats most of that.`;
+    : savings.amount > 0
+      ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. The nearest is fine today.`
+      : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. The nearest is the better deal.`;
   return (
     <View
       testID="savings-line"
@@ -169,7 +171,7 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
       <View style={[styles.mainRow, { marginTop: spacing.sm }]}>
         <PriceSign pence={item.price.p} size="md" label={fuelOption(REGIONS[station.region], fuel).pumpCode} testID="nearest-price" />
         <View style={[styles.flex, { marginLeft: spacing.md }]}>
-          <AppText variant="bodyBold" numberOfLines={1} testID="nearest-name">
+          <AppText variant="bodyBold" numberOfLines={2} testID="nearest-name">
             {station.name}
           </AppText>
           <Meta item={item} />

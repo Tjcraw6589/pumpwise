@@ -75,7 +75,8 @@ export default function PlaceScreen() {
   }, [query, searchable, liveKey]);
 
   const current = search && search.query === query ? search : null;
-  const results = current?.results ?? [];
+  const cityMatches = searchable ? citiesFor(coverage.live).filter((c) => c.name.toLowerCase().startsWith(query.trim().toLowerCase())) : [];
+  const results = [...cityMatches, ...(current?.results ?? []).filter((p) => !cityMatches.some((c) => c.name === p.name))];
   const status = searchable ? (current?.status ?? 'searching') : 'idle';
 
   const pick = (place: Place) => {
@@ -127,7 +128,7 @@ export default function PlaceScreen() {
               Nothing in {regionList(coverage.live)} matches “{query.trim()}”.
             </AppText>
           ) : null}
-          {status === 'error' ? (
+          {status === 'error' && results.length === 0 ? (
             <AppText variant="body" tone="muted" style={{ paddingVertical: spacing.md }}>
               Search isn&apos;t answering. Check your connection, or pick a city below.
             </AppText>

@@ -5,6 +5,9 @@ import { REGIONS } from './regions';
 
 /** Prices older than this are still listed but never picked as "cheapest" or "nearest". */
 export const HERO_MAX_AGE_DAYS = 30;
+/** A detour counts as worth it only when it saves at least this much, and this much per extra km. */
+export const WORTH_IT_MIN = 1.0;
+export const WORTH_IT_PER_KM = 0.2;
 /** Tags that mean a driver may not be able to buy here. */
 export const MEMBERS_ONLY = 'members-only';
 export const PERMIT_REQUIRED = 'permit-required';
@@ -120,11 +123,12 @@ export function rankStations(stations: FeedStation[], options: RankOptions): Ran
   let savings: Savings | null = null;
   if (nearest && cheapest && nearest.station.id !== cheapest.station.id) {
     const amount = nearest.realCost - cheapest.realCost;
+    const extraKm = Math.max(0, 2 * (cheapest.distance - nearest.distance));
     savings = {
       amount,
       pumpSaving: (fillLitres * (nearest.price.p - cheapest.price.p)) / 100,
-      extraKm: Math.max(0, 2 * (cheapest.distance - nearest.distance)),
-      worthIt: amount >= 0.25,
+      extraKm,
+      worthIt: amount >= WORTH_IT_MIN && amount >= WORTH_IT_PER_KM * extraKm,
     };
   }
 
@@ -150,7 +154,8 @@ export type PriceBand = 'low' | 'mid' | 'high';
 export function priceBands(list: RankedStation[]): (price: number) => PriceBand {
   const prices = list.map((r) => r.price.p).sort((a, b) => a - b);
   if (prices.length < 3) return () => 'mid';
-  const low = prices[Math.floor((prices.length - 1) * 0.25)] ?? 0;
+  // Green: within 2.0 of the cheapest. Red: the dearest quarter.
+  const low = (prices[0] ?? 0) + 2.0;
   const high = prices[Math.ceil((prices.length - 1) * 0.75)] ?? 0;
   return (price) => (price <= low ? 'low' : price >= high && high > low ? 'high' : 'mid');
 }

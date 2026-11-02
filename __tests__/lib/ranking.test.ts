@@ -48,9 +48,17 @@ describe('rankStations', () => {
     const dNear = distanceKm(CENTER, stations[0] as FeedStation);
     const dCheap = distanceKm(CENTER, stations[1] as FeedStation);
     expect(r.savings?.pumpSaving).toBeCloseTo(4.8, 5);
+    expect(r.savings?.worthIt).toBe(true);
     expect(r.savings?.extraKm).toBeCloseTo(8.4, 1);
     expect(r.savings?.amount).toBeCloseTo(((40 + trip(dNear)) * 205.9 - (40 + trip(dCheap)) * 193.9) / 100, 6);
     expect(r.savings?.worthIt).toBe(true);
+  });
+
+  test('a small saving over a long detour is not worth the time', () => {
+    // $2.40 at the pump but 14 km of extra driving: a few cents ahead, not worth the time.
+    const r = rankStations([st('near', 0.8, 205.9), st('cheap', 7.8, 199.9)], options);
+    expect(r.savings?.amount).toBeGreaterThan(0);
+    expect(r.savings?.worthIt).toBe(false);
   });
 
   test('a tiny saving far away is not worth it, and best value counts the drive', () => {
@@ -124,6 +132,8 @@ describe('priceBands', () => {
     const r = rankStations([st('a', 1, 190), st('b', 1.1, 195), st('c', 1.2, 200), st('d', 1.3, 205), st('e', 1.4, 210)], options);
     const band = priceBands(r.inArea);
     expect(band(190)).toBe('low');
+    expect(band(191.9)).toBe('low');
+    expect(band(195)).toBe('mid');
     expect(band(200)).toBe('mid');
     expect(band(210)).toBe('high');
   });
