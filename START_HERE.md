@@ -16,25 +16,11 @@ FuelWatch allows apps to use its data as long as FuelWatch is credited with a li
 
 App ID `com.tyjcraw.pumpwise` is registered on the Apple developer site, and the app exists in App Store Connect as **Pumpwise: Fuel Prices Near Me** (Apple ID 6828174153, SKU `pumpwise`, primary language English (Australia)). `eas.json` already points uploads at it. Team ID: JA885J7PGW.
 
-## 3. Build and upload the real app (you, about 5 minutes of typing, then 20 to 40 minutes of waiting)
+## 3 and 4. Build, upload, listing and submission (done 1 November 2026)
 
-Open a terminal in the project folder (`cd C:\Users\Tyjcr\Documents\Pumpwise`) and run:
+Build 4 (version 1.0) was uploaded and the full listing filled in. Pumpwise was submitted to App Review on 1 November 2026 and is "Waiting for Review". Apple emails when the review finishes (usually within 48 hours); release is automatic after approval.
 
-```
-eas build -p ios --profile production
-```
-
-It asks you to sign in to your Apple account once, so it can make Pumpwise's signing certificate and provisioning profile. Type your Apple password yourself. Then:
-
-```
-eas submit -p ios --latest
-```
-
-Each build uses one of Expo's 15 free iPhone builds a month.
-
-## 4. Fill in the listing and submit (you or Claude, about 30 minutes)
-
-Everything to paste is in `STORE_LISTING.md`: name, subtitle, description, keywords, categories, privacy answers ("Data Not Collected"), age rating and review notes. Screenshots are in `store/screenshots/`. Set availability to **Australia**, attach the build, and press **Add for Review**.
+If Apple asks for changes: fix, `eas build -p ios --profile production` (no sign-in needed now), `eas submit -p ios --latest`, then in App Store Connect remove the version from review, attach the new build, and submit again.
 
 ---
 
