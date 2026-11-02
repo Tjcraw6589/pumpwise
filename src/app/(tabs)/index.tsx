@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { FlatList, Linking, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AdBanner } from '@/components/AdBanner';
 import { AppText } from '@/components/AppText';
 import { CheapestCard, NearestCard } from '@/components/HeroCards';
 import { Notice } from '@/components/Notice';
@@ -243,6 +244,7 @@ export default function NearbyScreen() {
         initialNumToRender={12}
         refreshControl={<RefreshControl refreshing={refreshing && phase === 'ready'} onRefresh={requestRefresh} tintColor={colors.accent} />}
       />
+      <AdBanner />
     </SafeAreaView>
   );
 }

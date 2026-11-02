@@ -13,6 +13,7 @@ import { useRegion } from '@/hooks/useRegion';
 import { formatMoney } from '@/lib/format';
 import { fuelChipLabel, fuelOption } from '@/lib/regions';
 import { economyLabel, economyToL100, formatDistance, sameEconomy, sameRadius, toKm } from '@/lib/units';
+import { showAdPrivacyOptions, usePrivacyOptionsRequired } from '@/services/ads';
 import { DIRECTIONS_APPS } from '@/services/directions';
 import { FILL_OPTIONS, type ThemePreference, useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -71,6 +72,7 @@ export default function SettingsScreen() {
   const resetSettings = useStore((s) => s.resetSettings);
   const areaLabel = useAreaLabel();
   const region = useRegion();
+  const adPrivacyRequired = usePrivacyOptionsRequired();
   const chosenFuel = fuelOption(region, settings.fuel).kind;
   const distanceUnit = region.distanceUnit;
   const card = { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth };
@@ -183,6 +185,9 @@ export default function SettingsScreen() {
             <LinkRow icon="information-circle-outline" label="Where the prices come from" onPress={() => router.push('/about')} testID="settings-about" />
             <LinkRow icon="flag-outline" label="Report a wrong price" detail={region.source.name} onPress={() => void Linking.openURL(region.report.url)} />
             <LinkRow icon="shield-checkmark-outline" label="Privacy" onPress={() => router.push('/legal/privacy')} testID="settings-privacy" />
+            {adPrivacyRequired ? (
+              <LinkRow icon="options-outline" label="Ad privacy choices" onPress={() => void showAdPrivacyOptions()} testID="settings-ad-privacy" />
+            ) : null}
             <LinkRow icon="document-text-outline" label="Terms of use" onPress={() => router.push('/legal/terms')} testID="settings-terms" />
             <LinkRow
               icon="mail-outline"
@@ -198,7 +203,7 @@ export default function SettingsScreen() {
           </AppText>
         </Pressable>
         <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.lg }}>
-          Pumpwise {APP_VERSION} · No account, no tracking.
+          Pumpwise {APP_VERSION} · No account. A small ad keeps it free.
         </AppText>
       </ScrollView>
     </SafeAreaView>

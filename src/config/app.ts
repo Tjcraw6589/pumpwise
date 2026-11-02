@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 
 interface Extra {
   feedUrl?: string;
+  monetization?: { admobBannerIos?: string };
   support?: { email?: string; siteUrl?: string; privacyUrl?: string; termsUrl?: string };
 }
 
@@ -20,3 +21,6 @@ export const APP_NAME = Constants.expoConfig?.name ?? 'Pumpwise';
 export const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
 export const SUPPORT_EMAIL = extra.support?.email ?? 'tyjcraw@gmail.com';
 export const SITE_URL = extra.support?.siteUrl ?? 'https://tjcraw6589.github.io/pumpwise/';
+
+/** AdMob banner unit for the Nearby tab. Empty until the owner adds it, which means no ads at all. */
+export const ADMOB_BANNER_IOS = (extra.monetization?.admobBannerIos ?? '').trim();

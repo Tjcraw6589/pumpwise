@@ -6,6 +6,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { initializeAds } from '@/services/ads';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
@@ -26,6 +27,11 @@ export default function RootLayout() {
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(theme.colors.background).catch(() => undefined);
   }, [theme.colors.background]);
+
+  useEffect(() => {
+    // Ads (and the consent or tracking prompts that may precede them) only start after onboarding.
+    if (ready && onboardingComplete) void initializeAds();
+  }, [ready, onboardingComplete]);
 
   if (!ready) return null;
 

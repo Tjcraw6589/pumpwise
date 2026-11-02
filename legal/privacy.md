@@ -1,12 +1,12 @@
 # Pumpwise Privacy Policy
 
-Last updated: 29 October 2026
+Last updated: 2 November 2026
 
 Pumpwise shows official fuel prices near you. It is built to need as little of your information as possible. This policy explains what the app does and does not do with data.
 
 ## The short version
 
-- Pumpwise has no accounts, no sign-in, no adverts, no analytics and no tracking.
+- Pumpwise has no accounts, no sign-in and no analytics. A small banner advert keeps the app free; advertising is the only part of the app where a third party receives device information.
 - Your location is used on your iPhone to work out distances. It is never sent to us or stored by us.
 - Your settings (fuel, search area, fill-up size, fuel economy, recent places) stay on your iPhone.
 
@@ -29,6 +29,16 @@ When you tap Directions, Pumpwise opens Apple Maps, Google Maps or Waze with the
 ## Data you choose
 
 Your fuel, search area, fill-up size, fuel economy, members-only choice, appearance and recent places are saved in the app's private storage on your iPhone. They are never transmitted. Deleting the app removes them.
+
+## Advertising
+
+Pumpwise shows a small banner advert using the Google Mobile Ads SDK (AdMob). To serve and measure adverts, Google may collect information such as your device's advertising identifier, IP address, approximate location derived from it, device model and operating system, and interactions with adverts. How Google uses this information is described in Google's Privacy Policy at https://policies.google.com/privacy and at https://policies.google.com/technologies/partner-sites.
+
+- On iOS, the App Tracking Transparency prompt lets you allow or refuse tracking. If you refuse, adverts are still shown but are not personalised using your identifier.
+- In the European Economic Area, the United Kingdom and Switzerland, Google's consent form is shown before personalised adverts are requested, and Settings offers "Ad privacy choices" to change your answer.
+- You can reset or limit your advertising identifier in your iPhone settings at any time.
+
+Your precise location is never shared with the advertising SDK.
 
 ## Children
 

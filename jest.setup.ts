@@ -64,6 +64,30 @@ jest.mock('expo-location', () => {
   };
 });
 
+jest.mock('react-native-google-mobile-ads', () => ({
+  __esModule: true,
+  default: () => ({
+    initialize: jest.fn(async () => []),
+    setRequestConfiguration: jest.fn(async () => undefined),
+  }),
+  BannerAd: () => null,
+  BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
+  TestIds: { ADAPTIVE_BANNER: 'test-banner' },
+  MaxAdContentRating: { G: 'G', PG: 'PG', T: 'T', MA: 'MA' },
+  AdsConsentPrivacyOptionsRequirementStatus: { REQUIRED: 'REQUIRED', NOT_REQUIRED: 'NOT_REQUIRED', UNKNOWN: 'UNKNOWN' },
+  AdsConsent: {
+    gatherConsent: jest.fn(async () => ({ canRequestAds: true })),
+    getConsentInfo: jest.fn(async () => ({ canRequestAds: true, privacyOptionsRequirementStatus: 'NOT_REQUIRED' })),
+    showPrivacyOptionsForm: jest.fn(async () => undefined),
+  },
+}));
+
+jest.mock('expo-tracking-transparency', () => ({
+  getTrackingPermissionsAsync: jest.fn(async () => ({ status: 'granted' })),
+  requestTrackingPermissionsAsync: jest.fn(async () => ({ status: 'granted' })),
+  PermissionStatus: { UNDETERMINED: 'undetermined', GRANTED: 'granted', DENIED: 'denied' },
+}));
+
 jest.mock('react-native-svg', () => {
   const React = require('react');
   const { View } = require('react-native');
