@@ -49,7 +49,7 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
       <PriceSign pence={item.price.p} size="md" tone={item.stale ? 'muted' : band === 'low' ? 'cheap' : 'normal'} />
       <View style={[styles.body, { marginLeft: spacing.md }]}>
         <View style={styles.titleRow}>
-          <AppText variant="bodyBold" numberOfLines={1} style={styles.flex}>
+          <AppText variant="bodyBold" numberOfLines={2} style={styles.flex}>
             {station.name}
           </AppText>
           <AppText variant="stat" style={{ marginLeft: spacing.sm, fontSize: 17, lineHeight: 22 }}>
@@ -61,24 +61,25 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
             {subtitle}
           </AppText>
         ) : null}
-        <View style={[styles.metaRow, { marginTop: 4 }]}>
-          <View style={styles.flex}>
+        {/* Wraps instead of cutting words off when the screen is narrow. */}
+        <View style={[styles.metaRow, { marginTop: 4, columnGap: spacing.sm }]}>
+          <View>
             {item.tomorrow !== null ? (
-              <TomorrowTag today={item.price.p} tomorrow={item.tomorrow} />
+              <TomorrowTag today={item.price.p} tomorrow={item.tomorrow} compact />
             ) : (
               <FreshnessTag at={item.price.at} region={station.region} now={now} />
             )}
           </View>
           {note ? (
-            <AppText variant="small" tone="warning" numberOfLines={1}>
+            <AppText variant="small" tone="warning" numberOfLines={1} style={styles.end}>
               {note}
             </AppText>
           ) : sortBy === 'value' ? (
-            <AppText variant="small" tone="muted">
+            <AppText variant="small" tone="muted" style={styles.end}>
               {formatMoney(item.realCost, region.currency)} total
             </AppText>
           ) : open.label ? (
-            <AppText variant="small" tone={closed ? 'pricey' : 'muted'} numberOfLines={1}>
+            <AppText variant="small" tone={closed ? 'pricey' : 'muted'} numberOfLines={1} style={styles.end}>
               {closed ? 'Closed' : open.label.replace('Open until', 'Till')}
             </AppText>
           ) : null}
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth },
   body: { flex: 1 },
   titleRow: { flexDirection: 'row', alignItems: 'center' },
-  metaRow: { flexDirection: 'row', alignItems: 'center' },
+  metaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
+  end: { marginLeft: 'auto' },
   flex: { flex: 1 },
 });

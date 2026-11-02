@@ -21,7 +21,7 @@ function Meta({ item }: { item: RankedStation }) {
   return (
     <View style={[styles.metaRow, { marginTop: spacing.xs }]}>
       <Ionicons name="navigate" size={13} color={colors.accentText} />
-      <AppText variant="caption" tone="muted" style={{ marginLeft: 4 }} numberOfLines={1}>
+      <AppText variant="caption" tone="muted" style={{ marginLeft: 4, flexShrink: 1 }} numberOfLines={2}>
         {parts.join(' · ')}
       </AppText>
     </View>
@@ -38,16 +38,18 @@ function PriceInfo({ item, now }: { item: RankedStation; now: Date }) {
   );
 }
 
-function SavingsLine({ savings, fillLitres, item }: { savings: Savings; fillLitres: number; item: RankedStation }) {
+function SavingsLine({ savings, fillLitres, item, betterPick }: { savings: Savings; fillLitres: number; item: RankedStation; betterPick: boolean }) {
   const { colors, spacing, radius } = useTheme();
   const region = REGIONS[item.station.region];
   const extra =
     savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
+  // When a third station beats the nearest once the drive is counted, point there instead of at the nearest.
+  const verdict = betterPick ? 'The best value pick below beats both.' : savings.amount > 0 ? 'The nearest is fine today.' : 'The nearest is the better deal.';
   const text = savings.worthIt
     ? `Saves ${formatMoney(savings.amount, region.currency)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
     : savings.amount > 0
-      ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. The nearest is fine today.`
-      : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. The nearest is the better deal.`;
+      ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. ${verdict}`
+      : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. ${verdict}`;
   return (
     <View
       testID="savings-line"
@@ -76,13 +78,15 @@ interface CheapestCardProps {
   fillLitres: number;
   savings: Savings | null;
   alsoNearest: boolean;
+  /** A best value station (shown below) beats the nearest once the drive is counted. */
+  betterPick?: boolean;
   now: Date;
   onDirections: () => void;
   onDetails: () => void;
 }
 
 /** The headline: the cheapest open station inside the search area. */
-export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, now, onDirections, onDetails }: CheapestCardProps) {
+export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, betterPick = false, now, onDirections, onDetails }: CheapestCardProps) {
   const { colors, spacing, radius } = useTheme();
   const { station } = item;
   const region = REGIONS[station.region];
@@ -118,7 +122,7 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           <PriceInfo item={item} now={now} />
         </View>
       </Pressable>
-      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} /> : null}
+      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} betterPick={betterPick} /> : null}
       <View style={[styles.actions, { marginTop: spacing.lg, gap: spacing.sm }]}>
         <Button
           label="Directions"

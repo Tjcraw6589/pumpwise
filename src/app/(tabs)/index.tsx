@@ -104,6 +104,8 @@ export default function NearbyScreen() {
   const cheapest = ranking?.cheapest ?? null;
   const nearest = ranking?.nearest ?? null;
   const bestValue = ranking?.bestValue ?? null;
+  const showBestValue = !!bestValue && bestValue.station.id !== cheapest?.station.id && bestValue.station.id !== nearest?.station.id;
+  const betterPick = showBestValue && !!nearest && !!bestValue && bestValue.realCost < nearest.realCost - 0.005;
 
   const header = (
     <View>
@@ -168,6 +170,7 @@ export default function NearbyScreen() {
               fillLitres={settings.fillLitres}
               savings={ranking?.savings ?? null}
               alsoNearest={nearest?.station.id === cheapest.station.id}
+              betterPick={betterPick}
               now={now}
               onDirections={() => directions(cheapest.station)}
               onDetails={() => openStation(cheapest.station.id)}
@@ -188,7 +191,7 @@ export default function NearbyScreen() {
               onDetails={() => openStation(nearest.station.id)}
             />
           ) : null}
-          {bestValue && bestValue.station.id !== cheapest?.station.id && bestValue.station.id !== nearest?.station.id ? (
+          {showBestValue && bestValue ? (
             <BestValueRow item={bestValue} onPress={() => openStation(bestValue.station.id)} />
           ) : null}
 

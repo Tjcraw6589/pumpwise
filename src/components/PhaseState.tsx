@@ -167,13 +167,15 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       );
     case 'empty': {
       const unit = region.distanceUnit;
-      const wider = region.radiusOptions.find((r) => toKm(r, unit) > radiusKm && !sameRadius(radiusKm, r, unit));
+      // Jump to at least double the area, so a remote driver isn't stepping 8, 10, 15, 25 km one tap at a time.
+      const bigger = region.radiusOptions.filter((r) => toKm(r, unit) > radiusKm && !sameRadius(radiusKm, r, unit));
+      const wider = bigger.find((r) => toKm(r, unit) >= 2 * radiusKm) ?? bigger[bigger.length - 1];
       const f = fuelOption(region, fuel);
       return (
         <EmptyState
           icon="search"
           title={`Nothing within ${radiusLabel(radiusKm, unit)}`}
-          body={`No station in this area has a ${f.label} (${f.pumpCode}) price right now. Try a wider area or another fuel.`}
+          body={`No station in this area has a price for ${f.label} (${f.pumpCode}) right now. ${wider ? 'Try a wider area or another fuel.' : 'Try another fuel, or choose a place to look around.'}`}
           testID="state-empty"
         >
           {wider ? (
