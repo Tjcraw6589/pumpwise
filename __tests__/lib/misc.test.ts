@@ -113,14 +113,16 @@ describe('places', () => {
 });
 
 describe('feedWarning', () => {
-  test('WA: only when the feed predates 6am Perth today', () => {
+  test("WA: only when the prices on screen are not today's", () => {
     // 12:00 Perth on 29 Oct: the price day started at 22:00 UTC on 28 Oct.
-    expect(feedWarning('2026-10-28T22:30:00Z', REGIONS.wa, NOW)).toBeNull();
-    expect(feedWarning('2026-10-28T14:00:00Z', REGIONS.wa, NOW)).toMatch(/haven't come through/);
-    // 05:00 Perth: yesterday's price day is still running, so a feed from last night is fine.
+    const feed = '2026-10-28T14:00:00Z'; // built at 22:00 Perth the night before: fine if it holds today's prices
+    expect(feedWarning(feed, REGIONS.wa, NOW, '2026-10-28T22:00:00.000Z')).toBeNull();
+    expect(feedWarning(feed, REGIONS.wa, NOW, '2026-10-27T22:00:00.000Z')).toMatch(/haven't come through/);
+    // 05:00 Perth: yesterday's price day is still running.
     const early = new Date('2026-10-28T21:00:00Z');
-    expect(feedWarning('2026-10-28T10:00:00Z', REGIONS.wa, early)).toBeNull();
-    expect(feedWarning('2026-10-27T10:00:00Z', REGIONS.wa, early)).not.toBeNull();
+    expect(feedWarning(feed, REGIONS.wa, early, '2026-10-27T22:00:00.000Z')).toBeNull();
+    expect(feedWarning(feed, REGIONS.wa, early, '2026-10-26T22:00:00.000Z')).not.toBeNull();
+    expect(feedWarning(feed, REGIONS.wa, NOW, null)).toBeNull();
   });
   test('UK: after two hours', () => {
     expect(feedWarning('2026-10-29T02:30:00Z', REGIONS.uk, NOW)).toBeNull();

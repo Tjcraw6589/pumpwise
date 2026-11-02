@@ -99,7 +99,8 @@ export default function NearbyScreen() {
   const band = useMemo(() => priceBands(ranking?.inArea ?? []), [ranking]);
   const openStation = (id: string) => router.push({ pathname: '/station/[id]', params: { id } });
 
-  const staleWarning = meta ? feedWarning(meta.generatedAt, region, now) : null;
+  const latestPriceAt = ranking?.inArea.reduce<string | null>((best, r) => (best === null || r.price.at > best ? r.price.at : best), null) ?? null;
+  const staleWarning = meta ? feedWarning(meta.generatedAt, region, now, latestPriceAt) : null;
   const cheapest = ranking?.cheapest ?? null;
   const nearest = ranking?.nearest ?? null;
   const bestValue = ranking?.bestValue ?? null;
