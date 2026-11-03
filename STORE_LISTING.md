@@ -10,10 +10,10 @@ Everything below fits Apple's field limits (counts given per field). Paste as-is
 | Primary language | English (Australia) |
 | Bundle ID | `com.tyjcraw.pumpwise` (internal, cannot change after the first upload) |
 | SKU | `pumpwise` |
-| Version | 1.0.0 |
+| Version | 1.0.0 (in review); 1.1.0 next, see "Version 1.1.0" below |
 | Primary category | Navigation |
 | Secondary category | Travel |
-| Price | Free. No in-app purchases, no adverts. |
+| Price | Free. No in-app purchases. 1.0 has no adverts; 1.1 adds one banner (AdMob). |
 | Availability | Australia (add more countries as Pumpwise covers them) |
 | Age rating | 4+ (answer "None" to every content question) |
 | Copyright | Use the same line as Bowerly |
@@ -88,6 +88,40 @@ Prices from FuelWatch, Government of Western Australia: www.fuelwatch.wa.gov.au.
 **What's New** (version 1.0.0)
 ```
 First release, covering Western Australia.
+```
+
+## Version 1.1.0
+
+Paste one of these into **What's New in This Version** (4,000 max). Use the first only once https://tjcraw6589.github.io/pumpwise/data/v3/meta.json shows `"nsw": {"status": "live"`; otherwise use the second.
+
+**What's New**, if NSW is live
+```
+New South Wales, the ACT and Tasmania are here, with official FuelCheck prices.
+
+• Fairer "worth the drive" advice: a detour only counts when it saves at least a dollar.
+• Price colours that mean something: green is within 2c of the cheapest.
+• A tidier map that shows more prices as you zoom in.
+• Better with VoiceOver, on smaller iPhones and in dark mode.
+• A small banner ad on the Nearby tab keeps Pumpwise free.
+```
+
+**What's New**, Western Australia only
+```
+• Fairer "worth the drive" advice: a detour only counts when it saves at least a dollar.
+• Price colours that mean something: green is within 2c of the cheapest.
+• A tidier map that shows more prices as you zoom in.
+• Better with VoiceOver, on smaller iPhones and in dark mode.
+• A small banner ad on the Nearby tab keeps Pumpwise free.
+```
+
+**Other listing changes for 1.1**
+- App Information → "Contains ads?": **Yes**.
+- Description, PRIVATE BY DESIGN: replace "No account, no adverts, no tracking." with "No account. A small ad keeps it free."
+- App Privacy: the new label is in `ADS.md` step 4 ("Data Not Collected" no longer applies once ads are in).
+- If NSW is live: add this line after the first paragraph of the description, and add `fuelcheck` to the keywords in place of `bunbury`:
+
+```
+Now also in New South Wales, the ACT and Tasmania, with official FuelCheck prices that stations must update whenever they change.
 ```
 
 ## Screenshots
