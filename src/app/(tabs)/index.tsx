@@ -131,7 +131,7 @@ export default function NearbyScreen() {
         accessibilityRole="button"
         accessibilityLabel={`Searching ${areaLabel}. Change place`}
         onPress={() => router.push('/place')}
-        hitSlop={6}
+        hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
         testID="place-chip"
         style={[styles.placeRow, { marginTop: 2, marginBottom: spacing.md }]}
       >

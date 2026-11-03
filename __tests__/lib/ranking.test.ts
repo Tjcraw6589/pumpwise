@@ -1,6 +1,7 @@
 import type { FeedStation } from '@/lib/feed';
 import { distanceKm } from '@/lib/geo';
-import { priceBands, rankStations, sortStations } from '@/lib/ranking';
+import { declutterPins } from '@/lib/declutter';
+import { priceBands, type RankedStation, rankStations, sortStations } from '@/lib/ranking';
 
 const NOW = new Date('2026-10-29T04:00:00Z'); // Thursday, 12:00 in Perth
 const CENTER = { lat: -31.95, lng: 115.86 };
@@ -140,5 +141,25 @@ describe('priceBands', () => {
   test('everything is mid with too few prices to compare', () => {
     const r = rankStations([st('a', 1, 190), st('b', 2, 210)], options);
     expect(priceBands(r.inArea)(190)).toBe('mid');
+  });
+});
+
+describe('declutterPins', () => {
+  const at = (id: string, lat: number, lng: number, p: number) =>
+    ({ station: { ...st(id, 1, p), lat, lng }, distance: 1, price: { p, at: '2026-10-29T00:00:00Z' }, stale: false, restricted: false }) as unknown as RankedStation;
+  // One point covers 0.0001 degrees: a pin is 0.0062 wide and 0.0032 tall.
+  const scale = { latPerPt: 0.0001, lngPerPt: 0.0001 };
+
+  test('keeps the cheapest of overlapping pins and every pin that has room', () => {
+    const list = [at('a', -31.95, 115.86, 210), at('b', -31.951, 115.861, 205), at('c', -31.97, 115.86, 220)];
+    const shown = declutterPins(list, scale).map((r) => r.station.id).sort();
+    expect(shown).toEqual(['b', 'c']);
+  });
+
+  test('always keeps the stations it is told to, and shows everything when zoomed in', () => {
+    const list = [at('a', -31.95, 115.86, 210), at('b', -31.951, 115.861, 205)];
+    expect(declutterPins(list, scale, ['a']).map((r) => r.station.id)).toEqual(['a']);
+    expect(declutterPins(list, scale, ['a', 'b']).map((r) => r.station.id).sort()).toEqual(['a', 'b']);
+    expect(declutterPins(list, { latPerPt: 0.000001, lngPerPt: 0.000001 })).toHaveLength(2);
   });
 });

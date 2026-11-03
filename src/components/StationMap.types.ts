@@ -8,6 +8,8 @@ export interface StationMapProps {
   stations: RankedStation[];
   band: (pence: number) => PriceBand;
   selectedId: string | null;
+  /** Stations whose pins always show, however crowded the map (the cheapest and the nearest). */
+  keepIds?: readonly (string | null | undefined)[];
   onSelect: (id: string | null) => void;
   showsUserLocation: boolean;
   /** Changes when the map should fly back to the search area. */

@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+import { declutterPins } from '@/lib/declutter';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/theme/useTheme';
@@ -13,12 +15,16 @@ export type { StationMapProps } from './StationMap.types';
  * Web preview only (the iPhone app uses Apple Maps): stations placed by their real offsets from the
  * search centre on a plain grid, so the map screen can be checked in a browser.
  */
-export function StationMap({ center, radiusKm, stations, band, selectedId, onSelect }: StationMapProps) {
+export function StationMap({ center, radiusKm, stations, band, selectedId, keepIds = [], onSelect }: StationMapProps) {
   const { colors } = useTheme();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const half = Math.min(size.width, size.height) / 2;
   const scale = half / (radiusKm * 1.15);
   const cos = Math.cos((center.lat * Math.PI) / 180);
+  const pins = useMemo(
+    () => (scale > 0 ? declutterPins(stations, { latPerPt: 1 / (111.0 * scale), lngPerPt: 1 / (111.32 * cos * scale) }, [selectedId, ...keepIds]) : stations),
+    [stations, scale, cos, selectedId, keepIds],
+  );
 
   return (
     <View
@@ -44,7 +50,7 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, onSel
             }}
           />
           <View pointerEvents="none" style={[styles.me, { left: size.width / 2 - 8, top: size.height / 2 - 8, backgroundColor: '#2F80ED' }]} />
-          {stations.map((item) => {
+          {pins.map((item) => {
             const x = size.width / 2 + (item.station.lng - center.lng) * 111.32 * cos * scale;
             const y = size.height / 2 - (item.station.lat - center.lat) * 111.0 * scale;
             const selected = item.station.id === selectedId;

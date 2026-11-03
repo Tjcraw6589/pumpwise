@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 
+import { declutterPins } from '@/lib/declutter';
 import { regionForRadius } from '@/lib/geo';
 import { useTheme } from '@/theme/useTheme';
 
@@ -12,9 +13,19 @@ export type { StationMapProps } from './StationMap.types';
 
 
 /** Apple Maps with a price sign on every station in the search area. */
-export function StationMap({ center, radiusKm, stations, band, selectedId, onSelect, showsUserLocation, recenterToken }: StationMapProps) {
+export function StationMap({ center, radiusKm, stations, band, selectedId, keepIds = [], onSelect, showsUserLocation, recenterToken }: StationMapProps) {
   const { colors, scheme } = useTheme();
   const map = useRef<MapView>(null);
+  const [region, setRegion] = useState(() => regionForRadius(center, radiusKm));
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  // Only as many pins as fit at the current zoom; zooming in shows more.
+  const pins = useMemo(
+    () =>
+      size.width > 0
+        ? declutterPins(stations, { latPerPt: region.latitudeDelta / size.height, lngPerPt: region.longitudeDelta / size.width }, [selectedId, ...keepIds])
+        : stations,
+    [stations, region, size, selectedId, keepIds],
+  );
 
   useEffect(() => {
     map.current?.animateToRegion(regionForRadius(center, radiusKm), 450);
@@ -33,6 +44,8 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, onSel
       userInterfaceStyle={scheme}
       pitchEnabled={false}
       onPress={() => onSelect(null)}
+      onLayout={(e) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
+      onRegionChangeComplete={(next) => setRegion(next)}
       testID="station-map"
     >
       <Circle
@@ -42,7 +55,7 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, onSel
         fillColor={colors.mapCircleFill}
         strokeWidth={1.5}
       />
-      {stations.map((item) => {
+      {pins.map((item) => {
         const selected = item.station.id === selectedId;
         return (
           <Marker

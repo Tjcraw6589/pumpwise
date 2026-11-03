@@ -40,7 +40,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
         {step < 2 ? (
-          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={10} testID="onboarding-skip">
+          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={14} testID="onboarding-skip">
             <AppText variant="small" tone="muted">
               Skip
             </AppText>

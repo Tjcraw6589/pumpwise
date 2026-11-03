@@ -42,6 +42,7 @@ export default function MapScreen() {
   const selected = stations.find((r) => r.station.id === selectedId) ?? ranking?.cheapest ?? null;
   const isCheapest = selected?.station.id === ranking?.cheapest?.station.id;
   const showMap = (phase === 'ready' || phase === 'empty') && center;
+  const keepIds = useMemo(() => [ranking?.cheapest?.station.id, ranking?.nearest?.station.id], [ranking]);
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]} testID="map-screen">
@@ -52,6 +53,7 @@ export default function MapScreen() {
           stations={stations}
           band={band}
           selectedId={selected?.station.id ?? null}
+          keepIds={keepIds}
           onSelect={setSelectedId}
           showsUserLocation={settings.locationMode === 'gps' && permission === 'granted'}
           recenterToken={recenterToken}
