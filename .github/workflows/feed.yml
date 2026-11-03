@@ -4,7 +4,9 @@
 # round to free repositories every few hours. The schedule below stays as a backup that restarts the
 # chain if it ever breaks. To stop the chain, set the repository variable FEED_CHAIN to "off".
 # Each source refreshes on its own schedule (FuelWatch, Western Australia: hourly and straight after
-# 6am and 2:30pm Perth, no key needed). The UK Fuel Finder source only runs
+# 6am and 2:30pm Perth, no key needed; NSW FuelCheck with the ACT and Tasmania: every 45 minutes,
+# only when the NSW_FUEL_API_KEY and NSW_FUEL_API_SECRET secrets exist).
+# The site carries data/v3 (every region) and data/v2 (Western Australia only, for Pumpwise 1.0). The UK Fuel Finder source only runs
 # when FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET secrets exist, and that service refuses
 # connections from outside the UK, so it stays off on GitHub's servers.
 name: Price feed
@@ -46,6 +48,8 @@ jobs:
         env:
           FUEL_FINDER_CLIENT_ID: ${{ secrets.FUEL_FINDER_CLIENT_ID }}
           FUEL_FINDER_CLIENT_SECRET: ${{ secrets.FUEL_FINDER_CLIENT_SECRET }}
+          NSW_FUEL_API_KEY: ${{ secrets.NSW_FUEL_API_KEY }}
+          NSW_FUEL_API_SECRET: ${{ secrets.NSW_FUEL_API_SECRET }}
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

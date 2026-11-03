@@ -35,11 +35,11 @@ export type Freshness = 'fresh' | 'recent' | 'old';
  * How much to trust a price's age. Where stations must report every change (UK), an old
  * timestamp usually means the price has not changed, but after two weeks it is worth a warning.
  */
-export function freshness(iso: string, now: Date): Freshness {
+export function freshness(iso: string, now: Date, trustDays = 14): Freshness {
   const hours = (now.getTime() - Date.parse(iso)) / 3_600_000;
   if (!Number.isFinite(hours)) return 'old';
   if (hours < 24) return 'fresh';
-  if (hours < 24 * 14) return 'recent';
+  if (hours < 24 * trustDays) return 'recent';
   return 'old';
 }
 

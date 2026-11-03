@@ -8,7 +8,8 @@ import { Button } from '@/components/Button';
 import { askForLocation } from '@/components/PhaseState';
 import { PriceSign } from '@/components/PriceSign';
 import { PumpMark } from '@/components/PumpMark';
-import { DEFAULT_REGION, REGIONS } from '@/lib/regions';
+import { useCoverage } from '@/hooks/useRegion';
+import { DEFAULT_REGION, REGIONS, regionList } from '@/lib/regions';
 import { selectionHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -17,6 +18,7 @@ import { useTheme } from '@/theme/useTheme';
 export default function OnboardingScreen() {
   const { colors, spacing, radius } = useTheme();
   const [step, setStep] = useState(0);
+  const coverage = useCoverage();
   const fuel = useStore((s) => s.settings.fuel);
   const updateSettings = useStore((s) => s.updateSettings);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
@@ -54,7 +56,7 @@ export default function OnboardingScreen() {
               Cheap fuel,{'\n'}close by.
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.md, maxWidth: 340 }}>
-              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Starting with Western Australia.
+              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Covering {regionList(coverage.live)}.
             </AppText>
             <View style={[styles.signs, { marginTop: spacing.xl, gap: spacing.md }]}>
               <View style={styles.center}>
@@ -67,7 +69,9 @@ export default function OnboardingScreen() {
             <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.xl }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                Official government prices. In WA every station&apos;s price is fixed for the day, and tomorrow&apos;s are out by 2:30pm.
+                {coverage.live.includes('nsw')
+                  ? 'Official government prices that stations must report by law: FuelWatch in WA, FuelCheck in NSW, the ACT and Tasmania.'
+                  : "Official government prices. In WA every station's price is fixed for the day, and tomorrow's are out by 2:30pm."}
               </AppText>
             </View>
           </View>

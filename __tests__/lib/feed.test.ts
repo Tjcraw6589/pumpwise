@@ -1,6 +1,10 @@
 import {
+  auEasternOffsetMinutes,
   buildFeed,
   cleanPrice,
+  FEED_VERSION,
+  LEGACY_VERSION,
+  legacyFeed,
   groupIntoTiles,
   hashId,
   regionAt,
@@ -10,7 +14,8 @@ import {
   tidyName,
 } from '@/lib/feed';
 
-import { fixtureFeed, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
+import { fixtureFeed, nswFixtureResponse, nswLocalTime, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
+import { buildNswStations, parseNswTime, splitAddress } from '../../scripts/feed/sources/nsw.ts';
 import { buildUkStations, normalizeUkPrices, normalizeUkStation, parseUkHours } from '../../scripts/feed/sources/uk.ts';
 import {
   buildWaStations,
@@ -55,7 +60,12 @@ describe('shared helpers', () => {
   test('regions by location', () => {
     expect(regionAt(-31.95, 115.86)).toBe('wa'); // Perth
     expect(regionAt(-17.96, 122.24)).toBe('wa'); // Broome
-    expect(regionAt(-33.87, 151.21)).toBeNull(); // Sydney: not covered yet
+    expect(regionAt(-33.87, 151.21)).toBe('nsw'); // Sydney
+    expect(regionAt(-35.28, 149.13)).toBe('nsw'); // Canberra: in NSW FuelCheck
+    expect(regionAt(-42.88, 147.33)).toBe('tas'); // Hobart
+    expect(regionAt(-37.81, 144.96)).toBeNull(); // Melbourne
+    expect(regionAt(-27.47, 153.03)).toBeNull(); // Brisbane
+    expect(regionAt(-34.93, 138.6)).toBeNull(); // Adelaide
     expect(regionAt(51.5, -0.12)).toBe('uk');
     expect(regionAt(54.6, -5.93)).toBe('uk'); // Belfast
     expect(regionAt(48.85, 2.35)).toBeNull(); // Paris
@@ -236,8 +246,8 @@ describe('WA source (FuelWatch RSS)', () => {
 
 describe('buildFeed', () => {
   test('groups every region into tiles with a status for each', () => {
-    const feed = fixtureFeed(NOW);
-    expect(feed.meta.v).toBe(2);
+    const feed = fixtureFeed(NOW, ['wa', 'uk']);
+    expect(feed.meta.v).toBe(FEED_VERSION);
     expect(feed.meta.stationCount).toBe(100);
     expect(feed.meta.regions.wa).toMatchObject({ status: 'live', stationCount: 46, tomorrow: true });
     expect(feed.meta.regions.uk).toMatchObject({ status: 'live', stationCount: 54, tomorrow: false });
@@ -254,5 +264,61 @@ describe('buildFeed', () => {
     const tiled = groupIntoTiles([...wa, ...wa, noPrice], NOW.toISOString());
     expect(tiled.stationCount).toBe(wa.length);
     expect(buildFeed([], {}, NOW).meta.stationCount).toBe(0);
+  });
+});
+
+describe('NSW, ACT and Tasmania (NSW Fuel API)', () => {
+  test('Sydney time: 10 hours ahead in winter, 11 in summer, switching on the first Sundays of October and April', () => {
+    expect(auEasternOffsetMinutes(new Date('2026-07-01T00:00:00Z'))).toBe(600);
+    expect(auEasternOffsetMinutes(new Date('2027-01-15T00:00:00Z'))).toBe(660);
+    expect(auEasternOffsetMinutes(new Date('2026-10-03T15:59:00Z'))).toBe(600);
+    expect(auEasternOffsetMinutes(new Date('2026-10-03T16:00:00Z'))).toBe(660);
+    expect(auEasternOffsetMinutes(new Date('2027-04-03T15:59:00Z'))).toBe(660);
+    expect(auEasternOffsetMinutes(new Date('2027-04-03T16:00:00Z'))).toBe(600);
+  });
+
+  test('reads both of the API date formats as Sydney time, and refuses future dates', () => {
+    expect(parseNswTime('29/05/2026 23:28:20', NOW)).toBe('2026-05-29T13:28:20.000Z');
+    expect(parseNswTime('2026-01-10 08:00:00', NOW)).toBe('2026-01-09T21:00:00.000Z');
+    expect(parseNswTime('rubbish', NOW)).toBeNull();
+    expect(parseNswTime(nswLocalTime(new Date(NOW.getTime() + 86_400_000)), NOW)).toBeNull();
+    expect(parseNswTime(nswLocalTime(NOW), NOW)).toBe(new Date(Math.floor(NOW.getTime() / 1000) * 1000).toISOString());
+  });
+
+  test('splits addresses into street, town and postcode', () => {
+    expect(splitAddress('123 Fake Street, Hurstville NSW 2220')).toEqual({ street: '123 Fake Street', town: 'Hurstville', postcode: '2220' });
+    expect(splitAddress('1 Main Rd, NORTH HOBART TAS 7000')).toEqual({ street: '1 Main Rd', town: 'North Hobart', postcode: '7000' });
+    expect(splitAddress('Somewhere odd')).toEqual({ street: 'Somewhere odd', town: '', postcode: '' });
+  });
+
+  test('builds stations for NSW (with Canberra) and Tasmania, skipping bad records', () => {
+    const stations = buildNswStations(nswFixtureResponse(NOW), NOW);
+    const nsw = stations.filter((s) => s.region === 'nsw');
+    const tas = stations.filter((s) => s.region === 'tas');
+    expect(nsw).toHaveLength(37); // 30 Sydney + 6 Canberra + Costco
+    expect(tas).toHaveLength(8);
+    const costco = stations.find((s) => s.name === 'Costco Fixture Park');
+    expect(costco?.tags).toContain('members-only');
+    const first = stations.find((s) => s.id === 'nsw-1001');
+    expect(first?.prices.super).toBeDefined();
+    expect(first?.prices.super?.p).not.toBe(2.1);
+    expect(stations.some((s) => s.id === 'nsw-424242')).toBe(false);
+    expect(first?.prices.e10).toBeDefined();
+    expect(tas.every((s) => s.prices.e10 === undefined)).toBe(true);
+    expect(first?.town).toBe('Sydney');
+    expect(first?.postcode).toBe('2000');
+    expect(first?.hours).toBeNull();
+  });
+
+  test('the version 2 feed for Pumpwise 1.0 keeps only the regions it knows', () => {
+    const full = fixtureFeed(NOW);
+    expect(full.meta.regions.nsw?.stationCount).toBe(37);
+    expect(full.meta.regions.tas?.stationCount).toBe(8);
+    const stations = full.tiles.flatMap((t) => t.stations);
+    const legacy = legacyFeed(stations, full.meta.regions, NOW);
+    expect(legacy.meta.v).toBe(LEGACY_VERSION);
+    expect(Object.keys(legacy.meta.regions).sort()).toEqual(['uk', 'wa']);
+    expect(legacy.tiles.every((t) => t.v === LEGACY_VERSION && t.stations.every((s) => s.region === 'wa' || s.region === 'uk'))).toBe(true);
+    expect(legacy.meta.stationCount).toBe(100);
   });
 });

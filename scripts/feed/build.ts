@@ -8,17 +8,31 @@ import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { buildFeed, type FeedMeta, type FeedStation, type FeedTile, FEED_VERSION, type RegionId, type RegionStatus } from '../../src/lib/feed.ts';
+import {
+  type BuiltFeed,
+  buildFeed,
+  type FeedMeta,
+  type FeedStation,
+  type FeedTile,
+  FEED_VERSION,
+  LEGACY_VERSION,
+  legacyFeed,
+  type RegionId,
+  type RegionStatus,
+} from '../../src/lib/feed.ts';
+import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
 import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = process.env.FEED_OUT_DIR ?? join(root, 'out', 'site');
-const PUBLIC_FEED = (process.env.FEED_PUBLIC_URL ?? 'https://tjcraw6589.github.io/pumpwise/data/v2').replace(/\/$/, '');
+const PUBLIC_FEED = (process.env.FEED_PUBLIC_URL ?? `https://tjcraw6589.github.io/pumpwise/data/v${FEED_VERSION}`).replace(/\/$/, '');
 const FORCE = process.env.FEED_FORCE === '1';
 
 interface Source {
-  id: RegionId;
+  id: string;
+  /** The regions this source supplies. The first one's status decides when to fetch again. */
+  regions: RegionId[];
   /** Minutes between real fetches; in between, the previous prices are reused. */
   everyMinutes: number;
   minStations: number;
@@ -30,9 +44,21 @@ interface Source {
 
 const SOURCES: Source[] = [
   // FuelWatch prices change once a day (6am) and tomorrow's appear at 2:30pm, so hourly is plenty.
-  { id: 'wa', everyMinutes: 55, minStations: WA_MIN_STATIONS, enabled: () => true, fetch: fetchWa, refetchMoments: waRefetchMoments },
+  { id: 'wa', regions: ['wa'], everyMinutes: 55, minStations: WA_MIN_STATIONS, enabled: () => true, fetch: fetchWa, refetchMoments: waRefetchMoments },
+  // NSW FuelCheck (with the ACT and Tasmania). The free plan allows 2,500 calls a month and each
+  // fetch uses two, so fetch at the first run 40+ minutes after the last: every 45 minutes,
+  // about 2,000 calls a month.
+  {
+    id: 'nsw',
+    regions: ['nsw', 'tas'],
+    everyMinutes: 40,
+    minStations: NSW_MIN_STATIONS,
+    enabled: () => nswCredentials() !== null,
+    fetch: async (now) => ({ stations: await fetchNsw(nswCredentials() as { key: string; secret: string }, now), tomorrow: false }),
+  },
   {
     id: 'uk',
+    regions: ['uk'],
     everyMinutes: 0,
     minStations: UK_MIN_STATIONS,
     enabled: () => ukCredentials() !== null,
@@ -77,15 +103,20 @@ function writeJson(file: string, value: unknown): void {
   writeFileSync(file, JSON.stringify(value));
 }
 
-export function writeSite(feed: { meta: FeedMeta; tiles: FeedTile[] }, target = outDir): void {
+function writeData(feed: BuiltFeed, dataDir: string): void {
+  writeJson(join(dataDir, 'meta.json'), feed.meta);
+  for (const tile of feed.tiles) writeJson(join(dataDir, 'tiles', `${tile.tile}.json`), tile);
+}
+
+/** The site, the current feed (data/v3) and the Western Australia feed Pumpwise 1.0 reads (data/v2). */
+export function writeSite(feed: BuiltFeed, legacy: BuiltFeed | null, target = outDir): void {
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target, { recursive: true });
   const siteSource = join(root, 'site');
   if (existsSync(siteSource)) cpSync(siteSource, target, { recursive: true });
   writeFileSync(join(target, '.nojekyll'), '');
-  const dataDir = join(target, 'data', `v${FEED_VERSION}`);
-  writeJson(join(dataDir, 'meta.json'), feed.meta);
-  for (const tile of feed.tiles) writeJson(join(dataDir, 'tiles', `${tile.tile}.json`), tile);
+  writeData(feed, join(target, 'data', `v${FEED_VERSION}`));
+  if (legacy) writeData(legacy, join(target, 'data', `v${LEGACY_VERSION}`));
 }
 
 async function main(): Promise<void> {
@@ -101,14 +132,14 @@ async function main(): Promise<void> {
       console.log(`${source.id}: off`);
       continue;
     }
-    const before = previous?.meta.regions[source.id];
-    const kept = previous?.byRegion.get(source.id) ?? [];
+    const before = previous?.meta.regions[source.regions[0] as RegionId];
+    const kept = source.regions.flatMap((id) => previous?.byRegion.get(id) ?? []);
     const ageMinutes = before ? (now.getTime() - Date.parse(before.updatedAt)) / 60_000 : Infinity;
     const crossed = before ? (source.refetchMoments?.(now) ?? []).some((m) => Date.parse(before.updatedAt) < m.getTime()) : false;
     if (!FORCE && before?.status === 'live' && kept.length > 0 && ageMinutes < source.everyMinutes && !crossed) {
       console.log(`${source.id}: reusing prices from ${Math.round(ageMinutes)} min ago`);
       stations.push(...kept);
-      regions[source.id] = before;
+      for (const id of source.regions) if (previous?.meta.regions[id]) regions[id] = previous.meta.regions[id];
       continue;
     }
     try {
@@ -118,7 +149,10 @@ async function main(): Promise<void> {
         throw new Error(`only ${withPrices.length} stations with prices (expected at least ${source.minStations})`);
       }
       stations.push(...withPrices);
-      regions[source.id] = { status: 'live', updatedAt: now.toISOString(), stationCount: withPrices.length, tomorrow: result.tomorrow };
+      for (const id of source.regions) {
+        const count = withPrices.filter((s) => s.region === id).length;
+        if (count > 0) regions[id] = { status: 'live', updatedAt: now.toISOString(), stationCount: count, tomorrow: result.tomorrow };
+      }
       fetchedSomething = true;
       console.log(`${source.id}: ${withPrices.length} stations${result.tomorrow ? ', with tomorrow\'s prices' : ''}`);
     } catch (error) {
@@ -127,9 +161,9 @@ async function main(): Promise<void> {
       if (before && kept.length > 0) {
         console.warn(`${source.id}: keeping the previous prices from ${before.updatedAt}`);
         stations.push(...kept);
-        regions[source.id] = before;
+        for (const id of source.regions) if (previous?.meta.regions[id]) regions[id] = previous.meta.regions[id];
       } else {
-        regions[source.id] = { status: 'error', updatedAt: now.toISOString(), stationCount: 0, tomorrow: false };
+        regions[source.regions[0] as RegionId] = { status: 'error', updatedAt: now.toISOString(), stationCount: 0, tomorrow: false };
       }
     }
   }
@@ -138,7 +172,7 @@ async function main(): Promise<void> {
     throw new Error('No prices from any source; keeping the previous site online.');
   }
   const feed = buildFeed(stations, regions, now);
-  writeSite(feed);
+  writeSite(feed, legacyFeed(stations, regions, now));
   console.log(
     `Feed: ${feed.meta.stationCount} stations, ${feed.meta.priceCount} prices, ${feed.tiles.length} tiles` +
       (fetchedSomething ? '' : ' (all reused)'),

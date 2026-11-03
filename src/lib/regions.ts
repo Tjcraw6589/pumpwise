@@ -1,4 +1,4 @@
-import { type FuelKind, type RegionId, regionAt } from './feed';
+import { auEasternOffsetMinutes, type FuelKind, type RegionId, regionAt } from './feed';
 import type { Place } from './places';
 
 export interface FuelOption {
@@ -32,6 +32,8 @@ export interface RegionInfo {
   priceMode: 'reported' | 'daily';
   /** Local hour the price day starts, for "daily" regions. */
   priceDayStartHour?: number;
+  /** "reported" regions: days before an unchanged price gets a "not confirmed" warning (default 14). */
+  trustDays?: number;
   /** Minutes ahead of UTC on a given date (for opening hours and "today"). */
   utcOffsetMinutes: (date: Date) => number;
   source: { name: string; url: string; credit: string };
@@ -99,6 +101,97 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Broome', detail: 'Western Australia', lat: -17.9614, lng: 122.2359 },
     ],
   },
+  nsw: {
+    id: 'nsw',
+    name: 'New South Wales',
+    currency: '$',
+    priceUnit: 'c',
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Unleaded 91', pumpCode: 'U91', description: 'Standard unleaded', common: true },
+      { kind: 'e10', label: 'E10', pumpCode: 'E10', description: '94 octane with 10% ethanol', common: true },
+      { kind: 'premium', label: 'Premium 95', pumpCode: 'P95', description: 'Premium unleaded', common: true },
+      { kind: 'super', label: 'Premium 98', pumpCode: 'P98', description: '98 octane unleaded', common: true },
+      { kind: 'diesel', label: 'Diesel', pumpCode: 'DL', description: 'Standard diesel', common: true },
+      { kind: 'premium-diesel', label: 'Premium diesel', pumpCode: 'PDL', description: 'Branded diesel', common: false },
+      { kind: 'lpg', label: 'LPG', pumpCode: 'LPG', description: 'Autogas', common: false },
+      { kind: 'e85', label: 'E85', pumpCode: 'E85', description: 'Ethanol blend', common: false },
+      { kind: 'b20', label: 'Biodiesel', pumpCode: 'B20', description: 'Diesel with 20% biodiesel', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
+    priceMode: 'reported',
+    trustDays: 30,
+    utcOffsetMinutes: auEasternOffsetMinutes,
+    source: {
+      name: 'FuelCheck',
+      url: 'https://www.fuelcheck.nsw.gov.au',
+      credit: 'Prices from FuelCheck, NSW Government',
+    },
+    report: {
+      label: 'Report it in FuelCheck',
+      url: 'https://www.fuelcheck.nsw.gov.au/app',
+      note: 'NSW stations must sell at the price they report to FuelCheck.',
+    },
+    about:
+      "In New South Wales and the ACT every station must report its prices to FuelCheck, and the price at the pump must match. A price stands until the station reports a new one. Pumpwise collects them about every 45 minutes.",
+    cities: [
+      { name: 'Sydney', detail: 'New South Wales', lat: -33.8688, lng: 151.2093 },
+      { name: 'Parramatta', detail: 'New South Wales', lat: -33.815, lng: 151.0011 },
+      { name: 'Newcastle', detail: 'New South Wales', lat: -32.9283, lng: 151.7817 },
+      { name: 'Wollongong', detail: 'New South Wales', lat: -34.4278, lng: 150.8931 },
+      { name: 'Gosford', detail: 'New South Wales', lat: -33.425, lng: 151.342 },
+      { name: 'Canberra', detail: 'Australian Capital Territory', lat: -35.2809, lng: 149.13 },
+      { name: 'Wagga Wagga', detail: 'New South Wales', lat: -35.1082, lng: 147.3598 },
+      { name: 'Albury', detail: 'New South Wales', lat: -36.0737, lng: 146.9135 },
+      { name: 'Coffs Harbour', detail: 'New South Wales', lat: -30.2963, lng: 153.1135 },
+      { name: 'Port Macquarie', detail: 'New South Wales', lat: -31.4333, lng: 152.9 },
+      { name: 'Tamworth', detail: 'New South Wales', lat: -31.0927, lng: 150.932 },
+      { name: 'Orange', detail: 'New South Wales', lat: -33.284, lng: 149.1004 },
+      { name: 'Dubbo', detail: 'New South Wales', lat: -32.2569, lng: 148.6011 },
+    ],
+  },
+  tas: {
+    id: 'tas',
+    name: 'Tasmania',
+    currency: '$',
+    priceUnit: 'c',
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Unleaded 91', pumpCode: 'U91', description: 'Standard unleaded', common: true },
+      { kind: 'premium', label: 'Premium 95', pumpCode: 'P95', description: 'Premium unleaded', common: true },
+      { kind: 'super', label: 'Premium 98', pumpCode: 'P98', description: '98 octane unleaded', common: true },
+      { kind: 'diesel', label: 'Diesel', pumpCode: 'DL', description: 'Standard diesel', common: true },
+      { kind: 'premium-diesel', label: 'Premium diesel', pumpCode: 'PDL', description: 'Branded diesel', common: false },
+      { kind: 'e10', label: 'E10', pumpCode: 'E10', description: '94 octane with 10% ethanol', common: false },
+      { kind: 'lpg', label: 'LPG', pumpCode: 'LPG', description: 'Autogas', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
+    priceMode: 'reported',
+    trustDays: 30,
+    utcOffsetMinutes: auEasternOffsetMinutes,
+    source: {
+      name: 'FuelCheck TAS',
+      url: 'https://www.fuelcheck.tas.gov.au',
+      credit: 'Prices from FuelCheck TAS, Tasmanian Government',
+    },
+    report: {
+      label: 'Visit FuelCheck TAS',
+      url: 'https://www.fuelcheck.tas.gov.au/app',
+      note: 'Tasmanian stations report their prices to FuelCheck TAS.',
+    },
+    about:
+      'Tasmanian stations report their prices to FuelCheck TAS. A price stands until the station reports a new one. Pumpwise collects them about every 45 minutes.',
+    cities: [
+      { name: 'Hobart', detail: 'Tasmania', lat: -42.8821, lng: 147.3272 },
+      { name: 'Launceston', detail: 'Tasmania', lat: -41.4332, lng: 147.1441 },
+      { name: 'Devonport', detail: 'Tasmania', lat: -41.18, lng: 146.35 },
+      { name: 'Burnie', detail: 'Tasmania', lat: -41.0526, lng: 145.906 },
+    ],
+  },
   uk: {
     id: 'uk',
     name: 'United Kingdom',
@@ -141,6 +234,12 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
 
 /** Where Pumpwise starts before it knows better: the first region to go live. */
 export const DEFAULT_REGION: RegionId = 'wa';
+
+/**
+ * The regions this version of the app expects to be live, used for wording before the feed has
+ * loaded (the welcome screens). Keep it in step with the feed's sources.
+ */
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];

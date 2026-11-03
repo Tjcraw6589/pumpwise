@@ -6,7 +6,12 @@
  * (`node scripts/feed/build.ts`), and the app imports the same code, so both always agree.
  */
 
-export const FEED_VERSION = 2;
+export const FEED_VERSION = 3;
+/**
+ * Version 2 of the feed (Western Australia only) stays online for Pumpwise 1.0, which can't read
+ * the regions added since. It is published alongside version 3 at data/v2.
+ */
+export const LEGACY_VERSION = 2;
 /** Stations are grouped into square tiles of this many degrees, so the app downloads only its area. */
 export const TILE_DEG = 0.5;
 
@@ -14,12 +19,14 @@ export const TILE_DEG = 0.5;
  * Fuels by what they are, not by each country's pump label. Each region names them its own way
  * (UK "E10" and WA "ULP" are both `regular`), so a driver's choice carries across borders.
  */
-export type FuelKind = 'regular' | 'premium' | 'super' | 'diesel' | 'premium-diesel' | 'lpg' | 'e85' | 'b10' | 'hvo';
-export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'hvo'];
+export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'premium-diesel' | 'lpg' | 'e85' | 'b10' | 'b20' | 'hvo';
+export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'uk';
-export const REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'uk';
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk'];
+/** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
+export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
 
 export interface Bounds {
   minLat: number;
@@ -28,11 +35,36 @@ export interface Bounds {
   maxLng: number;
 }
 
-/** Generous boxes around each region. WA's eastern edge is the 129th meridian. */
+/**
+ * Generous boxes around each region. WA's eastern edge is the 129th meridian. The NSW box includes
+ * the ACT, whose stations are in NSW FuelCheck, and clips a little of Victoria and Queensland along
+ * the borders, where the nearest stations are often in NSW anyway.
+ */
 export const REGION_BOUNDS: Record<RegionId, Bounds> = {
   wa: { minLat: -35.6, maxLat: -13.4, minLng: 112.5, maxLng: 129.0 },
+  nsw: { minLat: -37.6, maxLat: -28.1, minLng: 140.95, maxLng: 154.0 },
+  tas: { minLat: -43.9, maxLat: -39.3, minLng: 143.5, maxLng: 148.6 },
   uk: { minLat: 49.1, maxLat: 61.0, minLng: -8.7, maxLng: 2.1 },
 };
+
+/** First Sunday of a month at 02:00 Australian Eastern Standard Time (16:00 UTC the day before). */
+function firstSundayAest(year: number, monthIndex: number): number {
+  const first = new Date(Date.UTC(year, monthIndex, 1));
+  const day = 1 + ((7 - first.getUTCDay()) % 7);
+  return Date.UTC(year, monthIndex, day, 2) - 10 * 3_600_000;
+}
+
+/**
+ * Sydney, Canberra and Hobart time: UTC+10, or UTC+11 from the first Sunday in October to the
+ * first Sunday in April. Worked out here because phones don't all carry time zone data.
+ */
+export function auEasternOffsetMinutes(date: Date): number {
+  const t = date.getTime();
+  const year = new Date(t + 10 * 3_600_000).getUTCFullYear();
+  // Clocks go forward at 2am standard time and back at 3am daylight time: both 16:00 UTC the day before.
+  const daylight = t >= firstSundayAest(year, 9) || t < firstSundayAest(year, 3);
+  return daylight ? 11 * 60 : 10 * 60;
+}
 
 export function inBounds(b: Bounds, lat: number, lng: number): boolean {
   return lat >= b.minLat && lat <= b.maxLat && lng >= b.minLng && lng <= b.maxLng;
@@ -188,7 +220,7 @@ export interface Tiled {
 }
 
 /** Groups stations into tiles, dropping duplicates and stations with no price. */
-export function groupIntoTiles(stations: FeedStation[], generatedAt: string): Tiled {
+export function groupIntoTiles(stations: FeedStation[], generatedAt: string, version = FEED_VERSION): Tiled {
   const byTile = new Map<string, FeedStation[]>();
   const seen = new Set<string>();
   let priceCount = 0;
@@ -207,7 +239,7 @@ export function groupIntoTiles(stations: FeedStation[], generatedAt: string): Ti
   for (const key of [...byTile.keys()].sort()) {
     const list = (byTile.get(key) ?? []).sort((a, b) => a.id.localeCompare(b.id));
     counts[key] = list.length;
-    tiles.push({ v: FEED_VERSION, generatedAt, tile: key, stations: list });
+    tiles.push({ v: version, generatedAt, tile: key, stations: list });
   }
   return { tiles, counts, stationCount: seen.size, priceCount };
 }
@@ -218,12 +250,17 @@ export interface BuiltFeed {
 }
 
 /** The whole feed from every region's stations and status. */
-export function buildFeed(stations: FeedStation[], regions: Partial<Record<RegionId, RegionStatus>>, now: Date): BuiltFeed {
+export function buildFeed(
+  stations: FeedStation[],
+  regions: Partial<Record<RegionId, RegionStatus>>,
+  now: Date,
+  version = FEED_VERSION,
+): BuiltFeed {
   const generatedAt = now.toISOString();
-  const tiled = groupIntoTiles(stations, generatedAt);
+  const tiled = groupIntoTiles(stations, generatedAt, version);
   return {
     meta: {
-      v: FEED_VERSION,
+      v: version,
       generatedAt,
       tileDeg: TILE_DEG,
       stationCount: tiled.stationCount,
@@ -233,4 +270,17 @@ export function buildFeed(stations: FeedStation[], regions: Partial<Record<Regio
     },
     tiles: tiled.tiles,
   };
+}
+
+/** The version 2 feed for Pumpwise 1.0: the same prices, limited to the regions it knows. */
+export function legacyFeed(stations: FeedStation[], regions: Partial<Record<RegionId, RegionStatus>>, now: Date): BuiltFeed {
+  const keep = new Set<RegionId>(LEGACY_REGION_IDS);
+  const legacyRegions: Partial<Record<RegionId, RegionStatus>> = {};
+  for (const id of LEGACY_REGION_IDS) if (regions[id]) legacyRegions[id] = regions[id];
+  return buildFeed(
+    stations.filter((s) => keep.has(s.region)),
+    legacyRegions,
+    now,
+    LEGACY_VERSION,
+  );
 }

@@ -100,7 +100,9 @@ export default function NearbyScreen() {
   const openStation = (id: string) => router.push({ pathname: '/station/[id]', params: { id } });
 
   const latestPriceAt = ranking?.inArea.reduce<string | null>((best, r) => (best === null || r.price.at > best ? r.price.at : best), null) ?? null;
-  const staleWarning = meta ? feedWarning(meta.generatedAt, region, now, latestPriceAt) : null;
+  // Each region refreshes on its own schedule, so judge it by its own last update.
+  const regionUpdatedAt = meta?.regions[region.id]?.updatedAt ?? meta?.generatedAt;
+  const staleWarning = meta && regionUpdatedAt ? feedWarning(regionUpdatedAt, region, now, latestPriceAt) : null;
   const cheapest = ranking?.cheapest ?? null;
   const nearest = ranking?.nearest ?? null;
   const bestValue = ranking?.bestValue ?? null;
