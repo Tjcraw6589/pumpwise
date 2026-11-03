@@ -163,7 +163,7 @@ async function main(): Promise<void> {
         stations.push(...kept);
         for (const id of source.regions) if (previous?.meta.regions[id]) regions[id] = previous.meta.regions[id];
       } else {
-        regions[source.regions[0] as RegionId] = { status: 'error', updatedAt: now.toISOString(), stationCount: 0, tomorrow: false };
+        for (const id of source.regions) regions[id] = { status: 'error', updatedAt: now.toISOString(), stationCount: 0, tomorrow: false };
       }
     }
   }

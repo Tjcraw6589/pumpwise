@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useRegion } from '@/hooks/useRegion';
@@ -28,6 +28,7 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
   const locationMode = useStore((s) => s.settings.locationMode);
   const updateSettings = useStore((s) => s.updateSettings);
   const [sheet, setSheet] = useState<'fuel' | 'radius' | null>(null);
+  const closeSheet = useCallback(() => setSheet(null), []);
   const unit = region.distanceUnit;
   const selectedRadius = region.radiusOptions.find((r) => sameRadius(radiusKm, r, unit)) ?? -1;
 
@@ -46,7 +47,7 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
         value={region.fuels.some((f) => f.kind === fuel) ? fuel : (region.fuels[0]?.kind ?? fuel)}
         options={region.fuels.map((f) => ({ key: f.kind, label: f.label, detail: f.description, badge: f.pumpCode }))}
         onSelect={(key) => updateSettings({ fuel: key })}
-        onClose={() => setSheet(null)}
+        onClose={closeSheet}
         testID="fuel-sheet"
       />
       <OptionSheet
@@ -55,7 +56,7 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
         value={selectedRadius}
         options={region.radiusOptions.map((r) => ({ key: r, label: `Within ${r} ${unit}`, detail: areaHint(toKm(r, unit)) }))}
         onSelect={(key) => updateSettings({ radiusKm: toKm(key, unit) })}
-        onClose={() => setSheet(null)}
+        onClose={closeSheet}
         testID="radius-sheet"
       />
     </>
