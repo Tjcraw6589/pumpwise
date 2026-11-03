@@ -118,10 +118,40 @@ New South Wales, the ACT and Tasmania are here, with official FuelCheck prices.
 - App Information → "Contains ads?": **Yes**.
 - Description, PRIVATE BY DESIGN: replace "No account, no adverts, no tracking." with "No account. A small ad keeps it free."
 - App Privacy: the new label is in `ADS.md` step 4 ("Data Not Collected" no longer applies once ads are in).
-- If NSW is live: add this line after the first paragraph of the description, and add `fuelcheck` to the keywords in place of `bunbury`:
+- If NSW is live: add this line after the first paragraph of the description, and use the NSW keyword set below:
 
 ```
 Now also in New South Wales, the ACT and Tasmania, with official FuelCheck prices that stations must update whenever they change.
+```
+
+## ASO check for 1.1 (ASO.dev plugin skills, 3 November 2026)
+
+Checked with the ASO.dev `metadata-validation`, `keyword-research` and `whats-new-release-notes` rules. Pumpwise isn't live yet, so there are no rankings, ratings or downloads to score; this covers the text only.
+
+**Status: pass with one fix for 1.1.**
+
+| Field | Finding | Action |
+|---|---|---|
+| Keywords | `costco` is another company's name, and Costco has its own app showing fuel prices. Apple guideline 2.3.7 bans other apps' and companies' names in keywords. | Drop it in 1.1 (1.0 is in review and can't be changed). |
+| Keywords | `fuelcheck` would be the name of NSW's own app (FuelCheck), so it must not be added. | Use place names instead (set below). |
+| Keywords | `fuelwatch` is the WA Government scheme's name, credited as the source. Lower risk, but it is still someone else's name. | Your call; the WA set below keeps it. |
+| Subtitle | "Today's & tomorrow's petrol" is only true in WA: NSW and Tasmania have no tomorrow prices. | Keep it while WA is the only region; switch when NSW is live. |
+| What's New | Leads with what users get, specific, no overstated fixes, one honest line about the ad. | Ready to paste. |
+| Description | Claims match the app (official prices, members-only handling, hours). "No adverts" must go in 1.1 (already listed above). | As listed above. |
+
+**1.1 keywords, WA only** (99 of 100 characters; `costco` out, `ulp` and `pulp` in: the pump names WA drivers use)
+```
+fuelwatch,perth,wa,servo,diesel,unleaded,ulp,pulp,cheap,station,map,lpg,e85,98,premium,save,bunbury
+```
+
+**1.1 keywords, NSW live** (98 of 100 characters)
+```
+perth,sydney,nsw,wa,tas,hobart,canberra,servo,diesel,unleaded,ulp,e10,cheap,station,lpg,98,premium
+```
+
+**1.1 subtitle, NSW live** (23 of 30 characters). With this subtitle, `servo` is already indexed, so swap it for `save` in the keywords.
+```
+Cheapest servo near you
 ```
 
 ## Screenshots

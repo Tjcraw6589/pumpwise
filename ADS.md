@@ -21,7 +21,7 @@ TestFlight builds show no real ads until step 6 is done (Google: iOS apps get no
 ### After Apple approves 1.0 (Apple emails you)
 
 6. In AdMob: **Apps** → **Pumpwise** → **App settings** → **Add store** → search `Pumpwise: Fuel Prices Near Me` → select it. (1 minute.)
-7. **App Store Connect → App Privacy.** The label must change from "Data Not Collected" to what AdMob collects, exactly as Bowerly's: Device ID and Advertising Data (used for third-party advertising), Coarse Location, Product Interaction, Crash Data and Performance Data. These are declarations Apple wants from you, so Claude opens each page and you click.
+7. **App Store Connect → App Privacy.** The label must change from "Data Not Collected" to what AdMob collects, exactly as Bowerly's: Device ID and Advertising Data (used for third-party advertising), Coarse Location, Product Interaction, Crash Data and Performance Data. These are declarations Apple wants from you, so Claude opens each page and you click. EAS Update (also new in 1.1) adds nothing to the label: Expo declares no collected data, and Device ID is already on the list for AdMob.
 8. Add version 1.1 in App Store Connect, paste the What's New text from `STORE_LISTING.md`, set "Contains ads?" to Yes, pick the TestFlight build, and click **Add for Review** yourself.
 
 The order of steps 1 to 5 and the TestFlight build does not depend on Apple. Steps 6 to 8 do.

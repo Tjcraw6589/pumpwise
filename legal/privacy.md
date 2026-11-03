@@ -1,12 +1,12 @@
 # Pumpwise Privacy Policy
 
-Last updated: 2 November 2026
+Last updated: 3 November 2026
 
 Pumpwise shows official fuel prices near you. It is built to need as little of your information as possible. This policy explains what the app does and does not do with data.
 
 ## The short version
 
-- Pumpwise has no accounts, no sign-in and no analytics. A small banner advert keeps the app free; advertising is the only part of the app where a third party receives device information.
+- Pumpwise has no accounts, no sign-in and no analytics. A small banner advert keeps the app free. The advert and the app's check for updates are the only times a third party receives information about your device.
 - Your location is used on your iPhone to work out distances. It is never sent to us or stored by us.
 - Your settings (fuel, search area, fill-up size, fuel economy, recent places) stay on your iPhone.
 
@@ -39,6 +39,10 @@ Pumpwise shows a small banner advert using the Google Mobile Ads SDK (AdMob). To
 - You can reset or limit your advertising identifier in your iPhone settings at any time.
 
 Your precise location is never shared with the advertising SDK.
+
+## App updates
+
+So that small fixes can reach you without a new App Store version, Pumpwise checks Expo's update service (EAS Update, run by Expo) when it opens and downloads any update for your version of the app. The check sends your iPhone's platform, the app version and update channel, and a random installation number that the service uses to count how many phones it serves. It does not include your location, your settings or anything you type. Like any web service, Expo also sees your internet address. Expo's privacy policy is at https://expo.dev/privacy.
 
 ## Children
 
