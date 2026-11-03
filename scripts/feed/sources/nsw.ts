@@ -1,5 +1,5 @@
 // New South Wales (with the ACT) and Tasmania: the NSW Government Fuel API (FuelCheck), which also
-// carries FuelCheck TAS. Free key from https://api.nsw.gov.au (Fuel API, free plan: 2,500 calls a
+// carries FuelCheck TAS (v2 endpoints, with states=NSW|TAS). Free key from https://api.nsw.gov.au (Fuel API, free plan: 2,500 calls a
 // month, so the feed calls it every 45 minutes: one token and one price request each time).
 // Off unless NSW_FUEL_API_KEY and NSW_FUEL_API_SECRET are set as GitHub secrets.
 //
@@ -151,13 +151,15 @@ export function buildNswStations(response: unknown, now: Date): FeedStation[] {
   return [...byCode.values()].filter((s) => Object.keys(s.prices).length > 0);
 }
 
-/** Sydney-time "dd/MM/yyyy hh:mm:ss AM", the format the API's own samples use. */
-function requestTimestamp(now: Date): string {
-  const local = new Date(now.getTime() + auEasternOffsetMinutes(now) * 60_000);
+/** UTC "dd/MM/yyyy hh:mm:ss AM", as the API's published spec asks for the requesttimestamp header. */
+export function requestTimestamp(now: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
-  const h = local.getUTCHours();
-  return `${pad(local.getUTCDate())}/${pad(local.getUTCMonth() + 1)}/${local.getUTCFullYear()} ${pad(h % 12 || 12)}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())} ${h < 12 ? 'AM' : 'PM'}`;
+  const h = now.getUTCHours();
+  return `${pad(now.getUTCDate())}/${pad(now.getUTCMonth() + 1)}/${now.getUTCFullYear()} ${pad(h % 12 || 12)}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())} ${h < 12 ? 'AM' : 'PM'}`;
 }
+
+/** The v2 "all prices" call returns only NSW (with the ACT) unless Tasmania is asked for by name. */
+export const NSW_PRICES_URL = `${API}/FuelPriceCheck/v2/fuel/prices?states=${encodeURIComponent('NSW|TAS')}`;
 
 /** One token and one "all prices" request: two of the month's 2,500 calls. */
 export async function fetchNsw(credentials: NswCredentials, now: Date): Promise<FeedStation[]> {
@@ -170,7 +172,7 @@ export async function fetchNsw(credentials: NswCredentials, now: Date): Promise<
   const token = asString(asRecord(await tokenResponse.json())?.access_token);
   if (!token) throw new Error('token request: no access_token in the answer');
 
-  const pricesResponse = await request(`${API}/FuelPriceCheck/v2/fuel/prices`, {
+  const pricesResponse = await request(NSW_PRICES_URL, {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json; charset=utf-8',

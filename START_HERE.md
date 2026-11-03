@@ -28,15 +28,15 @@ If Apple asks for changes: fix, `eas build -p ios --profile production` (no sign
 
 The feed code is in (`scripts/feed/sources/nsw.ts`) and the app knows NSW, the ACT and Tasmania from version 1.1. It switches on as soon as GitHub has the key:
 
-1. Go to https://api.nsw.gov.au, click **Sign up** and create a free account (email and password; read the terms there before you accept them).
-2. Open **My apps** (top right menu) and **Create an app**. Any name, for example `Pumpwise`.
+1. Open https://api.nsw.gov.au/Account/Register. Type your first name, last name and email (twice), read the Terms and Conditions, tick the box and click **Sign up**. NSW emails you a link: open it and choose a password.
+2. Log in at https://api.nsw.gov.au/Account/Login. Open **My apps** (top right menu) and click **Create an app**. Any name, for example `Pumpwise`.
 3. Open https://api.nsw.gov.au/Product/Index/22 (**Fuel API**), click **Subscribe**, pick the **Free** plan (2,500 calls a month) and your app.
 4. Back in **My apps**, open the app: it shows an **API Key** and an **API Secret**.
-5. On GitHub, open https://github.com/Tjcraw6589/pumpwise/settings/secrets/actions, click **New repository secret** twice:
-   - Name `NSW_FUEL_API_KEY`, value: the API Key
-   - Name `NSW_FUEL_API_SECRET`, value: the API Secret
+5. On GitHub, open https://github.com/Tjcraw6589/pumpwise/settings/secrets/actions/new (sign in to GitHub first if it says "page not found"). Add two secrets, one at a time:
+   - Name `NSW_FUEL_API_KEY`, Secret: paste the API Key, click **Add secret**
+   - Open the same link again. Name `NSW_FUEL_API_SECRET`, Secret: paste the API Secret, click **Add secret**
 
-That's it. The next feed run (within 15 minutes) picks NSW up; check https://tjcraw6589.github.io/pumpwise/data/v3/meta.json for `"nsw": {"status": "live"`. The feed asks NSW every 45 minutes (two calls each time, about 2,000 a month), well inside the free plan.
+That's it. The next feed run (within 15 minutes) picks NSW up; check https://tjcraw6589.github.io/pumpwise/data/v3/meta.json for `"nsw": {"status": "live"`. The feed asks NSW every 45 minutes (two calls each time, about 2,000 a month), well inside the free plan. One call brings back NSW, the ACT and Tasmania together (the feed asks for `states=NSW|TAS`, as the API's published spec requires; without it Tasmania is left out).
 
 The data is published by the NSW Government under a Creative Commons Attribution licence (listed as CC BY-SA on data.gov.au), so the app credits FuelCheck on every price screen. Pumpwise 1.0 keeps reading the Western Australia feed (`data/v2`) and never sees the new regions; 1.1 reads `data/v3`.
 

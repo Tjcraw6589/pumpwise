@@ -15,7 +15,7 @@ import {
 } from '@/lib/feed';
 
 import { fixtureFeed, nswFixtureResponse, nswLocalTime, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
-import { buildNswStations, parseNswTime, splitAddress } from '../../scripts/feed/sources/nsw.ts';
+import { buildNswStations, NSW_PRICES_URL, parseNswTime, requestTimestamp, splitAddress } from '../../scripts/feed/sources/nsw.ts';
 import { buildUkStations, normalizeUkPrices, normalizeUkStation, parseUkHours } from '../../scripts/feed/sources/uk.ts';
 import {
   buildWaStations,
@@ -283,6 +283,12 @@ describe('NSW, ACT and Tasmania (NSW Fuel API)', () => {
     expect(parseNswTime('rubbish', NOW)).toBeNull();
     expect(parseNswTime(nswLocalTime(new Date(NOW.getTime() + 86_400_000)), NOW)).toBeNull();
     expect(parseNswTime(nswLocalTime(NOW), NOW)).toBe(new Date(Math.floor(NOW.getTime() / 1000) * 1000).toISOString());
+  });
+
+  test('asks for Tasmania by name and stamps requests in UTC, as the published API spec says', () => {
+    expect(NSW_PRICES_URL).toBe('https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices?states=NSW%7CTAS');
+    expect(requestTimestamp(new Date('2026-11-03T21:05:09Z'))).toBe('03/11/2026 09:05:09 PM');
+    expect(requestTimestamp(new Date('2026-01-09T00:30:00Z'))).toBe('09/01/2026 12:30:00 AM');
   });
 
   test('splits addresses into street, town and postcode', () => {
