@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { FlatList, Linking, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -23,6 +23,7 @@ import { feedWarning } from '@/lib/nearby';
 import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
 import { fuelOption, type RegionInfo } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
+import { initializeAds } from '@/services/ads';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -96,6 +97,12 @@ export default function NearbyScreen() {
   const areaLabel = useAreaLabel();
   const region = useRegion();
   const fuel = fuelOption(region, settings.fuel);
+
+  // Ads, and the consent or tracking prompts before them, start once the first prices are on screen,
+  // so a new user isn't asked to allow tracking straight after allowing location.
+  useEffect(() => {
+    if (phase === 'ready') void initializeAds();
+  }, [phase]);
 
   const list = useMemo(() => (ranking ? sortStations(ranking.inArea, settings.sortBy) : []), [ranking, settings.sortBy]);
   const band = useMemo(() => priceBands(ranking?.inArea ?? []), [ranking]);
