@@ -98,7 +98,8 @@ test.describe('Pumpwise smoke', () => {
     await page.getByTestId('header-dismiss').click();
     await page.getByTestId('settings-about').click();
     await expect(page.getByTestId('about-screen')).toBeVisible();
-    await expect(page.getByTestId('about-feed')).toContainText('100 stations');
+    await expect(page.getByTestId('about-feed')).toContainText('145 stations');
+    await expect(page.getByTestId('about-source-nsw')).toContainText('fuelcheck.nsw.gov.au');
     await expect(page.getByTestId('about-source-wa')).toContainText('fuelwatch.wa.gov.au');
   });
 });
@@ -111,7 +112,7 @@ test.describe('elsewhere', () => {
     await page.getByTestId('onboarding-skip').click();
     // The browser already allows location here, so the app goes straight to the search.
     await expect(page.getByTestId('nearby-screen').getByTestId('state-not-covered')).toBeVisible();
-    await expect(page.getByText('Pumpwise covers Western Australia')).toBeVisible();
+    await expect(page.getByText('Pumpwise covers Western Australia, New South Wales and Tasmania')).toBeVisible();
     await page.getByTestId('nearby-screen').getByTestId('try-city').click();
     await expect(page.getByTestId('nearby-screen').getByTestId('cheapest-card')).toBeVisible();
   });

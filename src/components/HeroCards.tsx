@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { FuelKind } from '@/lib/feed';
-import { formatMoney } from '@/lib/format';
+import { formatMoney, spokenPrice } from '@/lib/format';
 import type { RankedStation, Savings } from '@/lib/ranking';
 import { fuelOption, REGIONS } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
@@ -14,6 +14,14 @@ import { FreshnessTag } from './FreshnessTag';
 import { PriceSign } from './PriceSign';
 import { TomorrowTag } from './TomorrowTag';
 
+/** What VoiceOver reads for a headline card: name, price, distance and opening. */
+function spokenSummary(item: RankedStation): string {
+  const region = REGIONS[item.station.region];
+  return [item.station.name, spokenPrice(item.price.p, region.priceUnit), formatDistance(item.distance, region.distanceUnit), item.open.label]
+    .filter(Boolean)
+    .join(', ');
+}
+
 function Meta({ item }: { item: RankedStation }) {
   const { colors, spacing } = useTheme();
   const unit = REGIONS[item.station.region].distanceUnit;
@@ -21,7 +29,7 @@ function Meta({ item }: { item: RankedStation }) {
   return (
     <View style={[styles.metaRow, { marginTop: spacing.xs }]}>
       <Ionicons name="navigate" size={13} color={colors.accentText} />
-      <AppText variant="caption" tone="muted" style={{ marginLeft: 4 }} numberOfLines={1}>
+      <AppText variant="caption" tone="muted" style={{ marginLeft: 4, flexShrink: 1 }} numberOfLines={2}>
         {parts.join(' · ')}
       </AppText>
     </View>
@@ -38,14 +46,18 @@ function PriceInfo({ item, now }: { item: RankedStation; now: Date }) {
   );
 }
 
-function SavingsLine({ savings, fillLitres, item }: { savings: Savings; fillLitres: number; item: RankedStation }) {
+function SavingsLine({ savings, fillLitres, item, betterPick }: { savings: Savings; fillLitres: number; item: RankedStation; betterPick: boolean }) {
   const { colors, spacing, radius } = useTheme();
   const region = REGIONS[item.station.region];
   const extra =
     savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
+  // When a third station beats the nearest once the drive is counted, point there instead of at the nearest.
+  const verdict = betterPick ? 'The best value pick below beats both.' : savings.amount > 0 ? 'The nearest is fine today.' : 'The nearest is the better deal.';
   const text = savings.worthIt
     ? `Saves ${formatMoney(savings.amount, region.currency)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
-    : `Only ${formatMoney(Math.max(0, savings.pumpSaving), region.currency)} cheaper on ${fillLitres} L than the nearest, and the extra driving eats most of that.`;
+    : savings.amount > 0
+      ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. ${verdict}`
+      : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. ${verdict}`;
   return (
     <View
       testID="savings-line"
@@ -74,13 +86,15 @@ interface CheapestCardProps {
   fillLitres: number;
   savings: Savings | null;
   alsoNearest: boolean;
+  /** A best value station (shown below) beats the nearest once the drive is counted. */
+  betterPick?: boolean;
   now: Date;
   onDirections: () => void;
   onDetails: () => void;
 }
 
 /** The headline: the cheapest open station inside the search area. */
-export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, now, onDirections, onDetails }: CheapestCardProps) {
+export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, betterPick = false, now, onDirections, onDetails }: CheapestCardProps) {
   const { colors, spacing, radius } = useTheme();
   const { station } = item;
   const region = REGIONS[station.region];
@@ -101,7 +115,11 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           </View>
         ) : null}
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${station.name} details`} onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Cheapest: ${spokenSummary(item)}`}
+        accessibilityHint="Opens the station's prices and hours"
+        onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
         <PriceSign pence={item.price.p} size="lg" tone="cheap" label={fuelOption(region, fuel).pumpCode} testID="cheapest-price" />
         <View style={[styles.flex, { marginLeft: spacing.lg }]}>
           <AppText variant="h2" numberOfLines={2} testID="cheapest-name">
@@ -116,7 +134,7 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           <PriceInfo item={item} now={now} />
         </View>
       </Pressable>
-      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} /> : null}
+      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} betterPick={betterPick} /> : null}
       <View style={[styles.actions, { marginTop: spacing.lg, gap: spacing.sm }]}>
         <Button
           label="Directions"
@@ -150,7 +168,13 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
     <Pressable
       testID="nearest-card"
       accessibilityRole="button"
-      accessibilityLabel={`Nearest: ${station.name}`}
+      accessibilityLabel={`Nearest: ${spokenSummary(item)}`}
+      accessibilityHint="Opens the station's prices and hours. Swipe up or down for directions."
+      // VoiceOver can't reach a button inside another button, so directions is also an action here.
+      accessibilityActions={[{ name: 'directions', label: 'Directions' }]}
+      onAccessibilityAction={(event) => {
+        if (event.nativeEvent.actionName === 'directions') onDirections();
+      }}
       onPress={onDetails}
       style={({ pressed }) => [
         styles.card,
@@ -169,7 +193,7 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
       <View style={[styles.mainRow, { marginTop: spacing.sm }]}>
         <PriceSign pence={item.price.p} size="md" label={fuelOption(REGIONS[station.region], fuel).pumpCode} testID="nearest-price" />
         <View style={[styles.flex, { marginLeft: spacing.md }]}>
-          <AppText variant="bodyBold" numberOfLines={1} testID="nearest-name">
+          <AppText variant="bodyBold" numberOfLines={2} testID="nearest-name">
             {station.name}
           </AppText>
           <Meta item={item} />

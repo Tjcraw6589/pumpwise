@@ -24,5 +24,7 @@ export function AppText({ variant = 'body', tone = 'text', align, style, ...rest
     onPrimary: colors.onPrimary,
     danger: colors.danger,
   }[tone];
-  return <Text maxFontSizeMultiplier={1.6} {...rest} style={[typography[variant] as TextStyle, { color, textAlign: align }, style]} />;
+  // Titles are headings, so VoiceOver users can jump between them with the rotor.
+  const heading = variant === 'title' || variant === 'h2' || variant === 'h3';
+  return <Text maxFontSizeMultiplier={1.6} accessibilityRole={heading ? 'header' : undefined} {...rest} style={[typography[variant] as TextStyle, { color, textAlign: align }, style]} />;
 }

@@ -116,7 +116,7 @@ describe('Pumpwise end to end (router)', () => {
     useStore.getState().completeOnboarding();
     await renderRouter('./src/app', { initialUrl: '/' });
     await screen.findByTestId('state-not-covered');
-    expect(screen.getByText('Pumpwise covers Western Australia')).toBeTruthy();
+    expect(screen.getByText('Pumpwise covers Western Australia, New South Wales and Tasmania')).toBeTruthy();
     await press('try-city');
     await screen.findByTestId('cheapest-card');
     expect(useStore.getState().settings.place?.name).toBe('Perth');

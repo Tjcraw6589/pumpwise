@@ -1,6 +1,7 @@
 import type { FeedStation } from '@/lib/feed';
 import { distanceKm } from '@/lib/geo';
-import { priceBands, rankStations, sortStations } from '@/lib/ranking';
+import { declutterPins } from '@/lib/declutter';
+import { priceBands, type RankedStation, rankStations, sortStations } from '@/lib/ranking';
 
 const NOW = new Date('2026-10-29T04:00:00Z'); // Thursday, 12:00 in Perth
 const CENTER = { lat: -31.95, lng: 115.86 };
@@ -48,9 +49,17 @@ describe('rankStations', () => {
     const dNear = distanceKm(CENTER, stations[0] as FeedStation);
     const dCheap = distanceKm(CENTER, stations[1] as FeedStation);
     expect(r.savings?.pumpSaving).toBeCloseTo(4.8, 5);
+    expect(r.savings?.worthIt).toBe(true);
     expect(r.savings?.extraKm).toBeCloseTo(8.4, 1);
     expect(r.savings?.amount).toBeCloseTo(((40 + trip(dNear)) * 205.9 - (40 + trip(dCheap)) * 193.9) / 100, 6);
     expect(r.savings?.worthIt).toBe(true);
+  });
+
+  test('a small saving over a long detour is not worth the time', () => {
+    // $2.40 at the pump but 14 km of extra driving: a few cents ahead, not worth the time.
+    const r = rankStations([st('near', 0.8, 205.9), st('cheap', 7.8, 199.9)], options);
+    expect(r.savings?.amount).toBeGreaterThan(0);
+    expect(r.savings?.worthIt).toBe(false);
   });
 
   test('a tiny saving far away is not worth it, and best value counts the drive', () => {
@@ -124,11 +133,33 @@ describe('priceBands', () => {
     const r = rankStations([st('a', 1, 190), st('b', 1.1, 195), st('c', 1.2, 200), st('d', 1.3, 205), st('e', 1.4, 210)], options);
     const band = priceBands(r.inArea);
     expect(band(190)).toBe('low');
+    expect(band(191.9)).toBe('low');
+    expect(band(195)).toBe('mid');
     expect(band(200)).toBe('mid');
     expect(band(210)).toBe('high');
   });
   test('everything is mid with too few prices to compare', () => {
     const r = rankStations([st('a', 1, 190), st('b', 2, 210)], options);
     expect(priceBands(r.inArea)(190)).toBe('mid');
+  });
+});
+
+describe('declutterPins', () => {
+  const at = (id: string, lat: number, lng: number, p: number) =>
+    ({ station: { ...st(id, 1, p), lat, lng }, distance: 1, price: { p, at: '2026-10-29T00:00:00Z' }, stale: false, restricted: false }) as unknown as RankedStation;
+  // One point covers 0.0001 degrees: a pin is 0.0062 wide and 0.0032 tall.
+  const scale = { latPerPt: 0.0001, lngPerPt: 0.0001 };
+
+  test('keeps the cheapest of overlapping pins and every pin that has room', () => {
+    const list = [at('a', -31.95, 115.86, 210), at('b', -31.951, 115.861, 205), at('c', -31.97, 115.86, 220)];
+    const shown = declutterPins(list, scale).map((r) => r.station.id).sort();
+    expect(shown).toEqual(['b', 'c']);
+  });
+
+  test('always keeps the stations it is told to, and shows everything when zoomed in', () => {
+    const list = [at('a', -31.95, 115.86, 210), at('b', -31.951, 115.861, 205)];
+    expect(declutterPins(list, scale, ['a']).map((r) => r.station.id)).toEqual(['a']);
+    expect(declutterPins(list, scale, ['a', 'b']).map((r) => r.station.id).sort()).toEqual(['a', 'b']);
+    expect(declutterPins(list, { latPerPt: 0.000001, lngPerPt: 0.000001 })).toHaveLength(2);
   });
 });

@@ -18,7 +18,7 @@ import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useDirections } from '@/hooks/useDirections';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
-import { formatChange, formatMoney, timeAgo } from '@/lib/format';
+import { formatChange, formatMoney, spokenPrice, timeAgo } from '@/lib/format';
 import { feedWarning } from '@/lib/nearby';
 import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
 import { fuelOption, type RegionInfo } from '@/lib/regions';
@@ -51,6 +51,7 @@ function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => v
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`Best value once you count the drive: ${item.station.name}, ${spokenPrice(item.price.p, region.priceUnit)}, ${formatDistance(item.distance, region.distanceUnit)}, ${formatMoney(item.realCost, region.currency)} with the fuel to get there and back`}
       onPress={onPress}
       testID="best-value-row"
       style={({ pressed }) => [
@@ -100,10 +101,15 @@ export default function NearbyScreen() {
   const band = useMemo(() => priceBands(ranking?.inArea ?? []), [ranking]);
   const openStation = (id: string) => router.push({ pathname: '/station/[id]', params: { id } });
 
-  const staleWarning = meta ? feedWarning(meta.generatedAt, region, now) : null;
+  const latestPriceAt = ranking?.inArea.reduce<string | null>((best, r) => (best === null || r.price.at > best ? r.price.at : best), null) ?? null;
+  // Each region refreshes on its own schedule, so judge it by its own last update.
+  const regionUpdatedAt = meta?.regions[region.id]?.updatedAt ?? meta?.generatedAt;
+  const staleWarning = meta && regionUpdatedAt ? feedWarning(regionUpdatedAt, region, now, latestPriceAt) : null;
   const cheapest = ranking?.cheapest ?? null;
   const nearest = ranking?.nearest ?? null;
   const bestValue = ranking?.bestValue ?? null;
+  const showBestValue = !!bestValue && bestValue.station.id !== cheapest?.station.id && bestValue.station.id !== nearest?.station.id;
+  const betterPick = showBestValue && !!nearest && !!bestValue && bestValue.realCost < nearest.realCost - 0.005;
 
   const header = (
     <View>
@@ -127,7 +133,7 @@ export default function NearbyScreen() {
         accessibilityRole="button"
         accessibilityLabel={`Searching ${areaLabel}. Change place`}
         onPress={() => router.push('/place')}
-        hitSlop={6}
+        hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
         testID="place-chip"
         style={[styles.placeRow, { marginTop: 2, marginBottom: spacing.md }]}
       >
@@ -168,6 +174,7 @@ export default function NearbyScreen() {
               fillLitres={settings.fillLitres}
               savings={ranking?.savings ?? null}
               alsoNearest={nearest?.station.id === cheapest.station.id}
+              betterPick={betterPick}
               now={now}
               onDirections={() => directions(cheapest.station)}
               onDetails={() => openStation(cheapest.station.id)}
@@ -188,7 +195,7 @@ export default function NearbyScreen() {
               onDetails={() => openStation(nearest.station.id)}
             />
           ) : null}
-          {bestValue && bestValue.station.id !== cheapest?.station.id && bestValue.station.id !== nearest?.station.id ? (
+          {showBestValue && bestValue ? (
             <BestValueRow item={bestValue} onPress={() => openStation(bestValue.station.id)} />
           ) : null}
 

@@ -74,18 +74,22 @@ export function nearbyPhase(input: PhaseInput): NearbyPhase {
 
 /**
  * A warning when the feed is behind what drivers expect, or null. Where prices are fixed for the
- * day (WA), the feed only needs a rebuild after the price day starts; elsewhere, two hours is enough.
+ * day (WA), what matters is whether the prices on screen are today's: `latestPriceAt` is the start
+ * of the newest price day among the stations shown. Elsewhere, a feed older than two hours is enough.
  */
-export function feedWarning(generatedAt: string, region: RegionInfo, now: Date): string | null {
-  const built = Date.parse(generatedAt);
-  if (!Number.isFinite(built)) return null;
+export function feedWarning(generatedAt: string, region: RegionInfo, now: Date, latestPriceAt?: string | null): string | null {
   if (region.priceMode === 'daily') {
+    const latest = Date.parse(latestPriceAt ?? '');
+    if (!Number.isFinite(latest)) return null;
     const local = localClock(now, region.utcOffsetMinutes(now));
     let since = local.minutes * 60 + now.getUTCSeconds() - (region.priceDayStartHour ?? 0) * 3600;
     if (since < 0) since += 86_400;
     const dayStart = now.getTime() - since * 1000;
-    return built < dayStart ? "Today's prices haven't come through yet. Showing the last ones we have." : null;
+    // Prices start on the hour, so allow a minute of slack.
+    return latest < dayStart - 60_000 ? "Today's prices haven't come through yet. Showing the last ones we have." : null;
   }
+  const built = Date.parse(generatedAt);
+  if (!Number.isFinite(built)) return null;
   const hours = (now.getTime() - built) / 3_600_000;
   return hours > 2 ? `The price feed last updated ${timeAgo(generatedAt, now)}. Prices may have changed since.` : null;
 }

@@ -24,14 +24,29 @@ If Apple asks for changes: fix, `eas build -p ios --profile production` (no sign
 
 ---
 
+## 5. New South Wales, the ACT and Tasmania (code ready, needs your free key)
+
+The feed code is in (`scripts/feed/sources/nsw.ts`) and the app knows NSW, the ACT and Tasmania from version 1.1. It switches on as soon as GitHub has the key:
+
+1. Open https://api.nsw.gov.au/Account/Register. Type your first name, last name and email (twice), read the Terms and Conditions, tick the box and click **Sign up**. NSW emails you a link: open it and choose a password.
+2. Log in at https://api.nsw.gov.au/Account/Login. Open **My apps** (top right menu) and click **Create an app**. Any name, for example `Pumpwise`.
+3. Open https://api.nsw.gov.au/Product/Index/22 (**Fuel API**), click **Subscribe**, pick the **Free** plan (2,500 calls a month) and your app.
+4. Back in **My apps**, open the app: it shows an **API Key** and an **API Secret**.
+5. On GitHub, open https://github.com/Tjcraw6589/pumpwise/settings/secrets/actions/new (sign in to GitHub first if it says "page not found"). Add two secrets, one at a time:
+   - Name `NSW_FUEL_API_KEY`, Secret: paste the API Key, click **Add secret**
+   - Open the same link again. Name `NSW_FUEL_API_SECRET`, Secret: paste the API Secret, click **Add secret**
+
+That's it. The next feed run (within 15 minutes) picks NSW up; check https://tjcraw6589.github.io/pumpwise/data/v3/meta.json for `"nsw": {"status": "live"`. The feed asks NSW every 45 minutes (two calls each time, about 2,000 a month), well inside the free plan. One call brings back NSW, the ACT and Tasmania together (the feed asks for `states=NSW|TAS`, as the API's published spec requires; without it Tasmania is left out).
+
+The data is published by the NSW Government under a Creative Commons Attribution licence (listed as CC BY-SA on data.gov.au), so the app credits FuelCheck on every price screen. Pumpwise 1.0 keeps reading the Western Australia feed (`data/v2`) and never sees the new regions; 1.1 reads `data/v3`.
+
 ## Adding more places later
 
-- **New South Wales and Tasmania** (English, Australia): free key from https://api.nsw.gov.au (you sign up; 2,500 free requests a month is enough for an hourly feed). Then I add the source and the app picks it up with no app update needed for prices.
 - **Spain and France**: free, no sign-up, but the app needs translating first.
 - **United Kingdom**: the code is ready, but the UK Fuel Finder service refuses connections from outside the UK, including GitHub's servers, so it stays off unless that changes.
 
 ## How it works (for later)
 
 - **The app** (Expo SDK 58, TypeScript, Expo Router, iPhone only) downloads small price files for the area around you, works out the nearest and cheapest stations on the phone, shows each region's own units (km and dollars in WA), and opens directions in Apple Maps, Google Maps or Waze.
-- **The price feed** (`.github/workflows/feed.yml` + `scripts/feed/build.ts`, one file per source in `scripts/feed/sources/`) runs every 15 minutes. Each source refreshes on its own schedule; if one fails, its last good prices stay online.
+- **The price feed** (`.github/workflows/feed.yml` + `scripts/feed/build.ts`, one file per source in `scripts/feed/sources/`) runs every 15 minutes (:07, :22, :37, :52). GitHub's own scheduler only gets to free repositories every few hours, so each run waits for the next quarter hour and starts the next one itself; the schedule is a backup that restarts the chain if it ever stops. To pause it, add a repository variable `FEED_CHAIN` = `off` (Settings → Secrets and variables → Actions → Variables). Each source refreshes on its own schedule (WA: hourly, and within 15 minutes of 6am and 2:30pm Perth); if one fails, its last good prices stay online.
 - **Checks**: `npm run verify` (types, lint, 72 tests), `npm run export:web:test` then `npm run test:e2e` (browser smoke test with sample stations).

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/AppText';
@@ -8,7 +8,8 @@ import { Button } from '@/components/Button';
 import { askForLocation } from '@/components/PhaseState';
 import { PriceSign } from '@/components/PriceSign';
 import { PumpMark } from '@/components/PumpMark';
-import { DEFAULT_REGION, REGIONS } from '@/lib/regions';
+import { useCoverage } from '@/hooks/useRegion';
+import { DEFAULT_REGION, REGIONS, regionList } from '@/lib/regions';
 import { selectionHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -17,9 +18,13 @@ import { useTheme } from '@/theme/useTheme';
 export default function OnboardingScreen() {
   const { colors, spacing, radius } = useTheme();
   const [step, setStep] = useState(0);
+  const coverage = useCoverage();
   const fuel = useStore((s) => s.settings.fuel);
   const updateSettings = useStore((s) => s.updateSettings);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
+  // iPhone SE and other short screens get a smaller mark and title so the welcome fits without scrolling.
+  const compact = useWindowDimensions().height < 740;
+  const gap = compact ? spacing.lg : spacing.xl;
 
   const finish = async (withLocation: boolean) => {
     if (withLocation) await askForLocation();
@@ -38,7 +43,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
         {step < 2 ? (
-          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={10} testID="onboarding-skip">
+          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={14} testID="onboarding-skip">
             <AppText variant="small" tone="muted">
               Skip
             </AppText>
@@ -49,25 +54,27 @@ export default function OnboardingScreen() {
       <ScrollView contentContainerStyle={[styles.body, { padding: spacing.lg }]}>
         {step === 0 ? (
           <View style={styles.center}>
-            <PumpMark size={120} />
-            <AppText variant="title" align="center" style={{ fontSize: 44, lineHeight: 46, marginTop: spacing.xl }}>
+            <PumpMark size={compact ? 80 : 120} />
+            <AppText variant="title" align="center" style={{ fontSize: compact ? 38 : 44, lineHeight: compact ? 40 : 46, marginTop: gap }}>
               Cheap fuel,{'\n'}close by.
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.md, maxWidth: 340 }}>
-              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Starting with Western Australia.
+              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Covering {regionList(coverage.live)}.
             </AppText>
-            <View style={[styles.signs, { marginTop: spacing.xl, gap: spacing.md }]}>
+            <View style={[styles.signs, { marginTop: gap, gap: spacing.md }]}>
               <View style={styles.center}>
-                <PriceSign pence={189.9} size="lg" tone="cheap" label="CHEAPEST" />
+                <PriceSign pence={189.9} size={compact ? 'md' : 'lg'} tone="cheap" label="CHEAPEST" />
               </View>
               <View style={styles.center}>
-                <PriceSign pence={204.5} size="lg" label="NEAREST" />
+                <PriceSign pence={204.5} size={compact ? 'md' : 'lg'} label="NEAREST" />
               </View>
             </View>
-            <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.xl }]}>
+            <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: gap }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                Official government prices. In WA every station&apos;s price is fixed for the day, and tomorrow&apos;s are out by 2:30pm.
+                {coverage.live.includes('nsw')
+                  ? 'Official government prices that stations must report by law: FuelWatch in WA, FuelCheck in NSW, the ACT and Tasmania.'
+                  : "Official government prices. In WA every station's price is fixed for the day, and tomorrow's are out by 2:30pm."}
               </AppText>
             </View>
           </View>

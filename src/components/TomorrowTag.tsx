@@ -6,8 +6,11 @@ import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
 
-/** "Tomorrow 182.9 (−4.0)": green when it drops, red when it rises. WA only. */
-export function TomorrowTag({ today, tomorrow, testID }: { today: number; tomorrow: number; testID?: string }) {
+/**
+ * "Tomorrow 182.9 (−4.0)": green when it drops, red when it rises. WA only.
+ * `compact` ("182.9 tomorrow") fits beside the opening hours in list rows; the arrow and colour show the direction.
+ */
+export function TomorrowTag({ today, tomorrow, compact, testID }: { today: number; tomorrow: number; compact?: boolean; testID?: string }) {
   const { colors } = useTheme();
   const change = tomorrow - today;
   const tone = change < -0.05 ? 'cheap' : change > 0.05 ? 'pricey' : 'muted';
@@ -17,7 +20,7 @@ export function TomorrowTag({ today, tomorrow, testID }: { today: number; tomorr
     <View style={styles.row} testID={testID} accessibilityLabel={`Tomorrow ${formatPrice(tomorrow)}, ${formatChange(change)}`}>
       <Ionicons name={icon} size={12} color={color} />
       <AppText variant="caption" tone={tone} style={{ marginLeft: 4 }} numberOfLines={1}>
-        Tomorrow {formatPrice(tomorrow)} ({formatChange(change)})
+        {compact ? `${formatPrice(tomorrow)} tomorrow` : `Tomorrow ${formatPrice(tomorrow)} (${formatChange(change)})`}
       </AppText>
     </View>
   );

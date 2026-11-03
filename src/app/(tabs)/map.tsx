@@ -16,6 +16,7 @@ import { useDirections } from '@/hooks/useDirections';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
+import { spokenPrice } from '@/lib/format';
 import { priceBands } from '@/lib/ranking';
 import { fuelOption } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
@@ -35,6 +36,7 @@ export default function MapScreen() {
   const region = useRegion();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [recenterToken, setRecenterToken] = useState(0);
+  const [overlay, setOverlay] = useState({ top: 0, bottom: 0 });
 
   const stations = useMemo(() => ranking?.inArea ?? [], [ranking]);
   const band = useMemo(() => priceBands(stations), [stations]);
@@ -42,6 +44,7 @@ export default function MapScreen() {
   const selected = stations.find((r) => r.station.id === selectedId) ?? ranking?.cheapest ?? null;
   const isCheapest = selected?.station.id === ranking?.cheapest?.station.id;
   const showMap = (phase === 'ready' || phase === 'empty') && center;
+  const keepIds = useMemo(() => [ranking?.cheapest?.station.id, ranking?.nearest?.station.id], [ranking]);
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]} testID="map-screen">
@@ -52,13 +55,23 @@ export default function MapScreen() {
           stations={stations}
           band={band}
           selectedId={selected?.station.id ?? null}
+          keepIds={keepIds}
           onSelect={setSelectedId}
           showsUserLocation={settings.locationMode === 'gps' && permission === 'granted'}
           recenterToken={recenterToken}
+          mapPadding={{ top: overlay.top, right: 0, bottom: overlay.bottom, left: 0 }}
         />
       ) : null}
 
-      <SafeAreaView edges={['top', 'left', 'right']} pointerEvents="box-none" style={showMap ? styles.overlay : styles.flex}>
+      <SafeAreaView
+        edges={['top', 'left', 'right']}
+        pointerEvents="box-none"
+        style={showMap ? styles.overlay : styles.flex}
+        onLayout={(e) => {
+          const top = Math.round(e.nativeEvent.layout.height);
+          setOverlay((o) => (o.top === top ? o : { ...o, top }));
+        }}
+      >
         <View
           style={[
             styles.topCard,
@@ -82,7 +95,14 @@ export default function MapScreen() {
       </SafeAreaView>
 
       {showMap ? (
-        <View pointerEvents="box-none" style={[styles.bottom, { padding: spacing.md }]}>
+        <View
+          pointerEvents="box-none"
+          style={[styles.bottom, { padding: spacing.md }]}
+          onLayout={(e) => {
+            const bottom = Math.round(e.nativeEvent.layout.height);
+            setOverlay((o) => (o.bottom === bottom ? o : { ...o, bottom }));
+          }}
+        >
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Recentre map"
@@ -102,6 +122,8 @@ export default function MapScreen() {
             >
               <Pressable
                 accessibilityRole="button"
+                accessibilityLabel={`${isCheapest ? 'Cheapest' : 'Selected'}: ${selected.station.name}, ${spokenPrice(selected.price.p, region.priceUnit)}, ${[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(', ')}`}
+                accessibilityHint="Opens the station's prices and hours"
                 onPress={() => router.push({ pathname: '/station/[id]', params: { id: selected.station.id } })}
                 style={styles.row}
               >

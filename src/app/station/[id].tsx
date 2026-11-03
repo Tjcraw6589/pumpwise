@@ -11,7 +11,7 @@ import { Screen } from '@/components/Screen';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNow } from '@/hooks/useNearby';
-import { formatChange, formatPrice } from '@/lib/format';
+import { formatChange, formatPrice, spokenPrice } from '@/lib/format';
 import { distanceKm } from '@/lib/geo';
 import { localClock, openState, weekRows } from '@/lib/hours';
 import { fuelOption, REGIONS } from '@/lib/regions';
@@ -124,7 +124,15 @@ export default function StationScreen() {
             <Pressable
               key={f.kind}
               accessibilityRole="button"
-              accessibilityLabel={`${f.label}, ${formatPrice(price.p)}`}
+              accessibilityState={{ selected: isChosen }}
+              accessibilityLabel={[
+                f.label,
+                spokenPrice(price.p, region.priceUnit),
+                next !== undefined ? `tomorrow ${spokenPrice(next, region.priceUnit)}` : null,
+              ]
+                .filter(Boolean)
+                .join(', ')}
+              accessibilityHint={isChosen ? undefined : 'Makes this your fuel'}
               onPress={() => updateSettings({ fuel: f.kind })}
               style={[
                 styles.boardRow,
@@ -191,7 +199,7 @@ export default function StationScreen() {
 
       {station.hours ? (
         <View style={{ marginTop: spacing.xl }}>
-          <AppText variant="overline" tone="muted" style={{ marginBottom: spacing.sm }}>
+          <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
             Opening hours
           </AppText>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md }]}>
@@ -211,7 +219,7 @@ export default function StationScreen() {
 
       {station.tags.some((t) => TAG_LABELS[t]) ? (
         <View style={{ marginTop: spacing.xl }}>
-          <AppText variant="overline" tone="muted" style={{ marginBottom: spacing.sm }}>
+          <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
             At this station
           </AppText>
           <View style={[styles.tags, { gap: spacing.sm }]}>

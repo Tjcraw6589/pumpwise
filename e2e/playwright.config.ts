@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4173;
+// An uncommon port: 4173 is Vite's default and other local apps often hold it.
+const PORT = Number(process.env.PUMPWISE_E2E_PORT ?? 4319);
 
 export default defineConfig({
   testDir: '.',

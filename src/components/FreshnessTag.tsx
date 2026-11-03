@@ -19,7 +19,7 @@ export function FreshnessTag({ at, region, now, testID }: { at: string; region: 
   if (info.priceMode === 'daily') {
     ({ text, level } = dailyLabel(at, now, info.utcOffsetMinutes(now)));
   } else {
-    level = freshness(at, now);
+    level = freshness(at, now, info.trustDays);
     text = level === 'old' ? `Not confirmed since ${timeAgo(at, now)}` : `Reported ${timeAgo(at, now)}`;
   }
   const dot = level === 'fresh' ? colors.cheap : level === 'recent' ? colors.accent : colors.pricey;

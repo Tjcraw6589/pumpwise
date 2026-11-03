@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '@/components/AppText';
@@ -28,7 +28,7 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   const { spacing } = useTheme();
   return (
     <View style={{ marginTop: spacing.xl }}>
-      <AppText variant="overline" tone="muted" style={{ marginBottom: spacing.sm }}>
+      <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
         {title}
       </AppText>
       {children}
@@ -62,6 +62,19 @@ function LinkRow({ icon, label, detail, onPress, testID }: { icon: keyof typeof 
       <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
     </Pressable>
   );
+}
+
+/** Asks before wiping every setting, since one stray tap would otherwise lose them. */
+function confirmReset(reset: () => void): void {
+  const message = 'Your fuel, search area, fill-up, car and maps app go back to the defaults.';
+  if (Platform.OS === 'web') {
+    if (globalThis.confirm?.(`Reset settings? ${message}`) ?? true) reset();
+    return;
+  }
+  Alert.alert('Reset settings?', message, [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Reset', style: 'destructive', onPress: reset },
+  ]);
 }
 
 export default function SettingsScreen() {
@@ -197,7 +210,13 @@ export default function SettingsScreen() {
           </View>
         </Section>
 
-        <Pressable accessibilityRole="button" onPress={resetSettings} style={{ marginTop: spacing.xl, alignSelf: 'center' }} testID="settings-reset">
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => confirmReset(resetSettings)}
+          hitSlop={12}
+          style={{ marginTop: spacing.xl, alignSelf: 'center' }}
+          testID="settings-reset"
+        >
           <AppText variant="small" tone="muted">
             Reset settings
           </AppText>

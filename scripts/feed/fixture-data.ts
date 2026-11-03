@@ -1,7 +1,8 @@
 // Made-up stations in the same shape as each real source, for tests and the web smoke test.
-// Names and brands are fictional. WA stations are written as FuelWatch RSS and UK stations as
-// Fuel Finder JSON, so the real parsers run on them.
-import { buildFeed, type BuiltFeed, type FeedStation } from '../../src/lib/feed.ts';
+// Names and brands are fictional. WA stations are written as FuelWatch RSS, NSW and Tasmanian ones
+// as NSW Fuel API JSON and UK ones as Fuel Finder JSON, so the real parsers run on them.
+import { auEasternOffsetMinutes, buildFeed, type BuiltFeed, type FeedStation } from '../../src/lib/feed.ts';
+import { buildNswStations } from './sources/nsw.ts';
 import { buildUkStations } from './sources/uk.ts';
 import { buildWaStations, parseRss, WA_PRODUCTS, type WaProductFeed } from './sources/wa.ts';
 
@@ -216,8 +217,65 @@ export function ukFixtureRecords(now: Date): { stations: unknown[]; prices: unkn
   return { stations, prices };
 }
 
-/** The whole made-up feed: Perth and Bunbury (with tomorrow's prices), London and Leeds. */
-export function fixtureFeed(now: Date, regions: ('wa' | 'uk')[] = ['wa', 'uk']): BuiltFeed {
+/** Sydney time as the NSW API writes it: "29/05/2026 23:28:20". */
+export function nswLocalTime(date: Date): string {
+  const local = new Date(date.getTime() + auEasternOffsetMinutes(date) * 60_000);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(local.getUTCDate())}/${pad(local.getUTCMonth() + 1)}/${local.getUTCFullYear()} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
+}
+
+/** A made-up "all prices" answer from the NSW Fuel API: Sydney, Canberra and Hobart. */
+export function nswFixtureResponse(now: Date): { stations: unknown[]; prices: unknown[] } {
+  const rand = random(23);
+  const stations: unknown[] = [];
+  const prices: unknown[] = [];
+  const centres = [
+    { state: 'NSW', town: 'Sydney', postcode: '2000', lat: -33.8688, lng: 151.2093, count: 30, maxKm: 12 },
+    { state: 'ACT', town: 'Canberra', postcode: '2601', lat: -35.2809, lng: 149.13, count: 6, maxKm: 6 },
+    { state: 'TAS', town: 'Hobart', postcode: '7000', lat: -42.8821, lng: 147.3272, count: 8, maxKm: 6 },
+  ];
+  let code = 1000;
+  for (const centre of centres) {
+    for (let n = 0; n < centre.count; n++) {
+      code++;
+      const brand = BRANDS[n % BRANDS.length] ?? 'Northline';
+      const street = STREETS[(n * 3) % STREETS.length] ?? 'High Street';
+      const { lat, lng } = scatter(rand, centre.lat, centre.lng, centre.maxKm);
+      stations.push({
+        brandid: String(n % 6),
+        stationid: `s${code}`,
+        brand,
+        code: String(code),
+        name: `${brand} ${street}`,
+        address: `${10 + n} ${street}, ${centre.town} ${centre.state} ${centre.postcode}`,
+        location: { latitude: lat, longitude: lng },
+        state: centre.state,
+      });
+      const base = 189.9 + Math.round(rand() * 300) / 10;
+      // Most stations reported within the last day; some a while ago, as quiet country sites do.
+      const ageMinutes = n % 7 === 0 ? 60 * 24 * (3 + (n % 20)) : Math.round(5 + rand() * 60 * 20);
+      const at = nswLocalTime(new Date(now.getTime() - ageMinutes * 60_000));
+      const add = (fueltype: string, price: number) => prices.push({ stationcode: String(code), state: centre.state, fueltype, price, priceunit: 'litre', lastupdated: at });
+      add('U91', base);
+      if (centre.state !== 'TAS') add('E10', base - 2);
+      add('P95', base + 14);
+      add('P98', base + 22);
+      add('DL', base + 8);
+      if (n % 3 === 0) add('PDL', base + 16);
+      if (n % 5 === 0) add('LPG', 109.9 + n);
+    }
+  }
+  // A members-only warehouse, a reporting mistake (2.1c), an unknown fuel, and a price for a station that doesn't exist.
+  stations.push({ brand: 'Costco', code: '9001', name: 'Costco Fixture Park', address: '1 Warehouse Way, Sydney NSW 2000', location: { latitude: -33.86, longitude: 151.2 }, state: 'NSW' });
+  prices.push({ stationcode: '9001', state: 'NSW', fueltype: 'U91', price: 169.9, lastupdated: nswLocalTime(now) });
+  prices.push({ stationcode: '1001', state: 'NSW', fueltype: 'P98', price: 2.1, lastupdated: nswLocalTime(now) });
+  prices.push({ stationcode: '1002', state: 'NSW', fueltype: 'EV', price: 55, lastupdated: nswLocalTime(now) });
+  prices.push({ stationcode: '424242', state: 'NSW', fueltype: 'U91', price: 180, lastupdated: nswLocalTime(now) });
+  return { stations, prices };
+}
+
+/** The whole made-up feed: Perth and Bunbury (with tomorrow's prices), Sydney, Canberra, Hobart, London and Leeds. */
+export function fixtureFeed(now: Date, regions: ('wa' | 'nsw' | 'uk')[] = ['wa', 'nsw', 'uk']): BuiltFeed {
   const stations: FeedStation[] = [];
   const status: BuiltFeed['meta']['regions'] = {};
   if (regions.includes('wa')) {
@@ -225,6 +283,13 @@ export function fixtureFeed(now: Date, regions: ('wa' | 'uk')[] = ['wa', 'uk']):
     const wa = buildWaStations(today, tomorrow);
     stations.push(...wa);
     status.wa = { status: 'live', updatedAt: now.toISOString(), stationCount: wa.length, tomorrow: true };
+  }
+  if (regions.includes('nsw')) {
+    const au = buildNswStations(nswFixtureResponse(now), now);
+    stations.push(...au);
+    for (const id of ['nsw', 'tas'] as const) {
+      status[id] = { status: 'live', updatedAt: now.toISOString(), stationCount: au.filter((st) => st.region === id).length, tomorrow: false };
+    }
   }
   if (regions.includes('uk')) {
     const { stations: ukRaw, prices: ukPrices } = ukFixtureRecords(now);
