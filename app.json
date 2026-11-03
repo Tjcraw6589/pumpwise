@@ -60,6 +60,9 @@
             ]
           }
         ]
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "web": {
@@ -178,6 +181,9 @@
         "admobBannerIos": ""
       }
     },
-    "owner": "tjcraw6589s-team"
+    "owner": "tjcraw6589s-team",
+    "updates": {
+      "url": "https://u.expo.dev/2db14350-2d55-40c8-894c-3aba8f411d63"
+    }
   }
 }

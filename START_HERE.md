@@ -40,6 +40,20 @@ That's it. The next feed run (within 15 minutes) picks NSW up; check https://tjc
 
 The data is published by the NSW Government under a Creative Commons Attribution licence (listed as CC BY-SA on data.gov.au), so the app credits FuelCheck on every price screen. Pumpwise 1.0 keeps reading the Western Australia feed (`data/v2`) and never sees the new regions; 1.1 reads `data/v3`.
 
+## 6. Small fixes without waiting for Apple (from version 1.1)
+
+Version 1.1 includes EAS Update, so a fix that only changes the app's own code, text or pictures can reach phones within a day, with no new App Store review. Ask Claude: "send this fix as an update". Claude runs the tests, then publishes with:
+
+```
+npx eas-cli@latest update --channel production --environment production --message "<what changed>"
+```
+
+Claude publishes to `production` only when you say so; to try a fix first, it publishes to the `preview` channel. A phone picks the update up the next time Pumpwise is fully closed and reopened (sometimes it takes two reopens).
+
+- **Free:** the Free plan covers 1,000 phones a month that download an update, and 100 GB of downloads. Free accounts can't be charged for going over (Expo billing FAQ).
+- **Not for everything:** new native features, new permissions, SDK upgrades and AdMob ID changes still need a new build and App Store review.
+- **Matching versions:** an update only reaches builds of the same app version (`runtimeVersion` policy `appVersion`), so updates published for 1.1.0 reach 1.1.0 builds only. Version 1.0 has no EAS Update and never receives them.
+
 ## Adding more places later
 
 - **Spain and France**: free, no sign-up, but the app needs translating first.
