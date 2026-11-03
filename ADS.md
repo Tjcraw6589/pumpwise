@@ -1,16 +1,30 @@
 # Pumpwise 1.1: the banner ad
 
-Version 1.1 adds one small banner at the bottom of the Nearby tab, using Google AdMob, the same setup as Bowerly. It is built and tested but **not released**: it waits on the `ads-1.1` branch until version 1.0 is approved, because Apple reviews one version at a time and AdMob only approves apps that are already live.
+Version 1.1 adds one small banner at the bottom of the Nearby tab, using Google AdMob, the same setup as Bowerly. It is built and tested but **not released**: it waits on the `ads-1.1` branch until version 1.0 is approved, because Apple reviews one version at a time. AdMob IDs can be made now (see below); ads only serve once the app is linked to its App Store page.
 
 Until the two AdMob IDs below are filled in, the app shows no ads at all (the ad code switches itself off when the unit ID is empty).
 
-## What you do (free, about 10 minutes, after 1.0 is live)
+## What you do (free, about 15 minutes in all)
 
-1. **AdMob app.** Sign in at https://apps.admob.com with the account that owns publisher `ca-app-pub-6745854970750685`. Apps → Add app → iOS → "Yes, it's listed on the App Store" → search "Pumpwise" → add. Copy the **App ID** (`ca-app-pub-…~…`).
-2. **Ad unit.** In the new app: Ad units → Add ad unit → **Banner** → name "Pumpwise banner" → create. Copy the **Ad unit ID** (`ca-app-pub-…/…`).
-3. Paste both into `app.json`: the App ID replaces the Google sample ID in the `react-native-google-mobile-ads` plugin's `iosAppId`, and the unit ID goes in `extra.monetization.admobBannerIos`. (Or paste them here in chat and I'll do it.)
-4. **App Store Connect → App Privacy.** The label must change from "Data Not Collected" to what AdMob collects, exactly as Bowerly's: Device ID and Advertising Data (used for third-party advertising), Coarse Location, Product Interaction, Crash Data and Performance Data. These are declarations Apple wants from you, so my tools won't click them; I'll open each page and you click.
-5. Build and submit 1.1: `eas build -p ios --profile production` then `eas submit -p ios --latest`, same as before.
+### Now (5 minutes, no need to wait for Apple)
+
+AdMob takes apps that are not in the App Store yet ("unpublished") and gives their IDs straight away. Ads only start showing once the app is linked to its App Store page, which is the last step below.
+
+1. Open https://apps.admob.com and sign in with the Google account that owns publisher `ca-app-pub-6745854970750685` (the Bowerly one).
+2. Click **Apps** → **Add app** → **iOS**. For "Is the app listed on a supported app store?" choose **No**. App name: `Pumpwise`. Click **Add app**.
+3. Copy the **App ID** it shows (`ca-app-pub-…~…`).
+4. Click **Add ad unit** → **Banner** → name `Pumpwise banner` → **Create ad unit**. Copy the **Ad unit ID** (`ca-app-pub-…/…`).
+5. Paste both IDs to Claude in chat. They are not secret: they ship inside the app. Claude puts them in `app.json`, runs every test, builds 1.1 and puts it on TestFlight.
+
+TestFlight builds show no real ads until step 6 is done (Google: iOS apps get no ads until they are in the App Store), so the banner space stays empty there. That is expected.
+
+### After Apple approves 1.0 (Apple emails you)
+
+6. In AdMob: **Apps** → **Pumpwise** → **App settings** → **Add store** → search `Pumpwise: Fuel Prices Near Me` → select it. (1 minute.)
+7. **App Store Connect → App Privacy.** The label must change from "Data Not Collected" to what AdMob collects, exactly as Bowerly's: Device ID and Advertising Data (used for third-party advertising), Coarse Location, Product Interaction, Crash Data and Performance Data. These are declarations Apple wants from you, so Claude opens each page and you click.
+8. Add version 1.1 in App Store Connect, paste the What's New text from `STORE_LISTING.md`, set "Contains ads?" to Yes, pick the TestFlight build, and click **Add for Review** yourself.
+
+The order of steps 1 to 5 and the TestFlight build does not depend on Apple. Steps 6 to 8 do.
 
 ## What's already done in the code
 
