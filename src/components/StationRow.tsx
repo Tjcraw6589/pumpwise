@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { formatMoney } from '@/lib/format';
+import { formatMoney, spokenPrice } from '@/lib/format';
 import type { PriceBand, RankedStation, SortMode } from '@/lib/ranking';
 import { MEMBERS_ONLY, PERMIT_REQUIRED } from '@/lib/ranking';
 import { REGIONS } from '@/lib/regions';
@@ -31,7 +31,16 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${station.name}, ${item.price.p}, ${formatDistance(item.distance, region.distanceUnit)}`}
+      accessibilityLabel={[
+        station.name,
+        spokenPrice(item.price.p, region.priceUnit),
+        formatDistance(item.distance, region.distanceUnit),
+        closed ? 'Closed' : open.label,
+        note,
+      ]
+        .filter(Boolean)
+        .join(', ')}
+      accessibilityHint="Opens the station's prices and hours"
       testID={`station-row-${station.id}`}
       onPress={onPress}
       style={({ pressed }) => [

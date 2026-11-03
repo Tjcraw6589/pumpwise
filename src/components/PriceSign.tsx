@@ -1,6 +1,7 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
-import { formatPrice } from '@/lib/format';
+import { useRegion } from '@/hooks/useRegion';
+import { formatPrice, spokenPrice } from '@/lib/format';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -15,6 +16,8 @@ interface PriceSignProps {
   size?: SignSize;
   /** Small label under the digits, such as "E10". */
   label?: string;
+  /** "c" or "p", for screen readers. Defaults to the unit where the search is. */
+  unit?: string;
   style?: ViewStyle;
   testID?: string;
 }
@@ -30,8 +33,9 @@ const SIZES: Record<SignSize, { digits: number; tenth: number; padH: number; pad
  * A forecourt price sign: lit digits on a dark panel, whole pence large and the tenth of a penny
  * smaller, as on UK pole signs. Always dark, in light and dark mode alike.
  */
-export function PriceSign({ pence, tone = 'normal', size = 'md', label, style, testID }: PriceSignProps) {
+export function PriceSign({ pence, tone = 'normal', size = 'md', label, unit, style, testID }: PriceSignProps) {
   const { colors, fonts, radius } = useTheme();
+  const region = useRegion();
   const s = SIZES[size];
   const [whole, tenth] = formatPrice(pence).split('.');
   const digitColor = tone === 'cheap' ? colors.signCheap : tone === 'muted' ? colors.signLabel : colors.signDigits;
@@ -39,7 +43,7 @@ export function PriceSign({ pence, tone = 'normal', size = 'md', label, style, t
     <View
       testID={testID}
       accessible
-      accessibilityLabel={`${formatPrice(pence)} per litre`}
+      accessibilityLabel={spokenPrice(pence, unit ?? region.priceUnit)}
       style={[
         styles.panel,
         {

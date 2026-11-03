@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { FuelKind } from '@/lib/feed';
-import { formatMoney } from '@/lib/format';
+import { formatMoney, spokenPrice } from '@/lib/format';
 import type { RankedStation, Savings } from '@/lib/ranking';
 import { fuelOption, REGIONS } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
@@ -13,6 +13,14 @@ import { Button } from './Button';
 import { FreshnessTag } from './FreshnessTag';
 import { PriceSign } from './PriceSign';
 import { TomorrowTag } from './TomorrowTag';
+
+/** What VoiceOver reads for a headline card: name, price, distance and opening. */
+function spokenSummary(item: RankedStation): string {
+  const region = REGIONS[item.station.region];
+  return [item.station.name, spokenPrice(item.price.p, region.priceUnit), formatDistance(item.distance, region.distanceUnit), item.open.label]
+    .filter(Boolean)
+    .join(', ');
+}
 
 function Meta({ item }: { item: RankedStation }) {
   const { colors, spacing } = useTheme();
@@ -107,7 +115,11 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           </View>
         ) : null}
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${station.name} details`} onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Cheapest: ${spokenSummary(item)}`}
+        accessibilityHint="Opens the station's prices and hours"
+        onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
         <PriceSign pence={item.price.p} size="lg" tone="cheap" label={fuelOption(region, fuel).pumpCode} testID="cheapest-price" />
         <View style={[styles.flex, { marginLeft: spacing.lg }]}>
           <AppText variant="h2" numberOfLines={2} testID="cheapest-name">
@@ -156,7 +168,13 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
     <Pressable
       testID="nearest-card"
       accessibilityRole="button"
-      accessibilityLabel={`Nearest: ${station.name}`}
+      accessibilityLabel={`Nearest: ${spokenSummary(item)}`}
+      accessibilityHint="Opens the station's prices and hours. Swipe up or down for directions."
+      // VoiceOver can't reach a button inside another button, so directions is also an action here.
+      accessibilityActions={[{ name: 'directions', label: 'Directions' }]}
+      onAccessibilityAction={(event) => {
+        if (event.nativeEvent.actionName === 'directions') onDirections();
+      }}
       onPress={onDetails}
       style={({ pressed }) => [
         styles.card,

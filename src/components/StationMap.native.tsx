@@ -13,7 +13,7 @@ export type { StationMapProps } from './StationMap.types';
 
 
 /** Apple Maps with a price sign on every station in the search area. */
-export function StationMap({ center, radiusKm, stations, band, selectedId, keepIds = [], onSelect, showsUserLocation, recenterToken }: StationMapProps) {
+export function StationMap({ center, radiusKm, stations, band, selectedId, keepIds = [], onSelect, showsUserLocation, recenterToken, mapPadding }: StationMapProps) {
   const { colors, scheme } = useTheme();
   const map = useRef<MapView>(null);
   const [region, setRegion] = useState(() => regionForRadius(center, radiusKm));
@@ -43,6 +43,7 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, keepI
       showsCompass={false}
       userInterfaceStyle={scheme}
       pitchEnabled={false}
+      mapPadding={mapPadding}
       onPress={() => onSelect(null)}
       onLayout={(e) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
       onRegionChangeComplete={(next) => setRegion(next)}

@@ -38,7 +38,7 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Nearby', tabBarIcon: icon('speedometer', 'speedometer-outline') }} />
       <Tabs.Screen name="map" options={{ title: 'Map', tabBarIcon: icon('map', 'map-outline') }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('options', 'options-outline') }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings', 'settings-outline') }} />
     </Tabs>
   );
 }

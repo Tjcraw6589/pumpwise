@@ -14,4 +14,6 @@ export interface StationMapProps {
   showsUserLocation: boolean;
   /** Changes when the map should fly back to the search area. */
   recenterToken: number;
+  /** Space taken by cards over the map, so the Apple Maps logo and "Legal" link stay visible. */
+  mapPadding?: { top: number; right: number; bottom: number; left: number };
 }

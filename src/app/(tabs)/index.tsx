@@ -17,7 +17,7 @@ import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useDirections } from '@/hooks/useDirections';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
-import { formatChange, formatMoney, timeAgo } from '@/lib/format';
+import { formatChange, formatMoney, spokenPrice, timeAgo } from '@/lib/format';
 import { feedWarning } from '@/lib/nearby';
 import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
 import { fuelOption, type RegionInfo } from '@/lib/regions';
@@ -50,6 +50,7 @@ function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => v
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`Best value once you count the drive: ${item.station.name}, ${spokenPrice(item.price.p, region.priceUnit)}, ${formatDistance(item.distance, region.distanceUnit)}, ${formatMoney(item.realCost, region.currency)} with the fuel to get there and back`}
       onPress={onPress}
       testID="best-value-row"
       style={({ pressed }) => [

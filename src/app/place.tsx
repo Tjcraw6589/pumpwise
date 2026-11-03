@@ -111,6 +111,7 @@ export default function PlaceScreen() {
           autoCapitalize="words"
           autoCorrect={false}
           returnKeyType="search"
+          clearButtonMode="while-editing"
           style={[styles.input, { color: colors.text, marginLeft: spacing.sm }]}
           testID="place-search"
           accessibilityLabel="Suburb, town or postcode"

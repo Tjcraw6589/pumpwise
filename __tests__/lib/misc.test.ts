@@ -1,4 +1,4 @@
-import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, timeAgo } from '@/lib/format';
+import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, spokenPrice, timeAgo } from '@/lib/format';
 import { distanceKm, regionForRadius } from '@/lib/geo';
 import { feedWarning, nearbyPhase, needsReload, RELOAD_AFTER_MS } from '@/lib/nearby';
 import { classifyQuery } from '@/lib/places';
@@ -22,6 +22,8 @@ describe('format', () => {
   test('prices, money and changes', () => {
     expect(formatPrice(139.9)).toBe('139.9');
     expect(formatPrice(200)).toBe('200.0');
+    expect(spokenPrice(185.8, 'c')).toBe('185.8 cents a litre');
+    expect(spokenPrice(139.9, 'p')).toBe('139.9 pence a litre');
     expect(formatMoney(2.4, '$')).toBe('$2.40');
     expect(formatMoney(-0.5, '£')).toBe('-£0.50');
     expect(formatChange(-4)).toBe('−4.0');

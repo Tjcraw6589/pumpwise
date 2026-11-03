@@ -27,7 +27,7 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
   const { spacing } = useTheme();
   return (
     <View style={{ marginTop: spacing.xl }}>
-      <AppText variant="overline" tone="muted" style={{ marginBottom: spacing.sm }}>
+      <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
         {title}
       </AppText>
       {children}

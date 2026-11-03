@@ -5,6 +5,12 @@ export function formatPrice(price: number): string {
   return price.toFixed(1);
 }
 
+/** "185.8 cents a litre": screen readers say "185.8c" badly, so prices get their unit in words. */
+export function spokenPrice(price: number, unit: string): string {
+  const word = unit === 'p' ? 'pence' : unit === 'c' ? 'cents' : unit;
+  return `${formatPrice(price)} ${word} a litre`;
+}
+
 export function formatMoney(amount: number, currency: string): string {
   const sign = amount < 0 ? '-' : '';
   return `${sign}${currency}${Math.abs(amount).toFixed(2)}`;
