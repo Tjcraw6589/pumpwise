@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,8 +8,9 @@ import { Button } from '@/components/Button';
 import { askForLocation } from '@/components/PhaseState';
 import { PriceSign } from '@/components/PriceSign';
 import { PumpMark } from '@/components/PumpMark';
-import { useCoverage } from '@/hooks/useRegion';
+import { type Coverage, coverageOf, useCoverage } from '@/hooks/useRegion';
 import { DEFAULT_REGION, REGIONS, regionList } from '@/lib/regions';
+import { fetchMeta } from '@/services/feedClient';
 import { selectionHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
@@ -18,7 +19,22 @@ import { useTheme } from '@/theme/useTheme';
 export default function OnboardingScreen() {
   const { colors, spacing, radius } = useTheme();
   const [step, setStep] = useState(0);
-  const coverage = useCoverage();
+  const loaded = useCoverage();
+  // The feed only loads once the tabs open, so fetch its summary here: the welcome then names only
+  // the places that really have prices, never the ones still waiting to go live.
+  const [fetched, setFetched] = useState<Coverage | null>(null);
+  useEffect(() => {
+    let gone = false;
+    fetchMeta()
+      .then((meta) => {
+        if (!gone) setFetched(coverageOf(meta));
+      })
+      .catch(() => undefined);
+    return () => {
+      gone = true;
+    };
+  }, []);
+  const coverage = loaded.known ? loaded : fetched;
   const fuel = useStore((s) => s.settings.fuel);
   const updateSettings = useStore((s) => s.updateSettings);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
@@ -59,7 +75,7 @@ export default function OnboardingScreen() {
               Cheap fuel,{'\n'}close by.
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.md, maxWidth: 340 }}>
-              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap. Covering {regionList(coverage.live)}.
+              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap.{coverage && coverage.live.length > 0 ? ` Covering ${regionList(coverage.live)}.` : ''}
             </AppText>
             <View style={[styles.signs, { marginTop: gap, gap: spacing.md }]}>
               <View style={styles.center}>
@@ -72,7 +88,7 @@ export default function OnboardingScreen() {
             <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: gap }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                {coverage.live.includes('nsw')
+                {coverage?.live.includes('nsw')
                   ? 'Official government prices that stations must report by law: FuelWatch in WA, FuelCheck in NSW, the ACT and Tasmania.'
                   : "Official government prices. In WA every station's price is fixed for the day, and tomorrow's are out by 2:30pm."}
               </AppText>
