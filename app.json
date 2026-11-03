@@ -102,7 +102,7 @@
       [
         "react-native-google-mobile-ads",
         {
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "iosAppId": "ca-app-pub-6745854970750685~6847189260",
           "userTrackingUsageDescription": "Pumpwise shows a small ad to keep the app free. Allowing tracking lets that ad be more relevant. Your location and settings never leave your iPhone either way.",
           "delayAppMeasurementInit": true,
           "skAdNetworkItems": [
@@ -178,7 +178,7 @@
         "projectId": "2db14350-2d55-40c8-894c-3aba8f411d63"
       },
       "monetization": {
-        "admobBannerIos": ""
+        "admobBannerIos": "ca-app-pub-6745854970750685/6192408138"
       }
     },
     "owner": "tjcraw6589s-team",
