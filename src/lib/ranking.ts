@@ -101,7 +101,7 @@ export function rankStations(stations: FeedStation[], options: RankOptions): Ran
       distance,
       price,
       tomorrow: station.tomorrow?.[fuel] ?? null,
-      open: openState(station.hours, now, region.utcOffsetMinutes(now)),
+      open: openState(station.hours, now, region.utcOffsetMinutes(now, station.lng)),
       tripLitres,
       realCost: ((fillLitres + tripLitres) * price.p) / 100,
       stale: Date.parse(price.at) < staleBefore,

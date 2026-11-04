@@ -59,7 +59,7 @@ export default function StationScreen() {
   }
 
   const region = REGIONS[station.region];
-  const offset = region.utcOffsetMinutes(now);
+  const offset = region.utcOffsetMinutes(now, station.lng);
   const open = openState(station.hours, now, offset);
   const today = localClock(now, offset).day;
   const distance = center ? distanceKm(center, station) : null;

@@ -18,6 +18,10 @@ export function FreshnessTag({ at, region, now, testID }: { at: string; region: 
   let level: ReturnType<typeof freshness>;
   if (info.priceMode === 'daily') {
     ({ text, level } = dailyLabel(at, now, info.utcOffsetMinutes(now)));
+  } else if (info.priceMode === 'current') {
+    // The source lists the prices in force without saying when each was set (Mexico).
+    text = 'Current price';
+    level = 'fresh';
   } else {
     level = freshness(at, now, info.trustDays);
     text = level === 'old' ? `Not confirmed since ${timeAgo(at, now)}` : `Reported ${timeAgo(at, now)}`;

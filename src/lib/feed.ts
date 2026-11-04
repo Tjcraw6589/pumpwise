@@ -6,12 +6,15 @@
  * (`node scripts/feed/build.ts`), and the app imports the same code, so both always agree.
  */
 
+/** The feed version this build of the app reads (its app.json `extra.feedUrl` must match). */
 export const FEED_VERSION = 3;
 /**
  * Version 2 of the feed (Western Australia only) stays online for Pumpwise 1.0, which can't read
- * the regions added since. It is published alongside version 3 at data/v2.
+ * the regions added since. It is published alongside the newer versions at data/v2.
  */
 export const LEGACY_VERSION = 2;
+/** The newest feed version, with every region. The feed job reads the previous run's prices from it. */
+export const LATEST_FEED_VERSION = 4;
 /** Stations are grouped into square tiles of this many degrees, so the app downloads only its area. */
 export const TILE_DEG = 0.5;
 
@@ -23,10 +26,22 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'uk';
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk'];
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx';
+/** In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France). */
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx'];
 /** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
 export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
+
+/**
+ * Every feed version the job publishes, and the regions each may carry. Apps look up every station's
+ * region, so an older app would fail on a region it was not built with: each older version keeps
+ * only the regions its app knows, and new regions appear only in the newest.
+ */
+export const PUBLISHED_FEEDS: readonly { version: number; regions: readonly RegionId[] | 'all' }[] = [
+  { version: LATEST_FEED_VERSION, regions: 'all' },
+  { version: 3, regions: ['wa', 'nsw', 'tas', 'uk'] },
+  { version: LEGACY_VERSION, regions: LEGACY_REGION_IDS },
+];
 
 export interface Bounds {
   minLat: number;
@@ -36,15 +51,33 @@ export interface Bounds {
 }
 
 /**
- * Generous boxes around each region. WA's eastern edge is the 129th meridian. The NSW box includes
- * the ACT, whose stations are in NSW FuelCheck, and clips a little of Victoria and Queensland along
- * the borders, where the nearest stations are often in NSW anyway.
+ * Boxes around each region, several where a single box would swallow a neighbour. WA's eastern edge
+ * is the 129th meridian. The NSW box includes the ACT, whose stations are in NSW FuelCheck, and clips
+ * a little of Victoria and Queensland along the borders, where the nearest stations are often in NSW
+ * anyway. Spain's boxes leave out most of Portugal and stop at the Pyrenees, and Great Britain's
+ * stop short of Normandy and Calais, so France gets those.
  */
-export const REGION_BOUNDS: Record<RegionId, Bounds> = {
-  wa: { minLat: -35.6, maxLat: -13.4, minLng: 112.5, maxLng: 129.0 },
-  nsw: { minLat: -37.6, maxLat: -28.1, minLng: 140.95, maxLng: 154.0 },
-  tas: { minLat: -43.9, maxLat: -39.3, minLng: 143.5, maxLng: 148.6 },
-  uk: { minLat: 49.1, maxLat: 61.0, minLng: -8.7, maxLng: 2.1 },
+export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
+  wa: [{ minLat: -35.6, maxLat: -13.4, minLng: 112.5, maxLng: 129.0 }],
+  nsw: [{ minLat: -37.6, maxLat: -28.1, minLng: 140.95, maxLng: 154.0 }],
+  tas: [{ minLat: -43.9, maxLat: -39.3, minLng: 143.5, maxLng: 148.6 }],
+  qld: [{ minLat: -29.2, maxLat: -9.0, minLng: 137.99, maxLng: 153.65 }],
+  uk: [
+    { minLat: 50.0, maxLat: 51.0, minLng: -8.7, maxLng: 1.2 },
+    { minLat: 51.0, maxLat: 61.0, minLng: -8.7, maxLng: 1.8 },
+  ],
+  es: [
+    { minLat: 42.15, maxLat: 43.9, minLng: -9.4, maxLng: -1.75 }, // Galicia to the Basque Country
+    { minLat: 35.9, maxLat: 42.15, minLng: -6.2, maxLng: -1.75 }, // the interior and the south
+    { minLat: 36.9, maxLat: 41.0, minLng: -7.0, maxLng: -6.2 }, // Extremadura and western Andalucía
+    { minLat: 36.9, maxLat: 37.9, minLng: -7.45, maxLng: -7.0 }, // Huelva to the Guadiana
+    { minLat: 35.9, maxLat: 42.5, minLng: -1.75, maxLng: 4.4 }, // the east, Catalonia and the Balearics
+    { minLat: 42.5, maxLat: 42.9, minLng: -1.75, maxLng: -0.75 }, // Navarra
+    { minLat: 27.6, maxLat: 29.5, minLng: -18.2, maxLng: -13.3 }, // Canary Islands
+    { minLat: 35.25, maxLat: 35.95, minLng: -5.4, maxLng: -2.9 }, // Ceuta and Melilla
+  ],
+  fr: [{ minLat: 41.3, maxLat: 51.2, minLng: -5.3, maxLng: 9.7 }],
+  mx: [{ minLat: 14.4, maxLat: 32.8, minLng: -118.5, maxLng: -86.6 }],
 };
 
 /** First Sunday of a month at 02:00 Australian Eastern Standard Time (16:00 UTC the day before). */
@@ -70,12 +103,33 @@ export function inBounds(b: Bounds, lat: number, lng: number): boolean {
   return lat >= b.minLat && lat <= b.maxLat && lng >= b.minLng && lng <= b.maxLng;
 }
 
+/** True when a point is inside any of a region's boxes. */
+export function inRegion(id: RegionId, lat: number, lng: number): boolean {
+  return REGION_BOUNDS[id].some((b) => inBounds(b, lat, lng));
+}
+
 export function regionAt(lat: number, lng: number): RegionId | null {
-  return REGION_IDS.find((id) => inBounds(REGION_BOUNDS[id], lat, lng)) ?? null;
+  return REGION_IDS.find((id) => inRegion(id, lat, lng)) ?? null;
+}
+
+/** Last Sunday of a month at 01:00 UTC, when clocks change across the EU and the UK. */
+function lastSundayUtc(year: number, monthIndex: number): number {
+  const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0, 1));
+  return lastDay.getTime() - lastDay.getUTCDay() * 86_400_000;
+}
+
+/** European summer time (UK, Spain, France): from the last Sunday in March to the last Sunday in October. */
+export function isEuropeanSummerTime(date: Date): boolean {
+  const t = date.getTime();
+  const year = date.getUTCFullYear();
+  return t >= lastSundayUtc(year, 2) && t < lastSundayUtc(year, 9);
 }
 
 export interface FeedPrice {
-  /** Pence or cents per litre, one decimal place (139.9 means 1.399 a litre). */
+  /**
+   * Hundredths of the local currency per litre, one decimal place: pence or cents (139.9 means
+   * 1.399 a litre, and €1.659 is 165.9), or centavos in Mexico (24.59 pesos is 2459).
+   */
   p: number;
   /**
    * When the price was reported (UK) or the start of the day it applies to (WA, where prices are
@@ -272,15 +326,26 @@ export function buildFeed(
   };
 }
 
-/** The version 2 feed for Pumpwise 1.0: the same prices, limited to the regions it knows. */
-export function legacyFeed(stations: FeedStation[], regions: Partial<Record<RegionId, RegionStatus>>, now: Date): BuiltFeed {
-  const keep = new Set<RegionId>(LEGACY_REGION_IDS);
-  const legacyRegions: Partial<Record<RegionId, RegionStatus>> = {};
-  for (const id of LEGACY_REGION_IDS) if (regions[id]) legacyRegions[id] = regions[id];
+/** One published feed version: the same prices, limited to the regions that version may carry. */
+export function feedForVersion(
+  stations: FeedStation[],
+  regions: Partial<Record<RegionId, RegionStatus>>,
+  now: Date,
+  published: { version: number; regions: readonly RegionId[] | 'all' },
+): BuiltFeed {
+  if (published.regions === 'all') return buildFeed(stations, regions, now, published.version);
+  const keep = new Set<RegionId>(published.regions);
+  const kept: Partial<Record<RegionId, RegionStatus>> = {};
+  for (const id of published.regions) if (regions[id]) kept[id] = regions[id];
   return buildFeed(
     stations.filter((s) => keep.has(s.region)),
-    legacyRegions,
+    kept,
     now,
-    LEGACY_VERSION,
+    published.version,
   );
+}
+
+/** The version 2 feed for Pumpwise 1.0: the same prices, limited to the regions it knows. */
+export function legacyFeed(stations: FeedStation[], regions: Partial<Record<RegionId, RegionStatus>>, now: Date): BuiltFeed {
+  return feedForVersion(stations, regions, now, { version: LEGACY_VERSION, regions: LEGACY_REGION_IDS });
 }

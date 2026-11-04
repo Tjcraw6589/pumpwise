@@ -9,8 +9,7 @@ import {
   type FeedPrice,
   type FeedStation,
   type FuelKind,
-  inBounds,
-  REGION_BOUNDS,
+  inRegion,
   roundCoord,
   tidyName,
 } from '../../../src/lib/feed.ts';
@@ -86,7 +85,7 @@ export function normalizeUkStation(raw: unknown): UkStationInfo | null {
   const location = asRecord(record.location) ?? record;
   const lat = asNumber(location.latitude);
   const lng = asNumber(location.longitude);
-  if (lat === null || lng === null || !inBounds(REGION_BOUNDS.uk, lat, lng)) return null;
+  if (lat === null || lng === null || !inRegion('uk', lat, lng)) return null;
 
   const brand = tidyName(asString(record.brand_name));
   const name = tidyName(asString(record.trading_name)) || brand || 'Fuel station';
