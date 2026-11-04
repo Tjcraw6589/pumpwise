@@ -12,7 +12,7 @@ const extra = (Constants.expoConfig?.extra ?? {}) as Extra;
  * Where the price feed lives. The web smoke test points this at a local made-up feed through
  * EXPO_PUBLIC_FEED_URL; the app itself uses the GitHub Pages address from app.json.
  */
-export const FEED_URL = (process.env.EXPO_PUBLIC_FEED_URL || extra.feedUrl || 'https://tjcraw6589.github.io/pumpwise/data/v3').replace(
+export const FEED_URL = (process.env.EXPO_PUBLIC_FEED_URL || extra.feedUrl || 'https://tjcraw6589.github.io/pumpwise/data/v4').replace(
   /\/$/,
   '',
 );

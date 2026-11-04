@@ -455,7 +455,7 @@ export const DEFAULT_REGION: RegionId = 'wa';
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];
