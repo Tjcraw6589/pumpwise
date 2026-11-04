@@ -2,7 +2,7 @@
 // FuelWatch allows apps to use its data "on the condition that FuelWatch is acknowledged as the
 // source of the data with a link back to www.fuelwatch.wa.gov.au" (fuelwatch.wa.gov.au/tools/rss).
 // WA prices are fixed for 24 hours from 6am, and tomorrow's prices are published after 2:30pm.
-import { cleanPrice, type FeedStation, type FuelKind, hashId, inBounds, REGION_BOUNDS, roundCoord, tidyName } from '../../../src/lib/feed.ts';
+import { cleanPrice, type FeedStation, type FuelKind, hashId, inRegion, roundCoord, tidyName } from '../../../src/lib/feed.ts';
 import { politeRequester } from '../http.ts';
 
 export const WA_RSS = 'https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS';
@@ -148,7 +148,7 @@ export function buildWaStations(today: WaProductFeed[], tomorrow: WaProductFeed[
       const lng = Number(item.longitude);
       const price = cleanPrice(item.price, WA_MIN_CENTS, WA_MAX_CENTS);
       const at = waPriceStart(item.date);
-      if (!Number.isFinite(lat) || !Number.isFinite(lng) || !inBounds(REGION_BOUNDS.wa, lat, lng) || price === null || !at) continue;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || !inRegion('wa', lat, lng) || price === null || !at) continue;
       const id = waStationId(item);
       let station = stations.get(id);
       if (!station) {

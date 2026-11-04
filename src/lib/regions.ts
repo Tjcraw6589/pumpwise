@@ -1,4 +1,4 @@
-import { auEasternOffsetMinutes, type FuelKind, type RegionId, regionAt } from './feed';
+import { auEasternOffsetMinutes, type FuelKind, isEuropeanSummerTime, type RegionId, regionAt } from './feed';
 import type { Place } from './places';
 
 export interface FuelOption {
@@ -21,6 +21,11 @@ export interface RegionInfo {
   currency: string;
   /** "p" (pence) or "c" (cents), after a price per litre. */
   priceUnit: string;
+  /**
+   * How a price per litre is shown. Absent: hundredths with one decimal and `priceUnit` ("189.9c").
+   * 3: whole currency to three decimals, as on European pumps ("€1.659"). 2: two decimals ("$24.59").
+   */
+  priceDecimals?: 2 | 3;
   distanceUnit: DistanceUnit;
   economyUnit: EconomyUnit;
   fuels: readonly FuelOption[];
@@ -28,8 +33,11 @@ export interface RegionInfo {
   radiusOptions: readonly number[];
   /** Car fuel economy choices, in the region's economy unit. */
   economyOptions: readonly number[];
-  /** "reported": each price has its own report time. "daily": prices are fixed for the day. */
-  priceMode: 'reported' | 'daily';
+  /**
+   * "reported": each price has its own report time. "daily": prices are fixed for the day.
+   * "current": the source lists the prices in force but not when they were set (Spain, Mexico).
+   */
+  priceMode: 'reported' | 'daily' | 'current';
   /** Local hour the price day starts, for "daily" regions. */
   priceDayStartHour?: number;
   /** "reported" regions: days before an unchanged price gets a "not confirmed" warning (default 14). */
@@ -39,8 +47,11 @@ export interface RegionInfo {
    * old price is still the current one ("Unchanged for 12 days"), not a stale one.
    */
   pricesStand?: boolean;
-  /** Minutes ahead of UTC on a given date (for opening hours and "today"). */
-  utcOffsetMinutes: (date: Date) => number;
+  /**
+   * Minutes ahead of UTC on a given date (for opening hours and "today"). `lng` is the station's
+   * longitude where a region spans time zones (Spain's Canary Islands are an hour behind).
+   */
+  utcOffsetMinutes: (date: Date, lng?: number) => number;
   source: { name: string; url: string; credit: string };
   report: { label: string; url: string; note: string };
   /** One-paragraph explanation for the About screen. */
@@ -48,16 +59,13 @@ export interface RegionInfo {
   cities: readonly Place[];
 }
 
-/** Last Sunday of a month at 01:00 UTC, when UK clocks change. */
-function lastSundayUtc(year: number, monthIndex: number): number {
-  const lastDay = new Date(Date.UTC(year, monthIndex + 1, 0, 1));
-  return lastDay.getTime() - lastDay.getUTCDay() * 86_400_000;
-}
+/** UK clocks change on the same dates as the rest of Europe. */
+export const isBritishSummerTime = isEuropeanSummerTime;
 
-export function isBritishSummerTime(date: Date): boolean {
-  const t = date.getTime();
-  const year = date.getUTCFullYear();
-  return t >= lastSundayUtc(year, 2) && t < lastSundayUtc(year, 9);
+/** Spain is on Central European Time, except the Canary Islands (west of 13°W), an hour behind. */
+export function spainOffsetMinutes(date: Date, lng?: number): number {
+  const base = lng !== undefined && lng < -12 ? 0 : 60;
+  return base + (isEuropeanSummerTime(date) ? 60 : 0);
 }
 
 export const REGIONS: Record<RegionId, RegionInfo> = {
@@ -199,6 +207,54 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Burnie', detail: 'Tasmania', lat: -41.0526, lng: 145.906 },
     ],
   },
+  qld: {
+    id: 'qld',
+    name: 'Queensland',
+    currency: '$',
+    priceUnit: 'c',
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Unleaded 91', pumpCode: 'U91', description: 'Standard unleaded', common: true },
+      { kind: 'e10', label: 'E10', pumpCode: 'E10', description: '94 octane with 10% ethanol', common: true },
+      { kind: 'premium', label: 'Premium 95', pumpCode: 'P95', description: 'Premium unleaded', common: true },
+      { kind: 'super', label: 'Premium 98', pumpCode: 'P98', description: '98 octane unleaded', common: true },
+      { kind: 'diesel', label: 'Diesel', pumpCode: 'DL', description: 'Standard diesel', common: true },
+      { kind: 'premium-diesel', label: 'Premium diesel', pumpCode: 'PDL', description: 'Branded diesel', common: false },
+      { kind: 'lpg', label: 'LPG', pumpCode: 'LPG', description: 'Autogas', common: false },
+      { kind: 'e85', label: 'E85', pumpCode: 'E85', description: 'Ethanol blend', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
+    priceMode: 'reported',
+    trustDays: 30,
+    pricesStand: true,
+    utcOffsetMinutes: () => 10 * 60,
+    source: {
+      name: 'Fuel Prices QLD',
+      url: 'https://www.fuelpricesqld.com.au',
+      credit: 'Prices from the Queensland Government fuel price reporting scheme',
+    },
+    report: {
+      label: 'Contact the Queensland Government',
+      url: 'https://www.epw.qld.gov.au/about/initiatives/fuel-price-reporting',
+      note: 'Queensland stations must report price changes within 30 minutes.',
+    },
+    about:
+      'Queensland stations must report every price change to the Queensland Government within 30 minutes. A price stands until the station reports a new one.',
+    cities: [
+      { name: 'Brisbane', detail: 'Queensland', lat: -27.4698, lng: 153.0251 },
+      { name: 'Gold Coast', detail: 'Queensland', lat: -28.0167, lng: 153.4 },
+      { name: 'Sunshine Coast', detail: 'Queensland', lat: -26.65, lng: 153.0667 },
+      { name: 'Ipswich', detail: 'Queensland', lat: -27.6144, lng: 152.7608 },
+      { name: 'Toowoomba', detail: 'Queensland', lat: -27.5598, lng: 151.9507 },
+      { name: 'Bundaberg', detail: 'Queensland', lat: -24.8661, lng: 152.3489 },
+      { name: 'Rockhampton', detail: 'Queensland', lat: -23.3791, lng: 150.5100 },
+      { name: 'Mackay', detail: 'Queensland', lat: -21.1411, lng: 149.1861 },
+      { name: 'Townsville', detail: 'Queensland', lat: -19.259, lng: 146.8169 },
+      { name: 'Cairns', detail: 'Queensland', lat: -16.9186, lng: 145.7781 },
+    ],
+  },
   uk: {
     id: 'uk',
     name: 'United Kingdom',
@@ -235,6 +291,159 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Manchester', detail: 'United Kingdom', lat: 53.4808, lng: -2.2426 },
       { name: 'Birmingham', detail: 'United Kingdom', lat: 52.4862, lng: -1.8904 },
       { name: 'Glasgow', detail: 'United Kingdom', lat: 55.8642, lng: -4.2518 },
+    ],
+  },
+  es: {
+    id: 'es',
+    name: 'Spain',
+    currency: '€',
+    priceUnit: 'c',
+    priceDecimals: 3,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Gasolina 95', pumpCode: '95', description: 'Unleaded 95 (E5)', common: true },
+      { kind: 'diesel', label: 'Diésel', pumpCode: 'A', description: 'Gasóleo A, standard diesel', common: true },
+      { kind: 'super', label: 'Gasolina 98', pumpCode: '98', description: 'Unleaded 98', common: true },
+      { kind: 'premium-diesel', label: 'Diésel Premium', pumpCode: 'A+', description: 'Premium diesel', common: true },
+      { kind: 'premium', label: 'Gasolina 95 Premium', pumpCode: '95+', description: 'Premium unleaded 95', common: false },
+      { kind: 'e10', label: 'Gasolina 95 E10', pumpCode: 'E10', description: 'Unleaded 95 with 10% ethanol', common: false },
+      { kind: 'lpg', label: 'Autogás (GLP)', pumpCode: 'GLP', description: 'Liquefied petroleum gas', common: false },
+      { kind: 'e85', label: 'E85', pumpCode: 'E85', description: 'Ethanol blend', common: false },
+      { kind: 'hvo', label: 'Diésel renovable', pumpCode: 'HVO', description: 'Renewable diesel', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    // The Ministry's list gives the prices in force when it was published, not when each was set.
+    priceMode: 'current',
+    utcOffsetMinutes: spainOffsetMinutes,
+    source: {
+      name: 'Geoportal de Gasolineras',
+      url: 'https://geoportalgasolineras.es',
+      credit: 'Prices from the Geoportal de Gasolineras, Spanish Ministry for the Ecological Transition',
+    },
+    report: {
+      label: 'Check it on the Geoportal',
+      url: 'https://geoportalgasolineras.es',
+      note: 'Spanish stations must report their prices to the Ministry whenever they change.',
+    },
+    about:
+      'In Spain every station must report its prices to the Ministry for the Ecological Transition whenever they change. The Ministry publishes them every half hour, and Pumpwise collects them about every 30 minutes.',
+    cities: [
+      { name: 'Madrid', detail: 'Spain', lat: 40.4168, lng: -3.7038 },
+      { name: 'Barcelona', detail: 'Spain', lat: 41.3874, lng: 2.1686 },
+      { name: 'Valencia', detail: 'Spain', lat: 39.4699, lng: -0.3763 },
+      { name: 'Sevilla', detail: 'Spain', lat: 37.3891, lng: -5.9845 },
+      { name: 'Zaragoza', detail: 'Spain', lat: 41.6488, lng: -0.8891 },
+      { name: 'Málaga', detail: 'Spain', lat: 36.7213, lng: -4.4214 },
+      { name: 'Murcia', detail: 'Spain', lat: 37.9922, lng: -1.1307 },
+      { name: 'Palma', detail: 'Spain', lat: 39.5696, lng: 2.6502 },
+      { name: 'Bilbao', detail: 'Spain', lat: 43.263, lng: -2.935 },
+      { name: 'Alicante', detail: 'Spain', lat: 38.3452, lng: -0.481 },
+      { name: 'Valladolid', detail: 'Spain', lat: 41.6523, lng: -4.7245 },
+      { name: 'Vigo', detail: 'Spain', lat: 42.2406, lng: -8.7207 },
+      { name: 'A Coruña', detail: 'Spain', lat: 43.3623, lng: -8.4115 },
+      { name: 'Granada', detail: 'Spain', lat: 37.1773, lng: -3.5986 },
+      { name: 'Las Palmas de Gran Canaria', detail: 'Spain', lat: 28.1235, lng: -15.4363 },
+      { name: 'Santa Cruz de Tenerife', detail: 'Spain', lat: 28.4636, lng: -16.2518 },
+    ],
+  },
+  fr: {
+    id: 'fr',
+    name: 'France',
+    currency: '€',
+    priceUnit: 'c',
+    priceDecimals: 3,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'SP95-E10', pumpCode: 'E10', description: 'Unleaded 95 with up to 10% ethanol', common: true },
+      { kind: 'diesel', label: 'Gazole', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'premium', label: 'SP95', pumpCode: 'E5', description: 'Unleaded 95', common: true },
+      { kind: 'super', label: 'SP98', pumpCode: 'E5', description: 'Unleaded 98', common: true },
+      { kind: 'e85', label: 'E85', pumpCode: 'E85', description: 'Superethanol', common: false },
+      { kind: 'lpg', label: 'GPLc', pumpCode: 'LPG', description: 'Autogas', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    priceMode: 'reported',
+    trustDays: 30,
+    pricesStand: true,
+    utcOffsetMinutes: (date) => 60 + (isEuropeanSummerTime(date) ? 60 : 0),
+    source: {
+      name: 'prix-carburants.gouv.fr',
+      url: 'https://www.prix-carburants.gouv.fr',
+      credit: 'Prices from prix-carburants.gouv.fr, French Ministry of the Economy (Licence Ouverte 2.0)',
+    },
+    report: {
+      label: 'Check it on prix-carburants.gouv.fr',
+      url: 'https://www.prix-carburants.gouv.fr',
+      note: 'French stations must report every price change to the government.',
+    },
+    about:
+      'In France every station must report its prices to the government whenever they change, and the price at the pump must match. Pumpwise collects them about every 15 minutes. The government list has no brand names, so stations are shown by their address.',
+    cities: [
+      { name: 'Paris', detail: 'France', lat: 48.8566, lng: 2.3522 },
+      { name: 'Marseille', detail: 'France', lat: 43.2965, lng: 5.3698 },
+      { name: 'Lyon', detail: 'France', lat: 45.764, lng: 4.8357 },
+      { name: 'Toulouse', detail: 'France', lat: 43.6047, lng: 1.4442 },
+      { name: 'Nice', detail: 'France', lat: 43.7102, lng: 7.262 },
+      { name: 'Nantes', detail: 'France', lat: 47.2184, lng: -1.5536 },
+      { name: 'Montpellier', detail: 'France', lat: 43.6108, lng: 3.8767 },
+      { name: 'Strasbourg', detail: 'France', lat: 48.5734, lng: 7.7521 },
+      { name: 'Bordeaux', detail: 'France', lat: 44.8378, lng: -0.5792 },
+      { name: 'Lille', detail: 'France', lat: 50.6292, lng: 3.0573 },
+      { name: 'Rennes', detail: 'France', lat: 48.1173, lng: -1.6778 },
+      { name: 'Reims', detail: 'France', lat: 49.2583, lng: 4.0317 },
+      { name: 'Grenoble', detail: 'France', lat: 45.1885, lng: 5.7245 },
+      { name: 'Dijon', detail: 'France', lat: 47.322, lng: 5.0415 },
+      { name: 'Rouen', detail: 'France', lat: 49.4432, lng: 1.0999 },
+      { name: 'Ajaccio', detail: 'France', lat: 41.9192, lng: 8.7386 },
+    ],
+  },
+  mx: {
+    id: 'mx',
+    name: 'Mexico',
+    currency: '$',
+    priceUnit: 'c',
+    priceDecimals: 2,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Magna', pumpCode: '87', description: 'Regular unleaded', common: true },
+      { kind: 'premium', label: 'Premium', pumpCode: '91', description: 'Premium unleaded', common: true },
+      { kind: 'diesel', label: 'Diésel', pumpCode: 'DSL', description: 'Diesel', common: true },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [5, 6, 7, 8, 9, 10, 12, 14],
+    priceMode: 'current',
+    // Mexico City time; the CRE list has no opening hours, so this only marks the day.
+    utcOffsetMinutes: () => -6 * 60,
+    source: {
+      name: 'Comisión Reguladora de Energía',
+      url: 'https://www.gob.mx/cre',
+      credit: 'Prices from the Comisión Reguladora de Energía (CRE), Government of Mexico',
+    },
+    report: {
+      label: 'Report it to PROFECO',
+      url: 'https://www.gob.mx/profeco',
+      note: 'Stations report their prices to the CRE; PROFECO handles complaints at the pump.',
+    },
+    about:
+      'In Mexico fuel stations report their prices to the Energy Regulatory Commission (CRE), which publishes them as open data. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices.',
+    cities: [
+      { name: 'Ciudad de México', detail: 'Mexico', lat: 19.4326, lng: -99.1332 },
+      { name: 'Guadalajara', detail: 'Mexico', lat: 20.6597, lng: -103.3496 },
+      { name: 'Monterrey', detail: 'Mexico', lat: 25.6866, lng: -100.3161 },
+      { name: 'Puebla', detail: 'Mexico', lat: 19.0414, lng: -98.2063 },
+      { name: 'Tijuana', detail: 'Mexico', lat: 32.5149, lng: -117.0382 },
+      { name: 'León', detail: 'Mexico', lat: 21.1219, lng: -101.6826 },
+      { name: 'Querétaro', detail: 'Mexico', lat: 20.5888, lng: -100.3899 },
+      { name: 'Mérida', detail: 'Mexico', lat: 20.9674, lng: -89.5926 },
+      { name: 'Cancún', detail: 'Mexico', lat: 21.1619, lng: -86.8515 },
+      { name: 'Toluca', detail: 'Mexico', lat: 19.2826, lng: -99.6557 },
+      { name: 'Chihuahua', detail: 'Mexico', lat: 28.6353, lng: -106.0889 },
+      { name: 'Aguascalientes', detail: 'Mexico', lat: 21.8853, lng: -102.2916 },
     ],
   },
 };

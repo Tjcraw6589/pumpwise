@@ -10,23 +10,27 @@ import { fileURLToPath } from 'node:url';
 
 import {
   type BuiltFeed,
-  buildFeed,
   type FeedMeta,
+  feedForVersion,
   type FeedStation,
   type FeedTile,
-  FEED_VERSION,
-  LEGACY_VERSION,
-  legacyFeed,
+  LATEST_FEED_VERSION,
+  PUBLISHED_FEEDS,
   type RegionId,
   type RegionStatus,
 } from '../../src/lib/feed.ts';
+import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
+import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
+import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
 import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
+import { fetchQld, QLD_MIN_STATIONS, qldToken } from './sources/qld.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
 import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = process.env.FEED_OUT_DIR ?? join(root, 'out', 'site');
-const PUBLIC_FEED = (process.env.FEED_PUBLIC_URL ?? `https://tjcraw6589.github.io/pumpwise/data/v${FEED_VERSION}`).replace(/\/$/, '');
+/** The live site's data folder; the previous run's prices are read from the newest version there. */
+const PUBLIC_DATA = (process.env.FEED_PUBLIC_DATA ?? 'https://tjcraw6589.github.io/pumpwise/data').replace(/\/$/, '');
 const FORCE = process.env.FEED_FORCE === '1';
 
 interface Source {
@@ -56,6 +60,21 @@ const SOURCES: Source[] = [
     enabled: () => nswCredentials() !== null,
     fetch: async (now) => ({ stations: await fetchNsw(nswCredentials() as { key: string; secret: string }, now), tomorrow: false }),
   },
+  // Queensland: free data-consumer API, off until the QLD_FUEL_API_TOKEN secret exists.
+  {
+    id: 'qld',
+    regions: ['qld'],
+    everyMinutes: 25,
+    minStations: QLD_MIN_STATIONS,
+    enabled: () => qldToken() !== null,
+    fetch: async (now) => ({ stations: await fetchQld(qldToken() as string, now), tomorrow: false }),
+  },
+  // Spain: the Ministry republishes every half hour, so every other run (about 12 MB each time).
+  { id: 'es', regions: ['es'], everyMinutes: 25, minStations: ES_MIN_STATIONS, enabled: () => true, fetch: async () => ({ stations: await fetchEs(), tomorrow: false }) },
+  // France: refreshed about every 10 minutes, so every run (about 1 MB zipped).
+  { id: 'fr', regions: ['fr'], everyMinutes: 10, minStations: FR_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchFr(now), tomorrow: false }) },
+  // Mexico: the CRE lists change a few times a day at most, so every three hours.
+  { id: 'mx', regions: ['mx'], everyMinutes: 170, minStations: MX_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchMx(now), tomorrow: false }) },
   {
     id: 'uk',
     regions: ['uk'],
@@ -71,31 +90,54 @@ interface Previous {
   byRegion: Map<RegionId, FeedStation[]>;
 }
 
-/** The feed that is online now, so sources that are not due (or fail) keep their prices. */
-async function loadPrevious(): Promise<Previous | null> {
-  try {
-    const metaResponse = await fetch(`${PUBLIC_FEED}/meta.json?t=${Date.now()}`, { signal: AbortSignal.timeout(30_000) });
-    if (!metaResponse.ok) return null;
-    const meta = (await metaResponse.json()) as FeedMeta;
-    if (meta.v !== FEED_VERSION) return null;
-    const byRegion = new Map<RegionId, FeedStation[]>();
-    for (const key of Object.keys(meta.tiles)) {
-      const response = await fetch(`${PUBLIC_FEED}/tiles/${key}.json?v=${encodeURIComponent(meta.generatedAt)}`, {
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!response.ok) return null;
-      const tile = (await response.json()) as FeedTile;
+async function getJson<T>(url: string): Promise<T | null> {
+  const response = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+  return response.ok ? ((await response.json()) as T) : null;
+}
+
+/** Every tile of a published feed, a few at a time, sorted into regions. */
+async function stationsFromTiles(base: string, meta: FeedMeta): Promise<Map<RegionId, FeedStation[]> | null> {
+  const byRegion = new Map<RegionId, FeedStation[]>();
+  const keys = Object.keys(meta.tiles);
+  for (let i = 0; i < keys.length; i += 16) {
+    const tiles = await Promise.all(
+      keys.slice(i, i + 16).map((key) => getJson<FeedTile>(`${base}/tiles/${key}.json?v=${encodeURIComponent(meta.generatedAt)}`)),
+    );
+    if (tiles.some((t) => t === null)) return null;
+    for (const tile of tiles as FeedTile[]) {
       for (const station of tile.stations) {
         const list = byRegion.get(station.region) ?? [];
         list.push(station);
         byRegion.set(station.region, list);
       }
     }
-    return { meta, byRegion };
-  } catch (error) {
-    console.warn(`Could not read the previous feed: ${String(error)}`);
-    return null;
   }
+  return byRegion;
+}
+
+/**
+ * The feed that is online now, so sources that are not due (or fail) keep their prices. Read from the
+ * newest version's per-region bundles (one file per region); before those exist, from its tiles, or
+ * from the previous version on the first run after a new version is introduced.
+ */
+async function loadPrevious(): Promise<Previous | null> {
+  for (const version of [LATEST_FEED_VERSION, LATEST_FEED_VERSION - 1]) {
+    const base = `${PUBLIC_DATA}/v${version}`;
+    try {
+      const meta = await getJson<FeedMeta>(`${base}/meta.json?t=${Date.now()}`);
+      if (!meta || meta.v !== version) continue;
+      const ids = Object.keys(meta.regions) as RegionId[];
+      const bundles = await Promise.all(ids.map((id) => getJson<FeedStation[]>(`${base}/regions/${id}.json?v=${encodeURIComponent(meta.generatedAt)}`)));
+      if (bundles.every((b) => Array.isArray(b))) {
+        return { meta, byRegion: new Map(ids.map((id, i) => [id, bundles[i] as FeedStation[]])) };
+      }
+      const byRegion = await stationsFromTiles(base, meta);
+      if (byRegion) return { meta, byRegion };
+    } catch (error) {
+      console.warn(`Could not read the previous feed (v${version}): ${String(error)}`);
+    }
+  }
+  return null;
 }
 
 function writeJson(file: string, value: unknown): void {
@@ -108,15 +150,35 @@ function writeData(feed: BuiltFeed, dataDir: string): void {
   for (const tile of feed.tiles) writeJson(join(dataDir, 'tiles', `${tile.tile}.json`), tile);
 }
 
-/** The site, the current feed (data/v3) and the Western Australia feed Pumpwise 1.0 reads (data/v2). */
-export function writeSite(feed: BuiltFeed, legacy: BuiltFeed | null, target = outDir): void {
+/**
+ * The site and every published feed version: data/v4 with every region (plus one bundle file per
+ * region, for the next run to reuse), data/v3 for Pumpwise 1.1 and data/v2 for 1.0, each limited to
+ * the regions its app knows.
+ */
+export function writeSite(
+  stations: FeedStation[],
+  regions: Partial<Record<RegionId, RegionStatus>>,
+  now: Date,
+  target = outDir,
+): BuiltFeed[] {
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target, { recursive: true });
   const siteSource = join(root, 'site');
   if (existsSync(siteSource)) cpSync(siteSource, target, { recursive: true });
   writeFileSync(join(target, '.nojekyll'), '');
-  writeData(feed, join(target, 'data', `v${FEED_VERSION}`));
-  if (legacy) writeData(legacy, join(target, 'data', `v${LEGACY_VERSION}`));
+  const built: BuiltFeed[] = [];
+  for (const published of PUBLISHED_FEEDS) {
+    const feed = feedForVersion(stations, regions, now, published);
+    const dataDir = join(target, 'data', `v${published.version}`);
+    writeData(feed, dataDir);
+    if (published.version === LATEST_FEED_VERSION) {
+      for (const id of Object.keys(feed.meta.regions) as RegionId[]) {
+        writeJson(join(dataDir, 'regions', `${id}.json`), stations.filter((s) => s.region === id));
+      }
+    }
+    built.push(feed);
+  }
+  return built;
 }
 
 async function main(): Promise<void> {
@@ -171,11 +233,12 @@ async function main(): Promise<void> {
   if (stations.length === 0 && failures > 0) {
     throw new Error('No prices from any source; keeping the previous site online.');
   }
-  const feed = buildFeed(stations, regions, now);
-  writeSite(feed, legacyFeed(stations, regions, now));
+  const [feed, ...older] = writeSite(stations, regions, now);
+  if (!feed) throw new Error('no feed versions configured');
   console.log(
-    `Feed: ${feed.meta.stationCount} stations, ${feed.meta.priceCount} prices, ${feed.tiles.length} tiles` +
-      (fetchedSomething ? '' : ' (all reused)'),
+    `Feed v${feed.meta.v}: ${feed.meta.stationCount} stations, ${feed.meta.priceCount} prices, ${feed.tiles.length} tiles` +
+      (fetchedSomething ? '' : ' (all reused)') +
+      older.map((f) => `; v${f.meta.v}: ${f.meta.stationCount} stations`).join(''),
   );
 }
 

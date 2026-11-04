@@ -11,9 +11,8 @@ import {
   cleanPrice,
   type FeedStation,
   type FuelKind,
-  inBounds,
+  inRegion,
   type Raw,
-  REGION_BOUNDS,
   type RegionId,
   roundCoord,
   tidyName,
@@ -79,11 +78,11 @@ export function splitAddress(address: string): { street: string; town: string; p
 
 function regionFor(state: string, lat: number, lng: number): RegionId | null {
   const s = state.toUpperCase();
-  if (s === 'TAS') return inBounds(REGION_BOUNDS.tas, lat, lng) ? 'tas' : null;
-  if (s === 'NSW' || s === 'ACT') return inBounds(REGION_BOUNDS.nsw, lat, lng) ? 'nsw' : null;
+  if (s === 'TAS') return inRegion('tas', lat, lng) ? 'tas' : null;
+  if (s === 'NSW' || s === 'ACT') return inRegion('nsw', lat, lng) ? 'nsw' : null;
   // No state given: go by the map.
-  if (inBounds(REGION_BOUNDS.tas, lat, lng)) return 'tas';
-  if (inBounds(REGION_BOUNDS.nsw, lat, lng)) return 'nsw';
+  if (inRegion('tas', lat, lng)) return 'tas';
+  if (inRegion('nsw', lat, lng)) return 'nsw';
   return null;
 }
 

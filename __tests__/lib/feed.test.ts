@@ -64,11 +64,30 @@ describe('shared helpers', () => {
     expect(regionAt(-35.28, 149.13)).toBe('nsw'); // Canberra: in NSW FuelCheck
     expect(regionAt(-42.88, 147.33)).toBe('tas'); // Hobart
     expect(regionAt(-37.81, 144.96)).toBeNull(); // Melbourne
-    expect(regionAt(-27.47, 153.03)).toBeNull(); // Brisbane
+    expect(regionAt(-27.47, 153.03)).toBe('qld'); // Brisbane
+    expect(regionAt(-28.0, 153.43)).toBe('qld'); // Surfers Paradise, just north of the NSW box
     expect(regionAt(-34.93, 138.6)).toBeNull(); // Adelaide
     expect(regionAt(51.5, -0.12)).toBe('uk');
     expect(regionAt(54.6, -5.93)).toBe('uk'); // Belfast
-    expect(regionAt(48.85, 2.35)).toBeNull(); // Paris
+    expect(regionAt(51.13, 1.31)).toBe('uk'); // Dover
+    expect(regionAt(48.85, 2.35)).toBe('fr'); // Paris
+    expect(regionAt(50.95, 1.86)).toBe('fr'); // Calais, across the water from Dover
+    expect(regionAt(49.44, 1.1)).toBe('fr'); // Rouen, under the old UK box
+    expect(regionAt(42.69, 2.89)).toBe('fr'); // Perpignan, north of the Pyrenees
+    expect(regionAt(41.93, 8.74)).toBe('fr'); // Ajaccio, Corsica
+    expect(regionAt(40.42, -3.7)).toBe('es'); // Madrid
+    expect(regionAt(41.39, 2.17)).toBe('es'); // Barcelona
+    expect(regionAt(43.26, -2.93)).toBe('es'); // Bilbao
+    expect(regionAt(42.24, -8.72)).toBe('es'); // Vigo
+    expect(regionAt(38.88, -6.97)).toBe('es'); // Badajoz, on the Portuguese border
+    expect(regionAt(37.26, -6.95)).toBe('es'); // Huelva
+    expect(regionAt(39.57, 2.65)).toBe('es'); // Palma
+    expect(regionAt(28.12, -15.44)).toBe('es'); // Las Palmas, Canary Islands
+    expect(regionAt(38.72, -9.14)).toBeNull(); // Lisbon: Portugal is not covered
+    expect(regionAt(41.15, -8.61)).toBeNull(); // Porto
+    expect(regionAt(19.43, -99.13)).toBe('mx'); // Mexico City
+    expect(regionAt(21.16, -86.85)).toBe('mx'); // Cancún
+    expect(regionAt(40.71, -74.0)).toBeNull(); // New York
   });
 
   test('tiles are half-degree squares and cover every point of an area', () => {
