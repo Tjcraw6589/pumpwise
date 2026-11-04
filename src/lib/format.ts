@@ -49,6 +49,18 @@ export function freshness(iso: string, now: Date, trustDays = 14): Freshness {
   return 'old';
 }
 
+/**
+ * For regions where a price stands until the station changes it (NSW, ACT, Tasmania): "Updated 3 h ago"
+ * within a day, then "Unchanged for 12 days", and only past `trustDays` "Not confirmed since …".
+ */
+export function standingLabel(at: string, now: Date, trustDays = 30): { text: string; level: Freshness } {
+  const level = freshness(at, now, trustDays);
+  const ago = timeAgo(at, now);
+  if (level === 'fresh') return { text: `Updated ${ago}`, level };
+  if (level === 'recent') return { text: `Unchanged for ${ago.replace(/ ago$/, '')}`, level };
+  return { text: `Not confirmed since ${ago}`, level };
+}
+
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 /**

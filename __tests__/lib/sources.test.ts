@@ -286,5 +286,8 @@ describe('published feed versions', () => {
     expect(REGIONS.fr.priceDecimals).toBe(3);
     expect(REGIONS.mx.priceDecimals).toBe(2);
     expect(REGIONS.mx.priceMode).toBe('current');
+    expect(REGIONS.es.priceMode).toBe('current');
+    expect(REGIONS.fr.pricesStand).toBe(true);
+    expect(REGIONS.qld.pricesStand).toBe(true);
   });
 });

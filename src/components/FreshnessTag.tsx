@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import type { RegionId } from '@/lib/feed';
-import { dailyLabel, freshness, timeAgo } from '@/lib/format';
+import { dailyLabel, freshness, standingLabel, timeAgo } from '@/lib/format';
 import { REGIONS } from '@/lib/regions';
 import { useTheme } from '@/theme/useTheme';
 
@@ -9,7 +9,8 @@ import { AppText } from './AppText';
 
 /**
  * How current a price is. UK: "● Reported 25 min ago". WA, where prices are fixed for the day:
- * "● Today's price". Green when current, amber when older, then a gentle warning.
+ * "● Today's price". NSW and Tasmania: "● Unchanged for 12 days". Green when current, amber (grey where
+ * prices stand until changed) when older, then a gentle warning.
  */
 export function FreshnessTag({ at, region, now, testID }: { at: string; region: RegionId; now: Date; testID?: string }) {
   const { colors, spacing } = useTheme();
@@ -19,14 +20,17 @@ export function FreshnessTag({ at, region, now, testID }: { at: string; region: 
   if (info.priceMode === 'daily') {
     ({ text, level } = dailyLabel(at, now, info.utcOffsetMinutes(now)));
   } else if (info.priceMode === 'current') {
-    // The source lists the prices in force without saying when each was set (Mexico).
+    // The source lists the prices in force without saying when each was set (Spain, Mexico).
     text = 'Current price';
     level = 'fresh';
+  } else if (info.pricesStand) {
+    ({ text, level } = standingLabel(at, now, info.trustDays));
   } else {
     level = freshness(at, now, info.trustDays);
     text = level === 'old' ? `Not confirmed since ${timeAgo(at, now)}` : `Reported ${timeAgo(at, now)}`;
   }
-  const dot = level === 'fresh' ? colors.cheap : level === 'recent' ? colors.accent : colors.pricey;
+  // Where prices stand until changed, an older price is still current: a calm grey dot, not amber.
+  const dot = level === 'fresh' ? colors.cheap : level === 'recent' ? (info.pricesStand ? colors.textFaint : colors.accent) : colors.pricey;
   return (
     <View style={styles.row} testID={testID}>
       <View style={[styles.dot, { backgroundColor: dot, marginRight: spacing.xs + 2 }]} />

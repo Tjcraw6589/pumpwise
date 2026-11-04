@@ -35,13 +35,18 @@ export interface RegionInfo {
   economyOptions: readonly number[];
   /**
    * "reported": each price has its own report time. "daily": prices are fixed for the day.
-   * "current": the source lists the prices in force but not when they were set (Mexico).
+   * "current": the source lists the prices in force but not when they were set (Spain, Mexico).
    */
   priceMode: 'reported' | 'daily' | 'current';
   /** Local hour the price day starts, for "daily" regions. */
   priceDayStartHour?: number;
   /** "reported" regions: days before an unchanged price gets a "not confirmed" warning (default 14). */
   trustDays?: number;
+  /**
+   * Stations must report every price change, so a price stands until the station changes it: an
+   * old price is still the current one ("Unchanged for 12 days"), not a stale one.
+   */
+  pricesStand?: boolean;
   /**
    * Minutes ahead of UTC on a given date (for opening hours and "today"). `lng` is the station's
    * longitude where a region spans time zones (Spain's Canary Islands are an hour behind).
@@ -131,6 +136,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'reported',
     trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: auEasternOffsetMinutes,
     source: {
       name: 'FuelCheck',
@@ -180,6 +186,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'reported',
     trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: auEasternOffsetMinutes,
     source: {
       name: 'FuelCheck TAS',
@@ -221,6 +228,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'reported',
     trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: () => 10 * 60,
     source: {
       name: 'Fuel Prices QLD',
@@ -306,8 +314,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     ],
     radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
     economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
-    priceMode: 'reported',
-    trustDays: 30,
+    // The Ministry's list gives the prices in force when it was published, not when each was set.
+    priceMode: 'current',
     utcOffsetMinutes: spainOffsetMinutes,
     source: {
       name: 'Geoportal de Gasolineras',
@@ -359,7 +367,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
     economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
     priceMode: 'reported',
-    trustDays: 14,
+    trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: (date) => 60 + (isEuropeanSummerTime(date) ? 60 : 0),
     source: {
       name: 'prix-carburants.gouv.fr',
