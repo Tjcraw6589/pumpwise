@@ -14,7 +14,7 @@ import {
   tidyName,
 } from '@/lib/feed';
 
-import { fixtureFeed, nswFixtureResponse, nswLocalTime, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
+import { fixtureFeed, nswFixtureResponse, nswApiTime, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
 import { buildNswStations, failureDetail, NSW_PRICES_URL, parseNswTime, requestTimestamp, splitAddress } from '../../scripts/feed/sources/nsw.ts';
 import { buildUkStations, normalizeUkPrices, normalizeUkStation, parseUkHours } from '../../scripts/feed/sources/uk.ts';
 import {
@@ -277,12 +277,12 @@ describe('NSW, ACT and Tasmania (NSW Fuel API)', () => {
     expect(auEasternOffsetMinutes(new Date('2027-04-03T16:00:00Z'))).toBe(600);
   });
 
-  test('reads both of the API date formats as Sydney time, and refuses future dates', () => {
-    expect(parseNswTime('29/05/2026 23:28:20', NOW)).toBe('2026-05-29T13:28:20.000Z');
-    expect(parseNswTime('2026-01-10 08:00:00', NOW)).toBe('2026-01-09T21:00:00.000Z');
+  test('reads both of the API date formats as UTC, as the live API sends them, and refuses future dates', () => {
+    expect(parseNswTime('29/05/2026 23:28:20', NOW)).toBe('2026-05-29T23:28:20.000Z');
+    expect(parseNswTime('2026-01-10 08:00:00', NOW)).toBe('2026-01-10T08:00:00.000Z');
     expect(parseNswTime('rubbish', NOW)).toBeNull();
-    expect(parseNswTime(nswLocalTime(new Date(NOW.getTime() + 86_400_000)), NOW)).toBeNull();
-    expect(parseNswTime(nswLocalTime(NOW), NOW)).toBe(new Date(Math.floor(NOW.getTime() / 1000) * 1000).toISOString());
+    expect(parseNswTime(nswApiTime(new Date(NOW.getTime() + 86_400_000)), NOW)).toBeNull();
+    expect(parseNswTime(nswApiTime(NOW), NOW)).toBe(new Date(Math.floor(NOW.getTime() / 1000) * 1000).toISOString());
   });
 
   test('asks for Tasmania by name and stamps requests in UTC, as the published API spec says', () => {
