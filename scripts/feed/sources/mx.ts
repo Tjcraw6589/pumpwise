@@ -30,7 +30,7 @@ export function mxName(raw: string): string {
   const text = decode(raw)
     .replace(/[,.]?\s*\b(S\.?\s*A\.?\s*P\.?\s*I\.?|S\.?\s*A\.?|S\.?\s*(?:DE\s*)?R\.?\s*L\.?)(\s*(DE|D\.)\s*C\.?\s*V\.?)?\s*$/i, '')
     .replace(/[,\s]+$/, '');
-  return tidyName(text);
+  return tidyName(text, 'es');
 }
 
 /** Pesos to centavos with one decimal, or null outside a believable range. */

@@ -119,8 +119,8 @@ export function buildFrStations(xml: string, now: Date): FeedStation[] {
       prices[kind] = { p: price, at };
     }
     if (Object.keys(prices).length === 0) continue;
-    const address = tidyName(xmlText(/<adresse>([\s\S]*?)<\/adresse>/.exec(body)?.[1] ?? ''));
-    const town = tidyName(xmlText(/<ville>([\s\S]*?)<\/ville>/.exec(body)?.[1] ?? ''));
+    const address = tidyName(xmlText(/<adresse>([\s\S]*?)<\/adresse>/.exec(body)?.[1] ?? ''), 'fr');
+    const town = tidyName(xmlText(/<ville>([\s\S]*?)<\/ville>/.exec(body)?.[1] ?? ''), 'fr');
     const services = [...body.matchAll(/<service>([\s\S]*?)<\/service>/g)].map((m) => xmlText(m[1] ?? ''));
     const tags = new Set<string>();
     if (attr(head, 'pop') === 'A') tags.add('motorway');

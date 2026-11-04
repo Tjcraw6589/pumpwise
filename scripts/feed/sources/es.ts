@@ -122,7 +122,7 @@ export function buildEsStations(response: unknown): FeedStation[] {
       if (price !== null) prices[kind] = { p: price, at };
     }
     if (Object.keys(prices).length === 0) continue;
-    const sign = tidyName(asString(s['Rótulo']));
+    const sign = tidyName(asString(s['Rótulo']), 'es');
     const tags: string[] = [];
     if (asString(s['Tipo Venta']).toUpperCase() === 'R') tags.push('members-only');
     stations.push({
@@ -130,8 +130,8 @@ export function buildEsStations(response: unknown): FeedStation[] {
       region: 'es',
       name: sign || 'Gasolinera',
       brand: '',
-      address: tidyName(asString(s['Dirección'])),
-      town: tidyName(asString(s.Municipio) || asString(s.Localidad)),
+      address: tidyName(asString(s['Dirección']), 'es'),
+      town: tidyName(asString(s.Municipio) || asString(s.Localidad), 'es'),
       postcode: asString(s['C.P.']),
       lat: roundCoord(lat),
       lng: roundCoord(lng),

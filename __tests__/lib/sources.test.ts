@@ -91,7 +91,7 @@ describe('Spain (Geoportal de Gasolineras)', () => {
     const stations = buildEsStations(answer);
     expect(stations.map((s) => s.id)).toEqual(['es-1234', 'es-7']);
     const madrid = stations[0] as FeedStation;
-    expect(madrid).toMatchObject({ region: 'es', name: 'Repsol', address: 'Calle De Serrano, 61', town: 'Madrid', postcode: '28001' });
+    expect(madrid).toMatchObject({ region: 'es', name: 'Repsol', address: 'Calle de Serrano, 61', town: 'Madrid', postcode: '28001' });
     expect(madrid.prices).toEqual({
       regular: { p: 169.9, at: '2026-11-04T04:22:06.000Z' },
       super: { p: 185.9, at: '2026-11-04T04:22:06.000Z' },
