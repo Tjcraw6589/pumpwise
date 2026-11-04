@@ -8,7 +8,6 @@ import {
   asNumber,
   asRecord,
   asString,
-  auEasternOffsetMinutes,
   cleanPrice,
   type FeedStation,
   type FuelKind,
@@ -52,7 +51,9 @@ export function nswCredentials(): NswCredentials | null {
 }
 
 /**
- * "29/05/2026 23:28:20" or "2026-05-29 23:28:20", in Sydney/Hobart time, to ISO 8601 UTC.
+ * "29/05/2026 23:28:20" or "2026-05-29 23:28:20", in UTC, to ISO 8601. The v2 API stamps prices in UTC:
+ * checked live on 4 November 2026, the newest price in each answer is minutes old in UTC, and reading
+ * the stamps as Sydney time made every price look 11 hours older than it was.
  * Null when it can't be read, or when it is in the future (a clock mistake at the station).
  */
 export function parseNswTime(value: unknown, now: Date): string | null {
@@ -63,11 +64,8 @@ export function parseNswTime(value: unknown, now: Date): string | null {
   if (!match) return null;
   const parts = match.slice(1).map(Number) as [number, number, number, number, number, number];
   const [day, month, year] = text.includes('/') ? [parts[0], parts[1], parts[2]] : [parts[2], parts[1], parts[0]];
-  const local = Date.UTC(year, month - 1, day, parts[3], parts[4], Number.isFinite(parts[5]) ? parts[5] : 0);
-  if (!Number.isFinite(local)) return null;
-  // Guess the offset from standard time, then correct it near a clock change.
-  let utc = local - 10 * 3_600_000;
-  utc = local - auEasternOffsetMinutes(new Date(utc)) * 60_000;
+  const utc = Date.UTC(year, month - 1, day, parts[3], parts[4], Number.isFinite(parts[5]) ? parts[5] : 0);
+  if (!Number.isFinite(utc)) return null;
   if (utc > now.getTime() + 10 * 60_000) return null;
   return new Date(utc).toISOString();
 }

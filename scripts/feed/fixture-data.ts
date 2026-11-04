@@ -1,7 +1,7 @@
 // Made-up stations in the same shape as each real source, for tests and the web smoke test.
 // Names and brands are fictional. WA stations are written as FuelWatch RSS, NSW and Tasmanian ones
 // as NSW Fuel API JSON and UK ones as Fuel Finder JSON, so the real parsers run on them.
-import { auEasternOffsetMinutes, buildFeed, type BuiltFeed, type FeedStation } from '../../src/lib/feed.ts';
+import { buildFeed, type BuiltFeed, type FeedStation } from '../../src/lib/feed.ts';
 import { buildNswStations } from './sources/nsw.ts';
 import { buildUkStations } from './sources/uk.ts';
 import { buildWaStations, parseRss, WA_PRODUCTS, type WaProductFeed } from './sources/wa.ts';
@@ -217,11 +217,10 @@ export function ukFixtureRecords(now: Date): { stations: unknown[]; prices: unkn
   return { stations, prices };
 }
 
-/** Sydney time as the NSW API writes it: "29/05/2026 23:28:20". */
-export function nswLocalTime(date: Date): string {
-  const local = new Date(date.getTime() + auEasternOffsetMinutes(date) * 60_000);
+/** A time as the NSW Fuel API writes it: "dd/MM/yyyy HH:mm:ss", in UTC. */
+export function nswApiTime(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(local.getUTCDate())}/${pad(local.getUTCMonth() + 1)}/${local.getUTCFullYear()} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
+  return `${pad(date.getUTCDate())}/${pad(date.getUTCMonth() + 1)}/${date.getUTCFullYear()} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
 }
 
 /** A made-up "all prices" answer from the NSW Fuel API: Sydney, Canberra and Hobart. */
@@ -254,7 +253,7 @@ export function nswFixtureResponse(now: Date): { stations: unknown[]; prices: un
       const base = 189.9 + Math.round(rand() * 300) / 10;
       // Most stations reported within the last day; some a while ago, as quiet country sites do.
       const ageMinutes = n % 7 === 0 ? 60 * 24 * (3 + (n % 20)) : Math.round(5 + rand() * 60 * 20);
-      const at = nswLocalTime(new Date(now.getTime() - ageMinutes * 60_000));
+      const at = nswApiTime(new Date(now.getTime() - ageMinutes * 60_000));
       const add = (fueltype: string, price: number) => prices.push({ stationcode: String(code), state: centre.state, fueltype, price, priceunit: 'litre', lastupdated: at });
       add('U91', base);
       if (centre.state !== 'TAS') add('E10', base - 2);
@@ -267,10 +266,10 @@ export function nswFixtureResponse(now: Date): { stations: unknown[]; prices: un
   }
   // A members-only warehouse, a reporting mistake (2.1c), an unknown fuel, and a price for a station that doesn't exist.
   stations.push({ brand: 'Costco', code: '9001', name: 'Costco Fixture Park', address: '1 Warehouse Way, Sydney NSW 2000', location: { latitude: -33.86, longitude: 151.2 }, state: 'NSW' });
-  prices.push({ stationcode: '9001', state: 'NSW', fueltype: 'U91', price: 169.9, lastupdated: nswLocalTime(now) });
-  prices.push({ stationcode: '1001', state: 'NSW', fueltype: 'P98', price: 2.1, lastupdated: nswLocalTime(now) });
-  prices.push({ stationcode: '1002', state: 'NSW', fueltype: 'EV', price: 55, lastupdated: nswLocalTime(now) });
-  prices.push({ stationcode: '424242', state: 'NSW', fueltype: 'U91', price: 180, lastupdated: nswLocalTime(now) });
+  prices.push({ stationcode: '9001', state: 'NSW', fueltype: 'U91', price: 169.9, lastupdated: nswApiTime(now) });
+  prices.push({ stationcode: '1001', state: 'NSW', fueltype: 'P98', price: 2.1, lastupdated: nswApiTime(now) });
+  prices.push({ stationcode: '1002', state: 'NSW', fueltype: 'EV', price: 55, lastupdated: nswApiTime(now) });
+  prices.push({ stationcode: '424242', state: 'NSW', fueltype: 'U91', price: 180, lastupdated: nswApiTime(now) });
   return { stations, prices };
 }
 
