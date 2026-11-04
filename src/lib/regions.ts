@@ -254,7 +254,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     source: {
       name: 'Fuel Prices QLD',
       url: 'https://www.fuelpricesqld.com.au',
-      credit: 'Prices from the Queensland Government fuel price reporting scheme',
+      credit: 'Based on data provided by the State of Queensland (Department of Energy and Climate) 2026',
     },
     report: {
       label: 'Contact the Queensland Government',
@@ -262,7 +262,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       note: 'Queensland stations must report price changes within 30 minutes.',
     },
     about:
-      'Queensland stations must report every price change to the Queensland Government within 30 minutes. A price stands until the station reports a new one.',
+      'Queensland stations must report every price change to the Queensland Government within 30 minutes. A price stands until the station reports a new one. The State gives no warranty in relation to the data and accepts no liability for any use of it.',
     cities: [
       { name: 'Brisbane', detail: 'Queensland', lat: -27.4698, lng: 153.0251 },
       { name: 'Gold Coast', detail: 'Queensland', lat: -28.0167, lng: 153.4 },

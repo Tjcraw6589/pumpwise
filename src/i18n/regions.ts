@@ -45,8 +45,9 @@ const ES: Record<RegionId, RegionText> = {
   qld: {
     name: 'Queensland',
     about:
-      'En Queensland las gasolineras deben comunicar cada cambio de precio al Gobierno de Queensland en un plazo de 30 minutos. Un precio sigue vigente hasta que la gasolinera comunica otro.',
-    credit: 'Precios del sistema de declaración de precios del Gobierno de Queensland',
+      'En Queensland las gasolineras deben comunicar cada cambio de precio al Gobierno de Queensland en un plazo de 30 minutos. Un precio sigue vigente hasta que la gasolinera comunica otro. El Estado no ofrece ninguna garantía sobre los datos ni acepta responsabilidad por su uso.',
+    // The licence notice stays in its own words.
+    credit: 'Based on data provided by the State of Queensland (Department of Energy and Climate) 2026',
     reportLabel: 'Contactar con el Gobierno de Queensland',
     reportNote: 'En Queensland las gasolineras deben comunicar cada cambio de precio en 30 minutos.',
   },
@@ -117,8 +118,9 @@ const FR: Record<RegionId, RegionText> = {
     name: 'Queensland',
     nameInSentence: 'le Queensland',
     about:
-      'Au Queensland, les stations doivent déclarer chaque changement de prix au gouvernement du Queensland sous 30 minutes. Un prix reste valable jusqu’à ce que la station en déclare un nouveau.',
-    credit: 'Prix issus du dispositif de déclaration des prix du gouvernement du Queensland',
+      'Au Queensland, les stations doivent déclarer chaque changement de prix au gouvernement du Queensland sous 30 minutes. Un prix reste valable jusqu’à ce que la station en déclare un nouveau. L’État ne donne aucune garantie sur ces données et décline toute responsabilité quant à leur utilisation.',
+    // The licence notice stays in its own words.
+    credit: 'Based on data provided by the State of Queensland (Department of Energy and Climate) 2026',
     reportLabel: 'Contacter le gouvernement du Queensland',
     reportNote: 'Au Queensland, les stations doivent déclarer chaque changement de prix sous 30 minutes.',
   },

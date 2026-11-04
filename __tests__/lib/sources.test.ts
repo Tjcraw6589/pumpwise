@@ -305,7 +305,7 @@ describe('published feed versions', () => {
       expect(info.id).toBe(id);
       expect(info.fuels.some((f) => f.kind === 'regular')).toBe(true);
       expect(info.cities.length).toBeGreaterThan(3);
-      expect(info.source.credit).toMatch(/^Prices from /);
+      expect(info.source.credit).toMatch(/^(Prices from|Based on data provided by) /);
     }
     expect(REGIONS.es.priceDecimals).toBe(3);
     expect(REGIONS.fr.priceDecimals).toBe(3);
