@@ -112,7 +112,7 @@ test.describe('elsewhere', () => {
     await page.getByTestId('onboarding-skip').click();
     // The browser already allows location here, so the app goes straight to the search.
     await expect(page.getByTestId('nearby-screen').getByTestId('state-not-covered')).toBeVisible();
-    await expect(page.getByText('Pumpwise covers Western Australia, New South Wales and Tasmania')).toBeVisible();
+    await expect(page.getByText('Pumpwise covers Western Australia, New South Wales, Tasmania, Spain, France and Mexico')).toBeVisible();
     await page.getByTestId('nearby-screen').getByTestId('try-city').click();
     await expect(page.getByTestId('nearby-screen').getByTestId('cheapest-card')).toBeVisible();
   });

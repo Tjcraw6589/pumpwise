@@ -1,16 +1,16 @@
 # Pumpwise Terms of Use
 
-Last updated: 29 October 2026
+Last updated: 4 November 2026
 
 These terms cover your use of the Pumpwise app. By using it you agree to them. Apple's standard Licensed Application End User License Agreement also applies.
 
 ## What Pumpwise is
 
-Pumpwise shows fuel prices that stations report to official government price schemes, starting with FuelWatch in Western Australia. It is free, has no accounts and is not affiliated with any government, station or fuel brand.
+Pumpwise shows fuel prices that stations report to official government price schemes in Australia, Spain, France and Mexico. It is free, has no accounts and is not affiliated with any government, station or fuel brand.
 
 ## Prices can be wrong
 
-Stations report their own prices, and Pumpwise collects them from the official source about once an hour (more often where prices change during the day). Stations sometimes report mistakes, and a price can change after it was reported. Always check the price at the pump before you fill up. In Western Australia you can contact FuelWatch at https://www.fuelwatch.wa.gov.au/contact if a station is not selling at its published price.
+Stations report their own prices, and Pumpwise collects them from each official source regularly, from every few minutes to every few hours depending on the country. Stations sometimes report mistakes, and a price can change after it was reported. Always check the price at the pump before you fill up. In Western Australia you can contact FuelWatch at https://www.fuelwatch.wa.gov.au/contact if a station is not selling at its published price.
 
 Opening hours, facilities, restrictions and locations also come from the stations and may be out of date. Distances are in a straight line, so the drive will usually be longer. "Best value" and savings are estimates based on the fuel economy and fill-up size you choose.
 
@@ -21,6 +21,11 @@ Do not use Pumpwise while driving. Let a passenger check, or look before you set
 ## Data sources
 
 - Western Australia: prices from FuelWatch, Government of Western Australia, www.fuelwatch.wa.gov.au. FuelWatch allows its data to be used in apps with this acknowledgement and link.
+- New South Wales and the Australian Capital Territory: prices from FuelCheck, NSW Government, www.fuelcheck.nsw.gov.au.
+- Tasmania: prices from FuelCheck TAS, Tasmanian Government, www.fuelcheck.tas.gov.au.
+- Spain: prices from the Geoportal de Gasolineras, Ministerio para la Transición Ecológica y el Reto Demográfico, geoportalgasolineras.es. Pumpwise shows when the prices were last published.
+- France: prices from prix-carburants.gouv.fr, Ministère de l'Économie, licensed under the Licence Ouverte / Open Licence 2.0 (https://www.etalab.gouv.fr/licence-ouverte-open-licence/). Pumpwise shows when each price was last updated.
+- Mexico: prices from the Comisión Reguladora de Energía (CRE), Government of Mexico, www.gob.mx/cre, published as open data.
 - United Kingdom (when available): contains public sector information licensed under the Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
 
 ## No warranty
