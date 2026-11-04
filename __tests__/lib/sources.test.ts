@@ -224,6 +224,16 @@ describe('Mexico (CRE)', () => {
     expect(stations[0]?.prices).toEqual({ regular: { p: 2295, at: NOW.toISOString() }, premium: { p: 2790, at: NOW.toISOString() } });
     expect(stations[1]?.prices).toEqual({ diesel: { p: 2700, at: NOW.toISOString() } });
   });
+
+  test('a station listed twice keeps every fuel, and a fuel at two prices is left out', () => {
+    const twice = `<places>
+  <place place_id="2040"><gas_price type="premium">28.99</gas_price><gas_price type="diesel">27</gas_price></place>
+  <place place_id="2040"><gas_price type="regular">23.99</gas_price><gas_price type="diesel">25.39</gas_price></place>
+  <place place_id="2040"><gas_price type="premium">28.99</gas_price></place>
+</places>`;
+    const [station] = buildMxStations(places, twice, NOW);
+    expect(station?.prices).toEqual({ premium: { p: 2899, at: NOW.toISOString() }, regular: { p: 2399, at: NOW.toISOString() } });
+  });
 });
 
 describe('Queensland (Fuel Prices QLD, off until the token exists)', () => {

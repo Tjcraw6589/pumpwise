@@ -44,15 +44,24 @@ export function mxPrice(value: unknown): number | null {
 /** Joins the two CRE lists into feed stations. Anything odd is skipped, never guessed. */
 export function buildMxStations(placesXml: string, pricesXml: string, now: Date): FeedStation[] {
   const at = now.toISOString();
-  const prices = new Map<string, FeedStation['prices']>();
+  // A station can be listed more than once, each time with some of its fuels (about one in nine in
+  // November 2026), so the entries are combined. A fuel listed at two different prices is left out.
+  const offers = new Map<string, Map<FuelKind, Set<number>>>();
   for (const match of pricesXml.matchAll(/<place\s+place_id="(\d+)"\s*>([\s\S]*?)<\/place>/g)) {
-    const list: FeedStation['prices'] = {};
+    const id = match[1] as string;
+    const station = offers.get(id) ?? new Map<FuelKind, Set<number>>();
     for (const p of (match[2] ?? '').matchAll(/<gas_price\s+type="([a-z]+)"\s*>([^<]*)<\/gas_price>/g)) {
       const kind = FUEL_KINDS[p[1] ?? ''];
       const price = mxPrice(p[2]);
-      if (kind && price !== null) list[kind] = { p: price, at };
+      if (kind && price !== null) station.set(kind, (station.get(kind) ?? new Set<number>()).add(price));
     }
-    if (Object.keys(list).length > 0) prices.set(match[1] as string, list);
+    offers.set(id, station);
+  }
+  const prices = new Map<string, FeedStation['prices']>();
+  for (const [id, station] of offers) {
+    const list: FeedStation['prices'] = {};
+    for (const [kind, seen] of station) if (seen.size === 1) list[kind] = { p: [...seen][0] as number, at };
+    if (Object.keys(list).length > 0) prices.set(id, list);
   }
   const stations: FeedStation[] = [];
   for (const match of placesXml.matchAll(/<place\s+place_id="(\d+)"\s*>([\s\S]*?)<\/place>/g)) {
