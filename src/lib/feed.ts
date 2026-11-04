@@ -224,23 +224,45 @@ export function asNumber(value: unknown): number | null {
 
 const KEEP_UPPER = new Set(['BP', 'MFG', 'JET', 'EG', 'UK', 'MSA', 'A1', 'M1', 'M6', 'M25', 'II', 'III', 'HVO', 'BWOC', 'CO-OP', 'IOR', 'OPT', 'WA', 'UGO', 'OMG', 'CGL', 'FDWA']);
 
-/** "TESCO EXTRA ST. ALBANS" becomes "Tesco Extra St. Albans"; mixed-case names are left alone. */
-export function tidyName(value: string): string {
+/** Small words Spanish and French names keep in lower case ("Avenida de la Paz", "Quai de la Rapée"). */
+const SMALL_WORDS: Record<'es' | 'fr', { always: Set<string>; afterDe: Set<string> }> = {
+  es: { always: new Set(['de', 'del', 'y', 'e']), afterDe: new Set(['la', 'las', 'los', 'el']) },
+  fr: { always: new Set(['de', 'du', 'des', 'et', 'sur', 'sous', 'aux', 'au', 'en']), afterDe: new Set(['la', 'le', 'les']) },
+};
+
+const firstUpper = (text: string): string => text.replace(/^\p{Ll}/u, (ch) => ch.toUpperCase());
+
+/**
+ * "TESCO EXTRA ST. ALBANS" becomes "Tesco Extra St. Albans"; mixed-case names keep their case, with a
+ * capital first letter. With a language, its small words stay small: "AVENIDA DE LA PAZ" becomes
+ * "Avenida de la Paz", and "114 BD DE L HOPITAL" becomes "114 Bd de l'Hopital".
+ */
+export function tidyName(value: string, lang?: 'es' | 'fr'): string {
   const text = value.replace(/\s+/g, ' ').trim();
-  if (!text || /[a-z]/.test(text)) return text;
-  return text
-    .split(' ')
-    .map((word) => {
-      if (KEEP_UPPER.has(word) || /\d/.test(word)) return word;
-      return (
-        word
-          .toLowerCase()
-          .replace(/(^|[-(&/])([a-z])/g, (_m, sep: string, ch: string) => sep + ch.toUpperCase())
-          // O'Neill and D'Arcy, but not Sainsbury's.
-          .replace(/^([A-Z])'([a-z])/, (_m, a: string, b: string) => `${a}'${b.toUpperCase()}`)
-      );
-    })
-    .join(' ');
+  if (!text) return text;
+  if (/\p{Ll}/u.test(text)) return firstUpper(text);
+  const small = lang ? SMALL_WORDS[lang] : null;
+  const words = text.split(' ');
+  const out = words.map((word, i) => {
+    if (KEEP_UPPER.has(word) || /\d/.test(word)) return word;
+    const lower = word.toLowerCase();
+    if (small && i > 0) {
+      const before = words[i - 1]?.toLowerCase() ?? '';
+      if (small.always.has(lower) || (small.afterDe.has(lower) && small.always.has(before))) return lower;
+      // French elision: "D'ASNIERES" and "L'HOPITAL" inside a name become "d'Asnieres" and "l'Hopital".
+      if (lang === 'fr' && /^[dl]'\p{L}/u.test(lower)) return lower.slice(0, 2) + firstUpper(lower.slice(2));
+    }
+    return (
+      lower
+        .replace(/(^|[-(&/])(\p{Ll})/gu, (_m, sep: string, ch: string) => sep + ch.toUpperCase())
+        // O'Neill and D'Arcy, but not Sainsbury's.
+        .replace(/^(\p{Lu})'(\p{Ll})/u, (_m, a: string, b: string) => `${a}'${b.toUpperCase()}`)
+    );
+  });
+  let joined = out.join(' ');
+  // French addresses often drop the apostrophe: "DE L HOPITAL", "AVENUE D ITALIE".
+  if (lang === 'fr') joined = joined.replace(/ ([LD]) (\p{Lu})/gu, (_m, letter: string, next: string) => ` ${letter.toLowerCase()}'${next}`);
+  return firstUpper(joined);
 }
 
 /** Rounds a reported price to one decimal, or null when it falls outside `[min, max]` (a reporting mistake). */

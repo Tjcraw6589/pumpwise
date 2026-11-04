@@ -118,9 +118,19 @@ export function buildFrStations(xml: string, now: Date): FeedStation[] {
       if (price === null || !at || Date.parse(at) > latest) continue;
       prices[kind] = { p: price, at };
     }
+    // A fuel the station has run out of: an open shortage ("rupture" with no end) that is permanent or
+    // began after the last price, so nobody drives there for fuel it doesn't have.
+    for (const r of body.matchAll(/<rupture\b([^>]*)\/?>/g)) {
+      const tag = r[1] ?? '';
+      const kind = FUEL_KINDS[attr(tag, 'nom')];
+      const listed = kind ? prices[kind] : undefined;
+      if (!kind || !listed || attr(tag, 'fin')) continue;
+      const since = parseFrTime(attr(tag, 'debut'));
+      if (attr(tag, 'type') === 'definitive' || (since && since >= listed.at)) delete prices[kind];
+    }
     if (Object.keys(prices).length === 0) continue;
-    const address = tidyName(xmlText(/<adresse>([\s\S]*?)<\/adresse>/.exec(body)?.[1] ?? ''));
-    const town = tidyName(xmlText(/<ville>([\s\S]*?)<\/ville>/.exec(body)?.[1] ?? ''));
+    const address = tidyName(xmlText(/<adresse>([\s\S]*?)<\/adresse>/.exec(body)?.[1] ?? ''), 'fr');
+    const town = tidyName(xmlText(/<ville>([\s\S]*?)<\/ville>/.exec(body)?.[1] ?? ''), 'fr');
     const services = [...body.matchAll(/<service>([\s\S]*?)<\/service>/g)].map((m) => xmlText(m[1] ?? ''));
     const tags = new Set<string>();
     if (attr(head, 'pop') === 'A') tags.add('motorway');

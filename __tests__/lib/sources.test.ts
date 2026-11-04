@@ -91,7 +91,7 @@ describe('Spain (Geoportal de Gasolineras)', () => {
     const stations = buildEsStations(answer);
     expect(stations.map((s) => s.id)).toEqual(['es-1234', 'es-7']);
     const madrid = stations[0] as FeedStation;
-    expect(madrid).toMatchObject({ region: 'es', name: 'Repsol', address: 'Calle De Serrano, 61', town: 'Madrid', postcode: '28001' });
+    expect(madrid).toMatchObject({ region: 'es', name: 'Repsol', address: 'Calle de Serrano, 61', town: 'Madrid', postcode: '28001' });
     expect(madrid.prices).toEqual({
       regular: { p: 169.9, at: '2026-11-04T04:22:06.000Z' },
       super: { p: 185.9, at: '2026-11-04T04:22:06.000Z' },
@@ -176,6 +176,21 @@ describe('France (prix-carburants.gouv.fr)', () => {
     expect(paris.town).toBe('Paris');
     expect(paris.tags).toEqual(['motorway']);
   });
+
+  test('a fuel the station has run out of is left out, but a shortage that has ended is not', () => {
+    const shortage = `<pdv_liste><pdv id="75013023" latitude="4882586" longitude="238433" cp="75013" pop="R">
+      <adresse>RUE JEAN-BAPTISTE BERLIER</adresse><ville>Paris</ville>
+      <prix nom="Gazole" id="1" maj="2026-11-04 06:00:00" valeur="2.250"/>
+      <prix nom="E10" id="5" maj="2026-11-01 08:00:00" valeur="1.989"/>
+      <prix nom="SP95" id="2" maj="2026-11-01 08:00:00" valeur="2.049"/>
+      <prix nom="SP98" id="6" maj="2026-11-03 09:00:00" valeur="2.099"/>
+      <rupture id="5" nom="E10" debut="2026-11-03 16:10:43" fin="" type="temporaire"/>
+      <rupture id="2" nom="SP95" debut="2022-10-10 13:36:55" fin="" type="definitive"/>
+      <rupture id="6" nom="SP98" debut="2026-10-29 22:10:13" fin="2026-11-02 07:00:00" type="temporaire"/>
+    </pdv></pdv_liste>`;
+    const [station] = buildFrStations(shortage, new Date('2026-11-04T08:00:00Z'));
+    expect(Object.keys(station?.prices ?? {}).sort()).toEqual(['diesel', 'super']);
+  });
 });
 
 describe('Mexico (CRE)', () => {
@@ -208,6 +223,16 @@ describe('Mexico (CRE)', () => {
     expect(stations[0]).toMatchObject({ region: 'mx', name: 'Estacion Hipodromo', lat: 32.47641, lng: -116.9214, hours: null });
     expect(stations[0]?.prices).toEqual({ regular: { p: 2295, at: NOW.toISOString() }, premium: { p: 2790, at: NOW.toISOString() } });
     expect(stations[1]?.prices).toEqual({ diesel: { p: 2700, at: NOW.toISOString() } });
+  });
+
+  test('a station listed twice keeps every fuel, and a fuel at two prices is left out', () => {
+    const twice = `<places>
+  <place place_id="2040"><gas_price type="premium">28.99</gas_price><gas_price type="diesel">27</gas_price></place>
+  <place place_id="2040"><gas_price type="regular">23.99</gas_price><gas_price type="diesel">25.39</gas_price></place>
+  <place place_id="2040"><gas_price type="premium">28.99</gas_price></place>
+</places>`;
+    const [station] = buildMxStations(places, twice, NOW);
+    expect(station?.prices).toEqual({ premium: { p: 2899, at: NOW.toISOString() }, regular: { p: 2399, at: NOW.toISOString() } });
   });
 });
 

@@ -41,6 +41,19 @@ describe('shared helpers', () => {
     expect(tidyName('  Esso   Kings Cross ')).toBe('Esso Kings Cross');
   });
 
+  test('tidyName keeps Spanish and French small words small, and accented capitals', () => {
+    expect(tidyName('ÁREA 117')).toBe('Área 117');
+    expect(tidyName('área 117')).toBe('Área 117');
+    expect(tidyName('AVENIDA DE LA PAZ', 'es')).toBe('Avenida de la Paz');
+    expect(tidyName('GASOLINERA LA ROSA', 'es')).toBe('Gasolinera La Rosa');
+    expect(tidyName('OPERADORA DE MINIESTACIONES Y SERVICIOS', 'es')).toBe('Operadora de Miniestaciones y Servicios');
+    expect(tidyName('114 BD DE L HOPITAL', 'fr')).toBe("114 Bd de l'Hopital");
+    expect(tidyName("3-5 AVENUE DE LA PORTE D'ASNIERES", 'fr')).toBe("3-5 Avenue de la Porte d'Asnieres");
+    expect(tidyName('AVENUE D ITALIE', 'fr')).toBe("Avenue d'Italie");
+    expect(tidyName('LE MANS', 'fr')).toBe('Le Mans');
+    expect(tidyName('36 Quai de la Rapée', 'fr')).toBe('36 Quai de la Rapée');
+  });
+
   test('cleanPrice keeps sensible prices and drops reporting mistakes', () => {
     expect(cleanPrice(139.9, 80, 300)).toBe(139.9);
     expect(cleanPrice('142.94', 80, 300)).toBe(142.9);
