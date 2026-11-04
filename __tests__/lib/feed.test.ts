@@ -15,7 +15,7 @@ import {
 } from '@/lib/feed';
 
 import { fixtureFeed, nswFixtureResponse, nswLocalTime, ukFixtureRecords, waFixtureFeeds, waFixtureRss, waPriceDate } from '../../scripts/feed/fixture-data.ts';
-import { buildNswStations, NSW_PRICES_URL, parseNswTime, requestTimestamp, splitAddress } from '../../scripts/feed/sources/nsw.ts';
+import { buildNswStations, failureDetail, NSW_PRICES_URL, parseNswTime, requestTimestamp, splitAddress } from '../../scripts/feed/sources/nsw.ts';
 import { buildUkStations, normalizeUkPrices, normalizeUkStation, parseUkHours } from '../../scripts/feed/sources/uk.ts';
 import {
   buildWaStations,
@@ -289,6 +289,17 @@ describe('NSW, ACT and Tasmania (NSW Fuel API)', () => {
     expect(NSW_PRICES_URL).toBe('https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices?states=NSW%7CTAS');
     expect(requestTimestamp(new Date('2026-11-03T21:05:09Z'))).toBe('03/11/2026 09:05:09 PM');
     expect(requestTimestamp(new Date('2026-01-09T00:30:00Z'))).toBe('09/01/2026 12:30:00 AM');
+  });
+
+  test("explains a refused request in the API's own words, never showing the key or secret", async () => {
+    const creds = { key: 'k'.repeat(32), secret: 's'.repeat(16) };
+    const body = JSON.stringify({ ErrorCode: 'invalid_client', Error: `ClientId ${creds.key} is Invalid`, echo: creds.secret });
+    const detail = await failureDetail(new Response(body, { status: 401 }), creds);
+    expect(detail).toContain('HTTP 401');
+    expect(detail).toContain('invalid_client');
+    expect(detail).not.toContain(creds.key);
+    expect(detail).not.toContain(creds.secret);
+    expect(await failureDetail(new Response('', { status: 503 }), creds)).toBe('HTTP 503');
   });
 
   test('splits addresses into street, town and postcode', () => {

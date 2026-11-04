@@ -161,6 +161,21 @@ export function requestTimestamp(now: Date): string {
 /** The v2 "all prices" call returns only NSW (with the ACT) unless Tasmania is asked for by name. */
 export const NSW_PRICES_URL = `${API}/FuelPriceCheck/v2/fuel/prices?states=${encodeURIComponent('NSW|TAS')}`;
 
+/**
+ * The API's own words when a request fails ("ClientId is Invalid" means the key is wrong), cut short,
+ * with the key and secret blanked out so they can never reach a log.
+ */
+export async function failureDetail(response: Response, credentials: NswCredentials): Promise<string> {
+  let body = '';
+  try {
+    body = (await response.text()).replace(/\s+/g, ' ').trim();
+  } catch {
+    body = '';
+  }
+  for (const value of [credentials.key, credentials.secret]) if (value) body = body.split(value).join('[hidden]');
+  return `HTTP ${response.status}${body ? ` ${body.slice(0, 160)}` : ''}`;
+}
+
 /** One token and one "all prices" request: two of the month's 2,500 calls. */
 export async function fetchNsw(credentials: NswCredentials, now: Date): Promise<FeedStation[]> {
   const request = politeRequester(1500);
@@ -168,7 +183,11 @@ export async function fetchNsw(credentials: NswCredentials, now: Date): Promise<
   const tokenResponse = await request(`${API}/oauth/client_credential/accesstoken?grant_type=client_credentials`, {
     headers: { Authorization: `Basic ${basic}` },
   });
-  if (!tokenResponse.ok) throw new Error(`token request: HTTP ${tokenResponse.status}`);
+  if (!tokenResponse.ok) {
+    // Lengths only (a NSW key is 32 characters and a secret 16), to spot a swapped or partial paste.
+    const sizes = `key ${credentials.key.length} characters, secret ${credentials.secret.length}`;
+    throw new Error(`token request: ${await failureDetail(tokenResponse, credentials)} (${sizes})`);
+  }
   const token = asString(asRecord(await tokenResponse.json())?.access_token);
   if (!token) throw new Error('token request: no access_token in the answer');
 
@@ -181,7 +200,7 @@ export async function fetchNsw(credentials: NswCredentials, now: Date): Promise<
       requesttimestamp: requestTimestamp(now),
     },
   });
-  if (!pricesResponse.ok) throw new Error(`prices request: HTTP ${pricesResponse.status}`);
+  if (!pricesResponse.ok) throw new Error(`prices request: ${await failureDetail(pricesResponse, credentials)}`);
   const stations = buildNswStations(await pricesResponse.json(), now);
   const tas = stations.filter((s) => s.region === 'tas').length;
   console.log(`nsw: ${stations.length - tas} NSW and ACT stations, ${tas} Tasmanian stations`);
