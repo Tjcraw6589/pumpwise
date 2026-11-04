@@ -60,11 +60,12 @@ const SOURCES: Source[] = [
     enabled: () => nswCredentials() !== null,
     fetch: async (now) => ({ stations: await fetchNsw(nswCredentials() as { key: string; secret: string }, now), tomorrow: false }),
   },
-  // Queensland: free data-consumer API, off until the QLD_FUEL_API_TOKEN secret exists.
+  // Queensland: free publisher licence, off until the QLD_FUEL_API_TOKEN secret exists. The licence
+  // requires price changes to be published within 30 minutes, so it is fetched on every run.
   {
     id: 'qld',
     regions: ['qld'],
-    everyMinutes: 25,
+    everyMinutes: 10,
     minStations: QLD_MIN_STATIONS,
     enabled: () => qldToken() !== null,
     fetch: async (now) => ({ stations: await fetchQld(qldToken() as string, now), tomorrow: false }),
