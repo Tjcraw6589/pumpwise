@@ -19,6 +19,11 @@ jest.mock('@expo-google-fonts/barlow-condensed', () => ({
   BarlowCondensed_700Bold: 'BarlowCondensed_700Bold',
 }));
 
+// The phone's language and country: English in Australia unless a test switches with setLang.
+jest.mock('expo-localization', () => ({
+  getLocales: () => [{ languageCode: 'en', regionCode: 'AU', languageTag: 'en-AU' }],
+}));
+
 jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(async () => true),
   hide: jest.fn(),

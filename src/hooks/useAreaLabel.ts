@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 
@@ -7,5 +8,5 @@ export function useAreaLabel(): string {
   const place = useStore((s) => s.settings.place);
   const areaName = useLive((s) => s.areaName);
   if (mode === 'place' && place) return place.name;
-  return areaName ? `Near ${areaName}` : 'Near you';
+  return areaName ? t('area.near', areaName) : t('area.nearYou');
 }

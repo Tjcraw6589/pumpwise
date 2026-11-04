@@ -1,3 +1,5 @@
+import { localNumber, t } from '@/i18n';
+
 import type { DistanceUnit, EconomyUnit } from './regions';
 
 export const KM_PER_MILE = 1.609344;
@@ -12,16 +14,16 @@ export function fromKm(km: number, unit: DistanceUnit): number {
   return unit === 'mi' ? km / KM_PER_MILE : km;
 }
 
-/** "2.3 km", "450 m", "12 mi", "Under 0.1 mi". */
+/** "2.3 km", "450 m", "12 mi", "Under 0.1 mi"; "2,3 km" in Spanish and French. */
 export function formatDistance(km: number, unit: DistanceUnit): string {
   if (unit === 'km') {
     if (km < 1) return `${Math.max(10, Math.round((km * 1000) / 10) * 10)} m`;
-    if (km < 10) return `${km.toFixed(1)} km`;
+    if (km < 10) return `${localNumber(km.toFixed(1))} km`;
     return `${Math.round(km)} km`;
   }
   const miles = km / KM_PER_MILE;
-  if (miles < 0.1) return 'Under 0.1 mi';
-  if (miles < 10) return `${miles.toFixed(1)} mi`;
+  if (miles < 0.1) return t('units.underTenthMile');
+  if (miles < 10) return `${localNumber(miles.toFixed(1))} mi`;
   return `${Math.round(miles)} mi`;
 }
 
@@ -34,7 +36,7 @@ export function sameRadius(km: number, option: number, unit: DistanceUnit): bool
 export function radiusLabel(km: number, unit: DistanceUnit): string {
   const value = fromKm(km, unit);
   const rounded = value >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
-  return `${rounded} ${unit}`;
+  return `${localNumber(String(rounded))} ${unit}`;
 }
 
 export function economyToL100(value: number, unit: EconomyUnit): number {
@@ -50,5 +52,5 @@ export function sameEconomy(l100: number, option: number, unit: EconomyUnit): bo
 }
 
 export function economyLabel(value: number, unit: EconomyUnit): string {
-  return unit === 'mpg' ? `${value} mpg` : `${value} L/100km`;
+  return unit === 'mpg' ? `${value} mpg` : `${localNumber(String(value))} L/100km`;
 }

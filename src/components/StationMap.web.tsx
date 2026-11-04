@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 
 import { declutterPins } from '@/lib/declutter';
+import { t } from '@/i18n';
+import { REGIONS } from '@/lib/regions';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/theme/useTheme';
@@ -32,7 +34,7 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, keepI
       onLayout={(e) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
       testID="station-map"
     >
-      <Pressable style={StyleSheet.absoluteFill} onPress={() => onSelect(null)} accessibilityLabel="Map background" />
+      <Pressable style={StyleSheet.absoluteFill} onPress={() => onSelect(null)} accessibilityLabel={t('map.background')} />
       {half > 0 ? (
         <>
           <View
@@ -63,14 +65,14 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, keepI
                 onPress={() => onSelect(item.station.id)}
                 style={{ position: 'absolute', left: x - 30, top: y - 30, width: 60, alignItems: 'center', zIndex: selected ? 10 : 1 }}
               >
-                <MapPin pence={item.price.p} band={band(item.price.p)} selected={selected} stale={item.stale} />
+                <MapPin pence={item.price.p} region={REGIONS[item.station.region]} band={band(item.price.p)} selected={selected} stale={item.stale} />
               </Pressable>
             );
           })}
         </>
       ) : null}
       <AppText variant="caption" tone="faint" style={styles.note}>
-        Map preview. The iPhone app shows Apple Maps.
+        {t('map.webNote')}
       </AppText>
     </View>
   );

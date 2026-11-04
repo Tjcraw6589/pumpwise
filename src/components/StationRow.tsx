@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { formatMoney, spokenPrice } from '@/lib/format';
 import type { PriceBand, RankedStation, SortMode } from '@/lib/ranking';
 import { MEMBERS_ONLY, PERMIT_REQUIRED } from '@/lib/ranking';
@@ -26,21 +27,21 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
   const { station, open } = item;
   const region = REGIONS[station.region];
   const closed = open.status === 'closed';
-  const note = station.tags.includes(MEMBERS_ONLY) ? 'Members only' : station.tags.includes(PERMIT_REQUIRED) ? 'Permit needed' : null;
+  const note = station.tags.includes(MEMBERS_ONLY) ? t('tag.membersOnly') : station.tags.includes(PERMIT_REQUIRED) ? t('tag.permitNeeded') : null;
   const subtitle = [station.brand && station.brand !== station.name ? station.brand : null, station.town].filter(Boolean).join(' · ');
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={[
         station.name,
-        spokenPrice(item.price.p, region.priceUnit),
+        spokenPrice(item.price.p, region),
         formatDistance(item.distance, region.distanceUnit),
-        closed ? 'Closed' : open.label,
+        closed ? t('hours.closed') : open.label,
         note,
       ]
         .filter(Boolean)
         .join(', ')}
-      accessibilityHint="Opens the station's prices and hours"
+      accessibilityHint={t('a11y.opensStation')}
       testID={`station-row-${station.id}`}
       onPress={onPress}
       style={({ pressed }) => [
@@ -55,7 +56,7 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
         },
       ]}
     >
-      <PriceSign pence={item.price.p} size="md" tone={item.stale ? 'muted' : band === 'low' ? 'cheap' : 'normal'} />
+      <PriceSign pence={item.price.p} region={region} size="md" tone={item.stale ? 'muted' : band === 'low' ? 'cheap' : 'normal'} />
       <View style={[styles.body, { marginLeft: spacing.md }]}>
         <View style={styles.titleRow}>
           <AppText variant="bodyBold" numberOfLines={2} style={styles.flex}>
@@ -85,11 +86,11 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
             </AppText>
           ) : sortBy === 'value' ? (
             <AppText variant="small" tone="muted" style={styles.end}>
-              {formatMoney(item.realCost, region.currency)} total
+              {t('row.total', formatMoney(item.realCost, region))}
             </AppText>
           ) : open.label ? (
             <AppText variant="small" tone={closed ? 'pricey' : 'muted'} numberOfLines={1} style={styles.end}>
-              {closed ? 'Closed' : open.label.replace('Open until', 'Till')}
+              {closed ? t('hours.closed') : open.until ? t('row.till', open.until) : open.label}
             </AppText>
           ) : null}
         </View>

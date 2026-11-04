@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useRegion } from '@/hooks/useRegion';
+import { t } from '@/i18n';
 import { fuelChipLabel } from '@/lib/regions';
 import { radiusLabel, sameRadius, toKm } from '@/lib/units';
 import { useStore } from '@/store/useStore';
@@ -12,10 +13,10 @@ import { Chip } from './Chip';
 import { OptionSheet } from './OptionSheet';
 
 function areaHint(km: number): string {
-  if (km <= 3.5) return 'Just around here';
-  if (km <= 8.5) return 'A short drive';
-  if (km <= 16.5) return 'Worth a detour';
-  return 'Wide search';
+  if (km <= 3.5) return t('area.hintHere');
+  if (km <= 8.5) return t('area.hintShort');
+  if (km <= 16.5) return t('area.hintDetour');
+  return t('area.hintWide');
 }
 
 /** The fuel, search-area and (optionally) place chips shown above the list and the map. */
@@ -36,14 +37,14 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
     <>
       <View style={[styles.row, { gap: spacing.sm }]}>
         <Chip label={fuelChipLabel(region, fuel)} icon="water" picker onPress={() => setSheet('fuel')} testID="fuel-chip" />
-        <Chip label={`Within ${radiusLabel(radiusKm, unit)}`} icon="radio-button-on" picker onPress={() => setSheet('radius')} testID="radius-chip" />
+        <Chip label={t('search.within', radiusLabel(radiusKm, unit))} icon="radio-button-on" picker onPress={() => setSheet('radius')} testID="radius-chip" />
         {showPlace ? (
           <Chip label={areaLabel} icon={locationMode === 'gps' ? 'locate' : 'map'} picker onPress={() => router.push('/place')} testID="place-chip" />
         ) : null}
       </View>
       <OptionSheet
         visible={sheet === 'fuel'}
-        title="Fuel"
+        title={t('search.fuel')}
         value={region.fuels.some((f) => f.kind === fuel) ? fuel : (region.fuels[0]?.kind ?? fuel)}
         options={region.fuels.map((f) => ({ key: f.kind, label: f.label, detail: f.description, badge: f.pumpCode }))}
         onSelect={(key) => updateSettings({ fuel: key })}
@@ -52,9 +53,9 @@ export function SearchControls({ areaLabel, showPlace = true }: { areaLabel: str
       />
       <OptionSheet
         visible={sheet === 'radius'}
-        title="Search area"
+        title={t('search.area')}
         value={selectedRadius}
-        options={region.radiusOptions.map((r) => ({ key: r, label: `Within ${r} ${unit}`, detail: areaHint(toKm(r, unit)) }))}
+        options={region.radiusOptions.map((r) => ({ key: r, label: t('search.within', radiusLabel(toKm(r, unit), unit)), detail: areaHint(toKm(r, unit)) }))}
         onSelect={(key) => updateSettings({ radiusKm: toKm(key, unit) })}
         onClose={closeSheet}
         testID="radius-sheet"

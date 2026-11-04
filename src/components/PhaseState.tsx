@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Animated, View } from 'react-native';
 
 import { useCoverage, useRegion } from '@/hooks/useRegion';
+import { t } from '@/i18n';
 import type { NearbyPhase } from '@/lib/nearby';
 import type { Place } from '@/lib/places';
 import { fuelOption, REGIONS, regionList } from '@/lib/regions';
@@ -42,7 +43,7 @@ export function LoadingCards() {
     />
   );
   return (
-    <View testID="loading-cards" accessibilityLabel="Loading prices">
+    <View testID="loading-cards" accessibilityLabel={t('state.loading')}>
       {block(236, 'hero')}
       {block(104, 'nearest')}
       {block(74, 'row1')}
@@ -74,44 +75,44 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       return (
         <EmptyState
           icon="location"
-          title="See prices around you"
-          body="Pumpwise uses your location to find the nearest station and the cheapest one near you. Your exact location stays on your iPhone."
+          title={t('state.permissionTitle')}
+          body={t('state.permissionBody')}
           testID="state-need-permission"
         >
-          <Button label="Allow location" size="lg" fullWidth onPress={() => void askForLocation()} testID="allow-location" />
-          <Button label="Choose a place instead" variant="secondary" size="lg" fullWidth onPress={choose} testID="choose-place" />
+          <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void askForLocation()} testID="allow-location" />
+          <Button label={t('state.choosePlaceInstead')} variant="secondary" size="lg" fullWidth onPress={choose} testID="choose-place" />
         </EmptyState>
       );
     case 'denied':
       return (
         <EmptyState
           icon="location-outline"
-          title="Location is off"
+          title={t('state.deniedTitle')}
           body={
             canAskAgain
-              ? 'Pumpwise needs your location to show what is nearby. You can also search around a town or postcode.'
-              : 'Turn on location for Pumpwise in Settings, or search around a town or postcode instead.'
+              ? t('state.deniedBodyAsk')
+              : t('state.deniedBodySettings')
           }
           testID="state-denied"
         >
           {canAskAgain ? (
-            <Button label="Allow location" size="lg" fullWidth onPress={() => void askForLocation()} />
+            <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void askForLocation()} />
           ) : (
-            <Button label="Open Settings" size="lg" fullWidth onPress={openAppSettings} testID="open-settings" />
+            <Button label={t('state.openSettings')} size="lg" fullWidth onPress={openAppSettings} testID="open-settings" />
           )}
-          <Button label="Choose a place" variant="secondary" size="lg" fullWidth onPress={choose} testID="choose-place" />
+          <Button label={t('action.choosePlace')} variant="secondary" size="lg" fullWidth onPress={choose} testID="choose-place" />
         </EmptyState>
       );
     case 'location-error':
       return (
         <EmptyState
           icon="navigate-circle-outline"
-          title="Can't find you right now"
-          body="Your iPhone couldn't get a location fix. This can happen indoors or underground."
+          title={t('state.locationErrorTitle')}
+          body={t('state.locationErrorBody')}
           testID="state-location-error"
         >
           <Button
-            label="Try again"
+            label={t('action.tryAgain')}
             size="lg"
             fullWidth
             onPress={() => {
@@ -121,7 +122,7 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
                 .catch(() => useLive.getState().set({ locating: false, locationError: 'unavailable' }));
             }}
           />
-          <Button label="Choose a place" variant="secondary" size="lg" fullWidth onPress={choose} />
+          <Button label={t('action.choosePlace')} variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
     case 'not-covered': {
@@ -130,12 +131,12 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       return (
         <EmptyState
           icon="earth"
-          title={`Pumpwise covers ${regionList(coverage.live)}`}
-          body="Prices come from official government schemes, and this place isn't covered yet. Pick somewhere that is to look around."
+          title={t('state.notCoveredTitle', regionList(coverage.live))}
+          body={t('state.notCoveredBody')}
           testID="state-not-covered"
         >
-          <Button label={`Look around ${city.name}`} size="lg" fullWidth onPress={() => choosePlace(city)} testID="try-city" />
-          <Button label="Choose a place" variant="secondary" size="lg" fullWidth onPress={choose} />
+          <Button label={t('state.lookAround', city.name)} size="lg" fullWidth onPress={() => choosePlace(city)} testID="try-city" />
+          <Button label={t('action.choosePlace')} variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
     }
@@ -143,26 +144,22 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       return (
         <EmptyState
           icon="time-outline"
-          title="Prices are on their way"
-          body={`${region.name} prices couldn't be collected just now. They usually come back within the hour.`}
+          title={t('state.regionDownTitle')}
+          body={t('state.regionDownBody', region.name)}
           testID="state-region-down"
         >
-          <Button label="Check again" size="lg" fullWidth onPress={requestRefresh} />
+          <Button label={t('state.checkAgain')} size="lg" fullWidth onPress={requestRefresh} />
         </EmptyState>
       );
     case 'error':
       return (
         <EmptyState
           icon={feedError === 'offline' ? 'cloud-offline-outline' : 'alert-circle-outline'}
-          title={feedError === 'offline' ? 'No connection' : "Prices didn't load"}
-          body={
-            feedError === 'offline'
-              ? 'Pumpwise needs a data connection to fetch the latest prices.'
-              : 'The price feed did not answer. It usually comes back within a few minutes.'
-          }
+          title={feedError === 'offline' ? t('state.offlineTitle') : t('state.errorTitle')}
+          body={feedError === 'offline' ? t('state.offlineBody') : t('state.errorBody')}
           testID="state-error"
         >
-          <Button label="Try again" size="lg" fullWidth onPress={requestRefresh} testID="retry" />
+          <Button label={t('action.tryAgain')} size="lg" fullWidth onPress={requestRefresh} testID="retry" />
         </EmptyState>
       );
     case 'empty': {
@@ -174,12 +171,12 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       return (
         <EmptyState
           icon="search"
-          title={`Nothing within ${radiusLabel(radiusKm, unit)}`}
-          body={`No station in this area has a price for ${f.label} (${f.pumpCode}) right now. ${wider ? 'Try a wider area or another fuel.' : 'Try another fuel, or choose a place to look around.'}`}
+          title={t('state.emptyTitle', radiusLabel(radiusKm, unit))}
+          body={`${t('state.emptyBody', f.label, f.pumpCode)} ${wider ? t('state.emptyTryWider') : t('state.emptyTryOther')}`}
           testID="state-empty"
         >
           {wider ? (
-            <Button label={`Search within ${wider} ${unit}`} size="lg" fullWidth onPress={() => updateSettings({ radiusKm: toKm(wider, unit) })} testID="widen" />
+            <Button label={t('state.searchWithin', radiusLabel(toKm(wider, unit), unit))} size="lg" fullWidth onPress={() => updateSettings({ radiusKm: toKm(wider, unit) })} testID="widen" />
           ) : null}
         </EmptyState>
       );

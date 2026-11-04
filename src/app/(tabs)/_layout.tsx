@@ -4,6 +4,7 @@ import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useLiveController } from '@/hooks/useLiveController';
+import { t } from '@/i18n';
 import { useTheme } from '@/theme/useTheme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -36,9 +37,9 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Nearby', tabBarIcon: icon('speedometer', 'speedometer-outline') }} />
-      <Tabs.Screen name="map" options={{ title: 'Map', tabBarIcon: icon('map', 'map-outline') }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings', tabBarIcon: icon('settings', 'settings-outline') }} />
+      <Tabs.Screen name="index" options={{ title: t('tab.nearby'), tabBarIcon: icon('speedometer', 'speedometer-outline') }} />
+      <Tabs.Screen name="map" options={{ title: t('tab.map'), tabBarIcon: icon('map', 'map-outline') }} />
+      <Tabs.Screen name="settings" options={{ title: t('tab.settings'), tabBarIcon: icon('settings', 'settings-outline') }} />
     </Tabs>
   );
 }

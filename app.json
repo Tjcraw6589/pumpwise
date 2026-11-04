@@ -29,7 +29,12 @@
           "comgooglemaps",
           "waze"
         ],
-        "NSUserTrackingUsageDescription": "Pumpwise shows a small ad to keep the app free. Allowing tracking lets that ad be more relevant. Your location and settings never leave your iPhone either way."
+        "NSUserTrackingUsageDescription": "Pumpwise shows a small ad to keep the app free. Allowing tracking lets that ad be more relevant. Your location and settings never leave your iPhone either way.",
+        "CFBundleLocalizations": [
+          "en",
+          "es",
+          "fr"
+        ]
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,
@@ -156,7 +161,8 @@
         {
           "userTrackingPermission": "Pumpwise shows a small ad to keep the app free. Allowing tracking lets that ad be more relevant. Your location and settings never leave your iPhone either way."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
@@ -184,6 +190,10 @@
     "owner": "tjcraw6589s-team",
     "updates": {
       "url": "https://u.expo.dev/2db14350-2d55-40c8-894c-3aba8f411d63"
+    },
+    "locales": {
+      "es": "./locales/es.json",
+      "fr": "./locales/fr.json"
     }
   }
 }

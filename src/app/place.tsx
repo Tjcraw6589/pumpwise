@@ -8,6 +8,7 @@ import { Header } from '@/components/Header';
 import { askForLocation } from '@/components/PhaseState';
 import { Screen } from '@/components/Screen';
 import { useCoverage } from '@/hooks/useRegion';
+import { t } from '@/i18n';
 import type { RegionId } from '@/lib/feed';
 import { classifyQuery, type Place } from '@/lib/places';
 import { regionList } from '@/lib/regions';
@@ -100,13 +101,13 @@ export default function PlaceScreen() {
 
   return (
     <Screen scroll edges={['top', 'bottom']} testID="place-screen">
-      <Header title="Search around" dismiss="close" />
+      <Header title={t('place.title')} dismiss="close" />
       <View style={[styles.search, { backgroundColor: colors.input, borderColor: colors.border, borderRadius: radius.md, paddingHorizontal: spacing.md }]}>
         <Ionicons name="search" size={18} color={colors.textMuted} />
         <TextInput
           value={query}
           onChangeText={setQuery}
-          placeholder="Suburb, town or postcode"
+          placeholder={t('place.placeholder')}
           placeholderTextColor={colors.textFaint}
           autoCapitalize="words"
           autoCorrect={false}
@@ -114,7 +115,7 @@ export default function PlaceScreen() {
           clearButtonMode="while-editing"
           style={[styles.input, { color: colors.text, marginLeft: spacing.sm }]}
           testID="place-search"
-          accessibilityLabel="Suburb, town or postcode"
+          accessibilityLabel={t('place.placeholder')}
         />
         {status === 'searching' ? <ActivityIndicator color={colors.textMuted} /> : null}
       </View>
@@ -126,12 +127,12 @@ export default function PlaceScreen() {
           ))}
           {status === 'done' && results.length === 0 ? (
             <AppText variant="body" tone="muted" style={{ paddingVertical: spacing.md }}>
-              Nothing in {regionList(coverage.live)} matches “{query.trim()}”.
+              {t('place.noMatch', regionList(coverage.live), query.trim())}
             </AppText>
           ) : null}
           {status === 'error' && results.length === 0 ? (
             <AppText variant="body" tone="muted" style={{ paddingVertical: spacing.md }}>
-              Search isn&apos;t answering. Check your connection, or pick a city below.
+              {t('place.searchDown')}
             </AppText>
           ) : null}
         </View>
@@ -155,9 +156,9 @@ export default function PlaceScreen() {
       >
         <Ionicons name="locate" size={20} color={colors.accentText} />
         <View style={[styles.flex, { marginLeft: spacing.md }]}>
-          <AppText variant="bodyBold">Use my location</AppText>
+          <AppText variant="bodyBold">{t('place.useMyLocation')}</AppText>
           <AppText variant="caption" tone="muted">
-            {permission === 'denied' && !canAskAgain ? 'Location is off for Pumpwise. Tap to open Settings.' : 'Follows you as you drive'}
+            {permission === 'denied' && !canAskAgain ? t('place.locationOff') : t('place.follows')}
           </AppText>
         </View>
         {mode === 'gps' ? <Ionicons name="checkmark-circle" size={22} color={colors.accentText} /> : null}
@@ -166,7 +167,7 @@ export default function PlaceScreen() {
       {recent.length > 0 ? (
         <View style={{ marginTop: spacing.xl }}>
           <AppText variant="overline" tone="muted">
-            Recent
+            {t('place.recent')}
           </AppText>
           {recent.map((place) => (
             <PlaceRow key={`recent-${place.name}-${place.detail}`} place={place} icon="time-outline" onPress={() => pick(place)} />
@@ -176,14 +177,14 @@ export default function PlaceScreen() {
 
       <View style={{ marginTop: spacing.xl }}>
         <AppText variant="overline" tone="muted">
-          Cities
+          {t('place.cities')}
         </AppText>
         {citiesFor(coverage.live).map((place) => (
           <PlaceRow key={place.name} place={place} icon="business-outline" onPress={() => pick(place)} testID={`city-${place.name}`} />
         ))}
       </View>
       <AppText variant="caption" tone="faint" style={{ marginTop: spacing.lg }}>
-        Search uses Apple&apos;s map service (and postcodes.io for UK postcodes). Only what you type is sent.
+        {t('place.privacy')}
       </AppText>
     </Screen>
   );

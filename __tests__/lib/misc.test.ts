@@ -29,10 +29,10 @@ describe('format', () => {
   test('prices, money and changes', () => {
     expect(formatPrice(139.9)).toBe('139.9');
     expect(formatPrice(200)).toBe('200.0');
-    expect(spokenPrice(185.8, 'c')).toBe('185.8 cents a litre');
-    expect(spokenPrice(139.9, 'p')).toBe('139.9 pence a litre');
-    expect(formatMoney(2.4, '$')).toBe('$2.40');
-    expect(formatMoney(-0.5, '£')).toBe('-£0.50');
+    expect(spokenPrice(185.8, REGIONS.wa)).toBe('185.8 cents a litre');
+    expect(spokenPrice(139.9, REGIONS.uk)).toBe('139.9 pence a litre');
+    expect(formatMoney(2.4, REGIONS.wa)).toBe('$2.40');
+    expect(formatMoney(-0.5, REGIONS.uk)).toBe('-£0.50');
     expect(formatChange(-4)).toBe('−4.0');
     expect(formatChange(2.25)).toBe('+2.3');
     expect(formatChange(0.01)).toBe('±0.0');

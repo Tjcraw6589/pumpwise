@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 
 import { declutterPins } from '@/lib/declutter';
+import { REGIONS } from '@/lib/regions';
 import { regionForRadius } from '@/lib/geo';
 import { useTheme } from '@/theme/useTheme';
 
@@ -71,7 +72,7 @@ export function StationMap({ center, radiusKm, stations, band, selectedId, keepI
               onSelect(item.station.id);
             }}
           >
-            <MapPin pence={item.price.p} band={band(item.price.p)} selected={selected} stale={item.stale} />
+            <MapPin pence={item.price.p} region={REGIONS[item.station.region]} band={band(item.price.p)} selected={selected} stale={item.stale} />
           </Marker>
         );
       })}

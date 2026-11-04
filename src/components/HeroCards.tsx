@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import type { FuelKind } from '@/lib/feed';
 import { formatMoney, spokenPrice } from '@/lib/format';
 import type { RankedStation, Savings } from '@/lib/ranking';
@@ -17,7 +18,7 @@ import { TomorrowTag } from './TomorrowTag';
 /** What VoiceOver reads for a headline card: name, price, distance and opening. */
 function spokenSummary(item: RankedStation): string {
   const region = REGIONS[item.station.region];
-  return [item.station.name, spokenPrice(item.price.p, region.priceUnit), formatDistance(item.distance, region.distanceUnit), item.open.label]
+  return [item.station.name, spokenPrice(item.price.p, region), formatDistance(item.distance, region.distanceUnit), item.open.label]
     .filter(Boolean)
     .join(', ');
 }
@@ -49,7 +50,7 @@ function PriceInfo({ item, now }: { item: RankedStation; now: Date }) {
 /** A station that works out cheaper than the headline pick once the drive there and back is counted. */
 export interface BetterStill {
   name: string;
-  /** Dollars (pounds) better than the headline pick, all in. */
+  /** Money better than the headline pick, all in, in the region's currency. */
   amount: number;
 }
 
@@ -69,15 +70,15 @@ function SavingsLine({
   const { colors, spacing, radius } = useTheme();
   const region = REGIONS[item.station.region];
   const extra =
-    savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
+    savings.extraKm >= 0.2 ? t('hero.extraThereBack', formatDistance(savings.extraKm, region.distanceUnit)) : '';
   // When a third station beats the nearest once the drive is counted, point there instead of at the nearest.
-  const verdict = betterPick ? 'The best value pick below beats both.' : savings.amount > 0 ? 'The nearest is fine today.' : 'The nearest is the better deal.';
-  const still = betterStill ? ` ${betterStill.name}, below, is ${formatMoney(betterStill.amount, region.currency)} better again once you count the drive.` : '';
+  const verdict = betterPick ? t('hero.verdictBetterPick') : savings.amount > 0 ? t('hero.verdictFine') : t('hero.verdictNearest');
+  const still = betterStill ? t('hero.betterStill', betterStill.name, formatMoney(betterStill.amount, region)) : '';
   const text = savings.worthIt
     ? null
     : savings.amount > 0
-      ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. ${verdict}`
-      : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. ${verdict}`;
+      ? t('hero.onlyAhead', formatMoney(savings.amount, region), fillLitres, formatDistance(savings.extraKm, region.distanceUnit), verdict)
+      : t('hero.cheaperButFar', formatDistance(savings.extraKm, region.distanceUnit), fillLitres, verdict);
   return (
     <View
       testID="savings-line"
@@ -95,11 +96,11 @@ function SavingsLine({
       <AppText variant="caption" style={{ flex: 1, marginLeft: spacing.sm }}>
         {savings.worthIt ? (
           <>
-            Saves{' '}
+            {t('hero.saves')}{' '}
             <AppText variant="caption" style={{ fontWeight: '700', color: colors.cheap }}>
-              {formatMoney(savings.amount, region.currency)}
+              {formatMoney(savings.amount, region)}
             </AppText>{' '}
-            on a {fillLitres} L fill-up compared with the nearest{extra}.{still}
+            {t('hero.savesRest', fillLitres, extra, still)}
           </>
         ) : (
           text
@@ -137,22 +138,22 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
     >
       <View style={styles.headerRow}>
         <AppText variant="overline" tone="accent" style={styles.flex}>
-          Cheapest within {radiusLabel(radiusKm, region.distanceUnit)}
+          {t('hero.cheapestWithin', radiusLabel(radiusKm, region.distanceUnit))}
         </AppText>
         {alsoNearest ? (
           <View style={[styles.pill, { backgroundColor: colors.cheapSoft, borderRadius: radius.pill }]}>
             <AppText variant="small" tone="cheap">
-              Also the nearest
+              {t('hero.alsoNearest')}
             </AppText>
           </View>
         ) : null}
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Cheapest: ${spokenSummary(item)}`}
-        accessibilityHint="Opens the station's prices and hours"
+        accessibilityLabel={t('hero.cheapestSpoken', spokenSummary(item))}
+        accessibilityHint={t('a11y.opensStation')}
         onPress={onDetails} style={[styles.mainRow, { marginTop: spacing.md }]}>
-        <PriceSign pence={item.price.p} size="lg" tone="cheap" label={fuelOption(region, fuel).pumpCode} testID="cheapest-price" />
+        <PriceSign pence={item.price.p} region={region} size="lg" tone="cheap" label={fuelOption(region, fuel).pumpCode} testID="cheapest-price" />
         <View style={[styles.flex, { marginLeft: spacing.lg }]}>
           <AppText variant="h2" numberOfLines={2} testID="cheapest-name">
             {station.name}
@@ -169,7 +170,7 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
       {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} betterPick={betterPick} betterStill={betterStill} /> : null}
       <View style={[styles.actions, { marginTop: spacing.lg, gap: spacing.sm }]}>
         <Button
-          label="Directions"
+          label={t('action.directions')}
           variant="accent"
           size="lg"
           onPress={onDirections}
@@ -177,7 +178,7 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           style={styles.flex}
           testID="cheapest-directions"
         />
-        <Button label="Details" variant="secondary" size="lg" onPress={onDetails} testID="cheapest-details" />
+        <Button label={t('action.details')} variant="secondary" size="lg" onPress={onDetails} testID="cheapest-details" />
       </View>
     </View>
   );
@@ -200,10 +201,10 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
     <Pressable
       testID="nearest-card"
       accessibilityRole="button"
-      accessibilityLabel={`Nearest: ${spokenSummary(item)}`}
-      accessibilityHint="Opens the station's prices and hours. Swipe up or down for directions."
+      accessibilityLabel={t('hero.nearestSpoken', spokenSummary(item))}
+      accessibilityHint={t('hero.nearestHint')}
       // VoiceOver can't reach a button inside another button, so directions is also an action here.
-      accessibilityActions={[{ name: 'directions', label: 'Directions' }]}
+      accessibilityActions={[{ name: 'directions', label: t('action.directions') }]}
       onAccessibilityAction={(event) => {
         if (event.nativeEvent.actionName === 'directions') onDirections();
       }}
@@ -220,10 +221,10 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
       ]}
     >
       <AppText variant="overline" tone="muted">
-        Nearest{insideArea ? '' : ' (outside your area)'}
+        {insideArea ? t('hero.nearest') : t('hero.nearestOutside')}
       </AppText>
       <View style={[styles.mainRow, { marginTop: spacing.sm }]}>
-        <PriceSign pence={item.price.p} size="md" label={fuelOption(REGIONS[station.region], fuel).pumpCode} testID="nearest-price" />
+        <PriceSign pence={item.price.p} region={REGIONS[station.region]} size="md" label={fuelOption(REGIONS[station.region], fuel).pumpCode} testID="nearest-price" />
         <View style={[styles.flex, { marginLeft: spacing.md }]}>
           <AppText variant="bodyBold" numberOfLines={2} testID="nearest-name">
             {station.name}
@@ -233,7 +234,7 @@ export function NearestCard({ item, fuel, now, insideArea, onDirections, onDetai
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Directions to ${station.name}`}
+          accessibilityLabel={t('hero.directionsTo', station.name)}
           onPress={onDirections}
           hitSlop={8}
           testID="nearest-directions"

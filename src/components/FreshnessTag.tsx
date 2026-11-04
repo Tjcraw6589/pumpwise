@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import type { RegionId } from '@/lib/feed';
 import { dailyLabel, freshness, standingLabel, timeAgo } from '@/lib/format';
 import { REGIONS } from '@/lib/regions';
@@ -21,13 +22,13 @@ export function FreshnessTag({ at, region, now, testID }: { at: string; region: 
     ({ text, level } = dailyLabel(at, now, info.utcOffsetMinutes(now)));
   } else if (info.priceMode === 'current') {
     // The source lists the prices in force without saying when each was set (Spain, Mexico).
-    text = 'Current price';
+    text = t('fresh.current');
     level = 'fresh';
   } else if (info.pricesStand) {
     ({ text, level } = standingLabel(at, now, info.trustDays));
   } else {
     level = freshness(at, now, info.trustDays);
-    text = level === 'old' ? `Not confirmed since ${timeAgo(at, now)}` : `Reported ${timeAgo(at, now)}`;
+    text = level === 'old' ? t('fresh.notConfirmedSince', timeAgo(at, now)) : t('fresh.reported', timeAgo(at, now));
   }
   // Where prices stand until changed, an older price is still current: a calm grey dot, not amber.
   const dot = level === 'fresh' ? colors.cheap : level === 'recent' ? (info.pricesStand ? colors.textFaint : colors.accent) : colors.pricey;

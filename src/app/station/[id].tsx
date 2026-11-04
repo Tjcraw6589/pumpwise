@@ -11,6 +11,7 @@ import { Screen } from '@/components/Screen';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNow } from '@/hooks/useNearby';
+import { type PlainKey, t } from '@/i18n';
 import { formatChange, formatPrice, spokenPrice } from '@/lib/format';
 import { distanceKm } from '@/lib/geo';
 import { localClock, openState, weekRows } from '@/lib/hours';
@@ -21,22 +22,22 @@ import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
-const TAG_LABELS: Record<string, { label: string; icon: keyof typeof Ionicons.glyphMap; warn?: boolean }> = {
-  'members-only': { label: 'Members only', icon: 'card-outline', warn: true },
-  'permit-required': { label: 'Entry permit needed', icon: 'document-lock-outline', warn: true },
-  unmanned: { label: 'Unmanned, card only', icon: 'card-outline' },
-  'low-aromatic': { label: 'Low aromatic fuel', icon: 'leaf-outline' },
-  motorway: { label: 'Motorway services', icon: 'car-sport-outline' },
-  supermarket: { label: 'Supermarket', icon: 'cart-outline' },
-  toilets: { label: 'Toilets', icon: 'man-outline' },
-  'car-wash': { label: 'Car wash', icon: 'water-outline' },
-  '24h-fuel': { label: '24-hour pay at pump', icon: 'time-outline' },
-  adblue: { label: 'AdBlue', icon: 'flask-outline' },
-  lpg: { label: 'LPG', icon: 'flame-outline' },
-  air: { label: 'Air', icon: 'speedometer-outline' },
-  water: { label: 'Water', icon: 'water-outline' },
-  atm: { label: 'ATM', icon: 'cash-outline' },
-  truck: { label: 'Truck friendly', icon: 'bus-outline' },
+const TAG_LABELS: Record<string, { label: PlainKey; icon: keyof typeof Ionicons.glyphMap; warn?: boolean }> = {
+  'members-only': { label: 'tag.membersOnly', icon: 'card-outline', warn: true },
+  'permit-required': { label: 'tag.permitEntry', icon: 'document-lock-outline', warn: true },
+  unmanned: { label: 'tag.unmanned', icon: 'card-outline' },
+  'low-aromatic': { label: 'tag.lowAromatic', icon: 'leaf-outline' },
+  motorway: { label: 'tag.motorway', icon: 'car-sport-outline' },
+  supermarket: { label: 'tag.supermarket', icon: 'cart-outline' },
+  toilets: { label: 'tag.toilets', icon: 'man-outline' },
+  'car-wash': { label: 'tag.carWash', icon: 'water-outline' },
+  '24h-fuel': { label: 'tag.payAtPump', icon: 'time-outline' },
+  adblue: { label: 'tag.adblue', icon: 'flask-outline' },
+  lpg: { label: 'tag.lpg', icon: 'flame-outline' },
+  air: { label: 'tag.air', icon: 'speedometer-outline' },
+  water: { label: 'tag.water', icon: 'water-outline' },
+  atm: { label: 'tag.atm', icon: 'cash-outline' },
+  truck: { label: 'tag.truck', icon: 'bus-outline' },
 };
 
 export default function StationScreen() {
@@ -52,8 +53,8 @@ export default function StationScreen() {
   if (!station) {
     return (
       <Screen edges={['top', 'bottom']} testID="station-screen">
-        <Header title="Station" dismiss="close" />
-        <EmptyState icon="help-circle-outline" title="Station not found" body="Prices may have refreshed. Go back and pick it again." />
+        <Header title={t('station.title')} dismiss="close" />
+        <EmptyState icon="help-circle-outline" title={t('station.notFound')} body={t('station.notFoundBody')} />
       </Screen>
     );
   }
@@ -108,10 +109,10 @@ export default function StationScreen() {
           <View style={[styles.boardRow, { paddingBottom: spacing.xs }]}>
             <View style={styles.flex} />
             <AppText variant="overline" style={{ color: colors.signLabel, width: 92, textAlign: 'right' }}>
-              Today
+              {t('station.today')}
             </AppText>
             <AppText variant="overline" style={{ color: colors.signLabel, width: 78, textAlign: 'right' }}>
-              Tomorrow
+              {t('station.tomorrow')}
             </AppText>
           </View>
         ) : null}
@@ -127,12 +128,12 @@ export default function StationScreen() {
               accessibilityState={{ selected: isChosen }}
               accessibilityLabel={[
                 f.label,
-                spokenPrice(price.p, region.priceUnit),
-                next !== undefined ? `tomorrow ${spokenPrice(next, region.priceUnit)}` : null,
+                spokenPrice(price.p, region),
+                next !== undefined ? t('station.tomorrowSpoken', spokenPrice(next, region)) : null,
               ]
                 .filter(Boolean)
                 .join(', ')}
-              accessibilityHint={isChosen ? undefined : 'Makes this your fuel'}
+              accessibilityHint={isChosen ? undefined : t('station.makeYourFuel')}
               onPress={() => updateSettings({ fuel: f.kind })}
               style={[
                 styles.boardRow,
@@ -148,14 +149,14 @@ export default function StationScreen() {
                 </AppText>
               </View>
               <AppText variant="priceXL" style={{ color: isChosen ? colors.signCheap : colors.signDigits, fontSize: 38, lineHeight: 42, width: 92, textAlign: 'right' }}>
-                {formatPrice(price.p)}
+                {formatPrice(price.p, region)}
               </AppText>
               {hasTomorrow ? (
                 <View style={{ width: 78, alignItems: 'flex-end' }}>
                   {next !== undefined ? (
                     <>
                       <AppText variant="stat" style={{ color: '#E9EDF2' }}>
-                        {formatPrice(next)}
+                        {formatPrice(next, region)}
                       </AppText>
                       <AppText variant="small" style={{ color: next < price.p ? colors.signCheap : next > price.p ? '#FF8A80' : colors.signLabel }}>
                         {formatChange(next - price.p)}
@@ -178,13 +179,13 @@ export default function StationScreen() {
         </View>
       ) : (
         <AppText variant="caption" tone="muted" style={{ marginTop: spacing.sm }}>
-          No {fuelOption(region, chosen).label} price at this station.
+          {t('station.noPrice', fuelOption(region, chosen).label)}
         </AppText>
       )}
 
       <View style={{ marginTop: spacing.xl }}>
         <Button
-          label="Directions"
+          label={t('action.directions')}
           variant="accent"
           size="lg"
           fullWidth
@@ -200,7 +201,7 @@ export default function StationScreen() {
       {station.hours ? (
         <View style={{ marginTop: spacing.xl }}>
           <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
-            Opening hours
+            {t('station.hours')}
           </AppText>
           <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md }]}>
             {weekRows(station.hours).map((row, i) => (
@@ -217,10 +218,10 @@ export default function StationScreen() {
         </View>
       ) : null}
 
-      {station.tags.some((t) => TAG_LABELS[t]) ? (
+      {station.tags.some((tag) => TAG_LABELS[tag]) ? (
         <View style={{ marginTop: spacing.xl }}>
           <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
-            At this station
+            {t('station.facilities')}
           </AppText>
           <View style={[styles.tags, { gap: spacing.sm }]}>
             {station.tags.map((tag) => {
@@ -241,7 +242,7 @@ export default function StationScreen() {
                 >
                   <Ionicons name={known.icon} size={14} color={known.warn ? colors.warning : colors.accentText} />
                   <AppText variant="small" style={{ marginLeft: 6 }}>
-                    {known.label}
+                    {t(known.label)}
                   </AppText>
                 </View>
               );
@@ -258,7 +259,7 @@ export default function StationScreen() {
       >
         <Ionicons name="flag-outline" size={18} color={colors.accentText} />
         <View style={[styles.flex, { marginLeft: spacing.sm }]}>
-          <AppText variant="bodyBold">Price wrong at the pump?</AppText>
+          <AppText variant="bodyBold">{t('report.priceWrong')}</AppText>
           <AppText variant="caption" tone="muted">
             {region.report.label}. {region.report.note}
           </AppText>

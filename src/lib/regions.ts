@@ -1,3 +1,6 @@
+import { t } from '@/i18n';
+import { localizeRegion } from '@/i18n/regions';
+
 import { auEasternOffsetMinutes, type FuelKind, isEuropeanSummerTime, type RegionId, regionAt } from './feed';
 import type { Place } from './places';
 
@@ -18,7 +21,12 @@ export type EconomyUnit = 'mpg' | 'l100';
 export interface RegionInfo {
   id: RegionId;
   name: string;
+  /** The symbol, for the rare place money is written by hand. */
   currency: string;
+  /** ISO 4217 code, for formatting money: "AUD", "GBP", "EUR", "MXN". */
+  currencyCode: string;
+  /** How the region writes numbers and money ("en-AU", "es-ES", "fr-FR", "es-MX"). */
+  numberLocale: string;
   /** "p" (pence) or "c" (cents), after a price per litre. */
   priceUnit: string;
   /**
@@ -26,6 +34,8 @@ export interface RegionInfo {
    * 3: whole currency to three decimals, as on European pumps ("€1.659"). 2: two decimals ("$24.59").
    */
   priceDecimals?: 2 | 3;
+  /** Prices on the pumps use a decimal comma ("1,659"): Spain and France. */
+  decimalComma?: boolean;
   distanceUnit: DistanceUnit;
   economyUnit: EconomyUnit;
   fuels: readonly FuelOption[];
@@ -56,6 +66,8 @@ export interface RegionInfo {
   report: { label: string; url: string; note: string };
   /** One-paragraph explanation for the About screen. */
   about: string;
+  /** The name inside a sentence, where it differs ("the United Kingdom"). */
+  nameInSentence?: string;
   cities: readonly Place[];
 }
 
@@ -68,11 +80,14 @@ export function spainOffsetMinutes(date: Date, lng?: number): number {
   return base + (isEuropeanSummerTime(date) ? 60 : 0);
 }
 
-export const REGIONS: Record<RegionId, RegionInfo> = {
+/** Every region as written here, in English. The app reads `REGIONS`, in the phone's language. */
+const BASE_REGIONS: Record<RegionId, RegionInfo> = {
   wa: {
     id: 'wa',
     name: 'Western Australia',
     currency: '$',
+    currencyCode: 'AUD',
+    numberLocale: 'en-AU',
     priceUnit: 'c',
     distanceUnit: 'km',
     economyUnit: 'l100',
@@ -118,6 +133,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'nsw',
     name: 'New South Wales',
     currency: '$',
+    currencyCode: 'AUD',
+    numberLocale: 'en-AU',
     priceUnit: 'c',
     distanceUnit: 'km',
     economyUnit: 'l100',
@@ -170,6 +187,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'tas',
     name: 'Tasmania',
     currency: '$',
+    currencyCode: 'AUD',
+    numberLocale: 'en-AU',
     priceUnit: 'c',
     distanceUnit: 'km',
     economyUnit: 'l100',
@@ -211,6 +230,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'qld',
     name: 'Queensland',
     currency: '$',
+    currencyCode: 'AUD',
+    numberLocale: 'en-AU',
     priceUnit: 'c',
     distanceUnit: 'km',
     economyUnit: 'l100',
@@ -258,7 +279,10 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
   uk: {
     id: 'uk',
     name: 'United Kingdom',
+    nameInSentence: 'the United Kingdom',
     currency: '£',
+    currencyCode: 'GBP',
+    numberLocale: 'en-GB',
     priceUnit: 'p',
     distanceUnit: 'mi',
     economyUnit: 'mpg',
@@ -297,8 +321,11 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'es',
     name: 'Spain',
     currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'es-ES',
     priceUnit: 'c',
     priceDecimals: 3,
+    decimalComma: true,
     distanceUnit: 'km',
     economyUnit: 'l100',
     fuels: [
@@ -352,8 +379,11 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'fr',
     name: 'France',
     currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'fr-FR',
     priceUnit: 'c',
     priceDecimals: 3,
+    decimalComma: true,
     distanceUnit: 'km',
     economyUnit: 'l100',
     fuels: [
@@ -405,6 +435,8 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     id: 'mx',
     name: 'Mexico',
     currency: '$',
+    currencyCode: 'MXN',
+    numberLocale: 'es-MX',
     priceUnit: 'c',
     priceDecimals: 2,
     distanceUnit: 'km',
@@ -448,6 +480,11 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
   },
 };
 
+/** Every region, with its names and explanations in the phone's language. */
+export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
+  Object.entries(BASE_REGIONS).map(([id, info]) => [id, localizeRegion(info)]),
+) as Record<RegionId, RegionInfo>;
+
 /** Where Pumpwise starts before it knows better: the first region to go live. */
 export const DEFAULT_REGION: RegionId = 'wa';
 
@@ -479,7 +516,7 @@ export function fuelChipLabel(region: RegionInfo, kind: FuelKind): string {
 
 /** Names of live regions, joined for a sentence: "Western Australia and the United Kingdom". */
 export function regionList(ids: readonly RegionId[]): string {
-  const names = ids.map((id) => (id === 'uk' ? 'the United Kingdom' : REGIONS[id].name));
+  const names = ids.map((id) => REGIONS[id].nameInSentence ?? REGIONS[id].name);
   if (names.length <= 1) return names[0] ?? REGIONS[DEFAULT_REGION].name;
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+  return t('list.join', names.slice(0, -1).join(', '), names[names.length - 1] as string);
 }

@@ -18,41 +18,39 @@ import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useDirections } from '@/hooks/useDirections';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
+import { localNumber, type PlainKey, t } from '@/i18n';
 import { formatChange, formatMoney, spokenPrice, timeAgo } from '@/lib/format';
 import { feedWarning } from '@/lib/nearby';
 import { priceBands, type RankedStation, type SortMode, sortStations, type Trend } from '@/lib/ranking';
-import { fuelOption, type RegionInfo } from '@/lib/regions';
+import { fuelOption, REGIONS, type RegionInfo } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
 import { initializeAds } from '@/services/ads';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
-const SORTS: readonly { key: SortMode; label: string }[] = [
-  { key: 'price', label: 'Cheapest' },
-  { key: 'distance', label: 'Closest' },
-  { key: 'value', label: 'Best value' },
+const SORTS: readonly { key: SortMode; label: PlainKey }[] = [
+  { key: 'price', label: 'sort.cheapest' },
+  { key: 'distance', label: 'sort.closest' },
+  { key: 'value', label: 'sort.value' },
 ];
 
 function TrendNotice({ trend, region, fuelLabel }: { trend: Trend; region: RegionInfo; fuelLabel: string }) {
   const unit = region.priceUnit;
   const rises = trend.change > 0.5;
   const drops = trend.change < -0.5;
-  const text = drops
-    ? `Tomorrow ${fuelLabel} drops about ${formatChange(trend.change).slice(1)}${unit} around here. Wait if you can.`
-    : rises
-      ? `Tomorrow ${fuelLabel} rises about ${formatChange(trend.change).slice(1)}${unit} around here. Fill up today.`
-      : `Tomorrow's ${fuelLabel} prices around here are about the same as today.`;
+  const amount = `${localNumber(formatChange(trend.change).slice(1))}${unit}`;
+  const text = drops ? t('trend.drops', fuelLabel, amount) : rises ? t('trend.rises', fuelLabel, amount) : t('trend.same', fuelLabel);
   return <Notice tone={rises ? 'warning' : drops ? 'good' : 'info'} icon={drops ? 'trending-down' : rises ? 'trending-up' : 'calendar-outline'} text={text} testID="trend-notice" />;
 }
 
 function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => void }) {
   const { colors, spacing, radius } = useTheme();
-  const region = useRegion();
+  const region = REGIONS[item.station.region];
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Best value once you count the drive: ${item.station.name}, ${spokenPrice(item.price.p, region.priceUnit)}, ${formatDistance(item.distance, region.distanceUnit)}, ${formatMoney(item.realCost, region.currency)} with the fuel to get there and back`}
+      accessibilityLabel={`${t('value.title')}: ${item.station.name}, ${spokenPrice(item.price.p, region)}, ${formatDistance(item.distance, region.distanceUnit)}, ${t('value.withDrive', formatMoney(item.realCost, region))}`}
       onPress={onPress}
       testID="best-value-row"
       style={({ pressed }) => [
@@ -68,16 +66,16 @@ function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => v
     >
       <View style={styles.flex}>
         <AppText variant="overline" tone="cheap">
-          Best value once you count the drive
+          {t('value.title')}
         </AppText>
         <AppText variant="bodyBold" numberOfLines={1} style={{ marginTop: spacing.xs }}>
           {item.station.name}
         </AppText>
         <AppText variant="caption" tone="muted">
-          {formatDistance(item.distance, region.distanceUnit)} · {formatMoney(item.realCost, region.currency)} with the fuel to get there and back
+          {formatDistance(item.distance, region.distanceUnit)} · {t('value.withDrive', formatMoney(item.realCost, region))}
         </AppText>
       </View>
-      <PriceSign pence={item.price.p} size="sm" />
+      <PriceSign pence={item.price.p} region={region} size="sm" />
     </Pressable>
   );
 }
@@ -132,7 +130,7 @@ export default function NearbyScreen() {
         </AppText>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Refresh prices"
+          accessibilityLabel={t('nearby.refresh')}
           onPress={requestRefresh}
           hitSlop={10}
           testID="refresh"
@@ -143,7 +141,7 @@ export default function NearbyScreen() {
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Searching ${areaLabel}. Change place`}
+        accessibilityLabel={t('nearby.searching', areaLabel)}
         onPress={() => router.push('/place')}
         hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
         testID="place-chip"
@@ -156,7 +154,7 @@ export default function NearbyScreen() {
         <Ionicons name="chevron-down" size={14} color={colors.textMuted} style={{ marginLeft: 2 }} />
         {loadedAt && meta && phase === 'ready' ? (
           <AppText variant="caption" tone="muted" numberOfLines={1} style={{ marginLeft: 6 }} testID="checked-line">
-            · checked {timeAgo(new Date(loadedAt).toISOString(), now)}
+            {t('nearby.checked', timeAgo(new Date(loadedAt).toISOString(), now))}
           </AppText>
         ) : null}
       </Pressable>
@@ -166,8 +164,8 @@ export default function NearbyScreen() {
       {feedError && phase === 'ready' && loadedAt ? (
         <Notice
           tone="warning"
-          text={`Couldn't update. Showing prices from ${timeAgo(new Date(loadedAt).toISOString(), now)}.`}
-          action={{ label: 'Retry', onPress: requestRefresh }}
+          text={t('nearby.couldntUpdate', timeAgo(new Date(loadedAt).toISOString(), now))}
+          action={{ label: t('action.retry'), onPress: requestRefresh }}
           testID="stale-notice"
         />
       ) : null}
@@ -195,7 +193,7 @@ export default function NearbyScreen() {
           ) : (
             <Notice
               icon="moon-outline"
-              text={`Every station within ${radiusLabel(settings.radiusKm, region.distanceUnit)} is closed right now, members only, or hasn't confirmed its price lately.`}
+              text={t('nearby.allClosed', radiusLabel(settings.radiusKm, region.distanceUnit))}
             />
           )}
           {nearest && nearest.station.id !== cheapest?.station.id ? (
@@ -214,13 +212,13 @@ export default function NearbyScreen() {
 
           <View style={[styles.listHeader, { marginTop: spacing.xl, marginBottom: spacing.sm }]}>
             <AppText variant="h2" style={styles.flex}>
-              All nearby
+              {t('nearby.allNearby')}
             </AppText>
             <AppText variant="caption" tone="muted" testID="station-count">
-              {list.length} {list.length === 1 ? 'station' : 'stations'} · {radiusLabel(settings.radiusKm, region.distanceUnit)}
+              {t('nearby.stations', list.length)} · {radiusLabel(settings.radiusKm, region.distanceUnit)}
             </AppText>
           </View>
-          <SegmentedControl options={SORTS} value={settings.sortBy} onChange={(sortBy) => updateSettings({ sortBy })} testID="sort" />
+          <SegmentedControl options={SORTS.map((s) => ({ key: s.key, label: t(s.label) }))} value={settings.sortBy} onChange={(sortBy) => updateSettings({ sortBy })} testID="sort" />
           <View style={{ height: spacing.md }} />
         </View>
       )}
@@ -239,11 +237,11 @@ export default function NearbyScreen() {
           </AppText>
         </Pressable>
         <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.sm }}>
-          Distances are in a straight line.
+          {t('nearby.straightLine')}
         </AppText>
         <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.report.url)} hitSlop={8} testID="report-link">
           <AppText variant="small" tone="accent" align="center" style={{ marginTop: spacing.sm }}>
-            Price wrong at the pump? {region.report.label}
+            {t('report.priceWrong')} {region.report.label}
           </AppText>
         </Pressable>
       </View>

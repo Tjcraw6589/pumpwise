@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -29,7 +30,7 @@ export function Header({ title, dismiss, onDismiss, right, large = false }: Head
       {dismiss ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={dismiss === 'back' ? 'Back' : 'Close'}
+          accessibilityLabel={dismiss === 'back' ? t('action.back') : t('action.close')}
           hitSlop={12}
           onPress={handleDismiss}
           style={{ marginRight: spacing.sm }}

@@ -1,7 +1,8 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { useRegion } from '@/hooks/useRegion';
-import { formatPrice, spokenPrice } from '@/lib/format';
+import { priceParts, spokenPrice } from '@/lib/format';
+import type { RegionInfo } from '@/lib/regions';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -10,14 +11,14 @@ export type SignTone = 'cheap' | 'normal' | 'muted';
 export type SignSize = 'xl' | 'lg' | 'md' | 'sm';
 
 interface PriceSignProps {
-  /** Price per litre in pence or cents. */
+  /** Price per litre in the feed's hundredths: cents, pence or centavos. */
   pence: number;
   tone?: SignTone;
   size?: SignSize;
   /** Small label under the digits, such as "E10". */
   label?: string;
-  /** "c" or "p", for screen readers. Defaults to the unit where the search is. */
-  unit?: string;
+  /** Whose pumps the sign copies (cents, euros or pesos). Defaults to the region where the search is. */
+  region?: RegionInfo;
   style?: ViewStyle;
   testID?: string;
 }
@@ -30,20 +31,22 @@ const SIZES: Record<SignSize, { digits: number; tenth: number; padH: number; pad
 };
 
 /**
- * A forecourt price sign: lit digits on a dark panel, whole pence large and the tenth of a penny
- * smaller, as on UK pole signs. Always dark, in light and dark mode alike.
+ * A forecourt price sign: lit digits on a dark panel, the tail smaller, as the region's own pumps
+ * print it: "189" and ".9" (cents), "1,65" and "9" (euros), "24" and ".59" (pesos). Always dark,
+ * in light and dark mode alike.
  */
-export function PriceSign({ pence, tone = 'normal', size = 'md', label, unit, style, testID }: PriceSignProps) {
+export function PriceSign({ pence, tone = 'normal', size = 'md', label, region, style, testID }: PriceSignProps) {
   const { colors, fonts, radius } = useTheme();
-  const region = useRegion();
+  const here = useRegion();
+  const info = region ?? here;
   const s = SIZES[size];
-  const [whole, tenth] = formatPrice(pence).split('.');
+  const { main, tail } = priceParts(pence, info);
   const digitColor = tone === 'cheap' ? colors.signCheap : tone === 'muted' ? colors.signLabel : colors.signDigits;
   return (
     <View
       testID={testID}
       accessible
-      accessibilityLabel={spokenPrice(pence, unit ?? region.priceUnit)}
+      accessibilityLabel={spokenPrice(pence, info)}
       style={[
         styles.panel,
         {
@@ -62,20 +65,22 @@ export function PriceSign({ pence, tone = 'normal', size = 'md', label, unit, st
           style={{ fontFamily: fonts.display, fontSize: s.digits, lineHeight: s.digits * 1.05, color: digitColor, letterSpacing: 1 }}
           maxFontSizeMultiplier={1.2}
         >
-          {whole}
+          {main}
         </AppText>
-        <AppText
-          style={{
-            fontFamily: fonts.display,
-            fontSize: s.tenth,
-            lineHeight: s.tenth * 1.05,
-            color: digitColor,
-            marginBottom: s.digits * 0.07,
-          }}
-          maxFontSizeMultiplier={1.2}
-        >
-          .{tenth}
-        </AppText>
+        {tail ? (
+          <AppText
+            style={{
+              fontFamily: fonts.display,
+              fontSize: s.tenth,
+              lineHeight: s.tenth * 1.05,
+              color: digitColor,
+              marginBottom: s.digits * 0.07,
+            }}
+            maxFontSizeMultiplier={1.2}
+          >
+            {tail}
+          </AppText>
+        ) : null}
       </View>
       {label ? (
         <AppText

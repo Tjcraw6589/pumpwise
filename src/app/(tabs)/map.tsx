@@ -16,9 +16,10 @@ import { useDirections } from '@/hooks/useDirections';
 import { useSearchCenter } from '@/hooks/useLiveController';
 import { useNearby } from '@/hooks/useNearby';
 import { useRegion } from '@/hooks/useRegion';
+import { t } from '@/i18n';
 import { spokenPrice } from '@/lib/format';
 import { priceBands } from '@/lib/ranking';
-import { fuelOption } from '@/lib/regions';
+import { fuelOption, REGIONS } from '@/lib/regions';
 import { formatDistance, radiusLabel } from '@/lib/units';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
@@ -44,6 +45,7 @@ export default function MapScreen() {
   const selected = stations.find((r) => r.station.id === selectedId) ?? ranking?.cheapest ?? null;
   const isCheapest = selected?.station.id === ranking?.cheapest?.station.id;
   const showMap = (phase === 'ready' || phase === 'empty') && center;
+  const selectedRegion = selected ? REGIONS[selected.station.region] : region;
   const keepIds = useMemo(() => [ranking?.cheapest?.station.id, ranking?.nearest?.station.id], [ranking]);
 
   return (
@@ -105,7 +107,7 @@ export default function MapScreen() {
         >
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Recentre map"
+            accessibilityLabel={t('map.recentre')}
             onPress={() => setRecenterToken((t) => t + 1)}
             testID="recenter"
             style={[styles.fab, { backgroundColor: colors.surface, borderColor: colors.border, marginBottom: spacing.sm }]}
@@ -122,15 +124,15 @@ export default function MapScreen() {
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`${isCheapest ? 'Cheapest' : 'Selected'}: ${selected.station.name}, ${spokenPrice(selected.price.p, region.priceUnit)}, ${[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(', ')}`}
-                accessibilityHint="Opens the station's prices and hours"
+                accessibilityLabel={`${isCheapest ? t('map.cheapest') : t('map.selected')}: ${selected.station.name}, ${spokenPrice(selected.price.p, selectedRegion)}, ${[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(', ')}`}
+                accessibilityHint={t('a11y.opensStation')}
                 onPress={() => router.push({ pathname: '/station/[id]', params: { id: selected.station.id } })}
                 style={styles.row}
               >
-                <PriceSign pence={selected.price.p} size="md" tone={isCheapest ? 'cheap' : 'normal'} label={fuelOption(region, settings.fuel).pumpCode} />
+                <PriceSign pence={selected.price.p} region={selectedRegion} size="md" tone={isCheapest ? 'cheap' : 'normal'} label={fuelOption(region, settings.fuel).pumpCode} />
                 <View style={[styles.flex, { marginLeft: spacing.md }]}>
                   <AppText variant="overline" tone={isCheapest ? 'cheap' : 'muted'}>
-                    {isCheapest ? `Cheapest within ${radiusLabel(settings.radiusKm, region.distanceUnit)}` : 'Selected station'}
+                    {isCheapest ? t('hero.cheapestWithin', radiusLabel(settings.radiusKm, region.distanceUnit)) : t('map.selectedStation')}
                   </AppText>
                   <AppText variant="bodyBold" numberOfLines={1} testID="map-card-name">
                     {selected.station.name}
@@ -142,7 +144,7 @@ export default function MapScreen() {
                 </View>
               </Pressable>
               <Button
-                label="Directions"
+                label={t('action.directions')}
                 variant="accent"
                 fullWidth
                 onPress={() => directions(selected.station)}
@@ -153,9 +155,9 @@ export default function MapScreen() {
             </View>
           ) : phase === 'empty' ? (
             <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.xl, padding: spacing.lg }]}>
-              <AppText variant="bodyBold">Nothing within {radiusLabel(settings.radiusKm, region.distanceUnit)}</AppText>
+              <AppText variant="bodyBold">{t('state.emptyTitle', radiusLabel(settings.radiusKm, region.distanceUnit))}</AppText>
               <AppText variant="caption" tone="muted">
-                Try a wider area with the chip at the top.
+                {t('map.tryWider')}
               </AppText>
             </View>
           ) : null}

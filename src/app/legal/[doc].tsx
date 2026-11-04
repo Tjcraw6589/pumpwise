@@ -5,6 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Header } from '@/components/Header';
 import { Screen } from '@/components/Screen';
 import { LEGAL_DOCS } from '@/content/legal.generated';
+import { t } from '@/i18n';
 import { useTheme } from '@/theme/useTheme';
 
 /** Renders the small Markdown subset used by the legal documents: #, ##, ###, "- " bullets and paragraphs. */
@@ -62,10 +63,15 @@ export default function LegalScreen() {
   const entry = doc === 'terms' ? LEGAL_DOCS.terms : LEGAL_DOCS.privacy;
   return (
     <Screen scroll edges={['top', 'bottom']} testID="legal-screen">
-      <Header title={entry.title} dismiss="back" />
+      <Header title={doc === 'terms' ? t('legal.terms') : t('legal.privacy')} dismiss="back" />
       <AppText variant="caption" tone="muted" style={{ marginBottom: spacing.sm }}>
-        Last updated {entry.updated}
+        {t('legal.updated', entry.updated)}
       </AppText>
+      {t('legal.englishOnly') ? (
+        <AppText variant="caption" tone="muted" style={{ marginBottom: spacing.sm }} testID="legal-english-only">
+          {t('legal.englishOnly')}
+        </AppText>
+      ) : null}
       <MarkdownLite source={entry.markdown} />
       <View style={{ height: spacing.xxl }} />
     </Screen>

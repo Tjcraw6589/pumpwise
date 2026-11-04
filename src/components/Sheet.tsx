@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Animated, Modal, PanResponder, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -41,7 +42,7 @@ export function Sheet({ visible, onClose, title, children, maxHeightRatio = 0.85
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <View style={styles.root}>
-        <Pressable accessibilityLabel="Close" style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]} onPress={onClose} />
+        <Pressable accessibilityLabel={t('action.close')} style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]} onPress={onClose} />
         <Animated.View
           testID={testID}
           style={[
@@ -60,7 +61,7 @@ export function Sheet({ visible, onClose, title, children, maxHeightRatio = 0.85
             {title ? (
               <View style={[styles.header, { paddingHorizontal: spacing.lg, marginBottom: spacing.sm }]}>
                 <AppText variant="h3">{title}</AppText>
-                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} testID={testID ? `${testID}-close` : undefined}>
+                <Pressable accessibilityRole="button" accessibilityLabel={t('action.close')} onPress={onClose} hitSlop={12} testID={testID ? `${testID}-close` : undefined}>
                   <Ionicons name="close" size={22} color={colors.textMuted} />
                 </Pressable>
               </View>

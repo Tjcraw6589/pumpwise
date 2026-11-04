@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Pumpwise",
+    "NSLocationWhenInUseUsageDescription": "Pumpwise usa tu ubicación mientras la app está abierta para mostrarte las gasolineras más cercanas y las más baratas a tu alrededor. Tu ubicación exacta no sale de tu iPhone.",
+    "NSUserTrackingUsageDescription": "Pumpwise muestra un pequeño anuncio para seguir siendo gratis. Si permites el rastreo, ese anuncio puede ser más relevante. Tu ubicación y tus ajustes nunca salen de tu iPhone, permitas o no."
+  }
+}

@@ -2,12 +2,16 @@ import { StyleSheet, View } from 'react-native';
 
 import { formatPrice } from '@/lib/format';
 import type { PriceBand } from '@/lib/ranking';
+import type { RegionInfo } from '@/lib/regions';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
 
-/** A small price sign with a pointer, used as a map marker. Green digits for the cheapest quarter. */
-export function MapPin({ pence, band, selected, stale }: { pence: number; band: PriceBand; selected: boolean; stale: boolean }) {
+/**
+ * A small price sign with a pointer, used as a map marker, written as the station's region writes
+ * prices ("189.9", "1,659", "24.59"). Green digits for the cheapest quarter.
+ */
+export function MapPin({ pence, region, band, selected, stale }: { pence: number; region: RegionInfo; band: PriceBand; selected: boolean; stale: boolean }) {
   const { colors, fonts } = useTheme();
   const digit = stale ? colors.signLabel : band === 'low' ? colors.signCheap : band === 'high' ? '#FF8A80' : colors.signDigits;
   return (
@@ -25,7 +29,7 @@ export function MapPin({ pence, band, selected, stale }: { pence: number; band: 
         ]}
       >
         <AppText style={{ fontFamily: fonts.display, fontSize: selected ? 19 : 15, lineHeight: selected ? 22 : 18, color: digit }} maxFontSizeMultiplier={1}>
-          {formatPrice(pence)}
+          {formatPrice(pence, region)}
         </AppText>
       </View>
       <View style={[styles.pointer, { borderTopColor: selected ? colors.accent : colors.sign }]} />

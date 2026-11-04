@@ -1,3 +1,5 @@
+import { t } from '@/i18n';
+
 import { type RegionId, regionAt } from './feed';
 import { timeAgo } from './format';
 import { distanceKm, type LatLng } from './geo';
@@ -86,10 +88,10 @@ export function feedWarning(generatedAt: string, region: RegionInfo, now: Date, 
     if (since < 0) since += 86_400;
     const dayStart = now.getTime() - since * 1000;
     // Prices start on the hour, so allow a minute of slack.
-    return latest < dayStart - 60_000 ? "Today's prices haven't come through yet. Showing the last ones we have." : null;
+    return latest < dayStart - 60_000 ? t('warn.todayMissing') : null;
   }
   const built = Date.parse(generatedAt);
   if (!Number.isFinite(built)) return null;
   const hours = (now.getTime() - built) / 3_600_000;
-  return hours > 2 ? `The price feed last updated ${timeAgo(generatedAt, now)}. Prices may have changed since.` : null;
+  return hours > 2 ? t('warn.feedOld', timeAgo(generatedAt, now)) : null;
 }

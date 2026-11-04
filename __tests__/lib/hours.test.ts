@@ -30,7 +30,7 @@ describe('openState', () => {
 
   test('24 hours and normal hours', () => {
     expect(openState(WEEK('24h'), noon, PERTH)).toEqual({ status: 'open', label: 'Open 24 hours' });
-    expect(openState(WEEK('0600-2200'), noon, PERTH)).toEqual({ status: 'open', label: 'Open until 22:00' });
+    expect(openState(WEEK('0600-2200'), noon, PERTH)).toEqual({ status: 'open', label: 'Open until 22:00', until: '22:00' });
   });
   test('before opening and after closing', () => {
     expect(openState(WEEK('1300-2200'), noon, PERTH)).toEqual({ status: 'closed', label: 'Closed · opens 13:00' });
@@ -38,7 +38,7 @@ describe('openState', () => {
   });
   test('a shift that runs past midnight', () => {
     const lateNight = new Date('2026-12-02T17:00:00Z'); // Thursday 01:00 in Perth
-    expect(openState(WEEK('1800-0300'), lateNight, PERTH)).toEqual({ status: 'open', label: 'Open until 03:00' });
+    expect(openState(WEEK('1800-0300'), lateNight, PERTH)).toEqual({ status: 'open', label: 'Open until 03:00', until: '03:00' });
   });
   test('closed days look ahead to the next opening', () => {
     const hours = ['0700-1900', '0700-1900', 'closed', 'closed', '0800-1800', '0800-1800', '0800-1800'];

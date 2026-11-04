@@ -10,19 +10,23 @@ import { SegmentedControl } from '@/components/SegmentedControl';
 import { APP_VERSION, SUPPORT_EMAIL } from '@/config/app';
 import { useAreaLabel } from '@/hooks/useAreaLabel';
 import { useRegion } from '@/hooks/useRegion';
+import { type PlainKey, t } from '@/i18n';
 import { formatMoney } from '@/lib/format';
 import { fuelChipLabel, fuelOption } from '@/lib/regions';
-import { economyLabel, economyToL100, formatDistance, sameEconomy, sameRadius, toKm } from '@/lib/units';
+import { economyLabel, economyToL100, radiusLabel, sameEconomy, sameRadius, toKm } from '@/lib/units';
 import { showAdPrivacyOptions, usePrivacyOptionsRequired } from '@/services/ads';
 import { DIRECTIONS_APPS } from '@/services/directions';
 import { FILL_OPTIONS, type ThemePreference, useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
-const THEMES: readonly { key: ThemePreference; label: string }[] = [
-  { key: 'system', label: 'Automatic' },
-  { key: 'light', label: 'Light' },
-  { key: 'dark', label: 'Dark' },
+const THEMES: readonly { key: ThemePreference; label: PlainKey }[] = [
+  { key: 'system', label: 'theme.system' },
+  { key: 'light', label: 'theme.light' },
+  { key: 'dark', label: 'theme.dark' },
 ];
+
+/** A typical price per litre in each currency, to put "best value" in money. */
+const TYPICAL_PRICE: Record<string, number> = { AUD: 2.0, GBP: 1.4, EUR: 1.7, MXN: 24 };
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   const { spacing } = useTheme();
@@ -66,14 +70,14 @@ function LinkRow({ icon, label, detail, onPress, testID }: { icon: keyof typeof 
 
 /** Asks before wiping every setting, since one stray tap would otherwise lose them. */
 function confirmReset(reset: () => void): void {
-  const message = 'Your fuel, search area, fill-up, car and maps app go back to the defaults.';
+  const message = t('settings.resetMessage');
   if (Platform.OS === 'web') {
-    if (globalThis.confirm?.(`Reset settings? ${message}`) ?? true) reset();
+    if (globalThis.confirm?.(`${t('settings.resetTitle')} ${message}`) ?? true) reset();
     return;
   }
-  Alert.alert('Reset settings?', message, [
-    { text: 'Cancel', style: 'cancel' },
-    { text: 'Reset', style: 'destructive', onPress: reset },
+  Alert.alert(t('settings.resetTitle'), message, [
+    { text: t('action.cancel'), style: 'cancel' },
+    { text: t('settings.resetConfirm'), style: 'destructive', onPress: reset },
   ]);
 }
 
@@ -90,21 +94,21 @@ export default function SettingsScreen() {
   const distanceUnit = region.distanceUnit;
   const card = { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth };
   // What one extra mile or kilometre (there and back) costs at a typical price, to make "best value" concrete.
-  const typicalPrice = region.id === 'wa' ? 2.0 : 1.4;
+  const typicalPrice = TYPICAL_PRICE[region.currencyCode] ?? 1.7;
   const unitCost = 2 * toKm(1, distanceUnit) * (settings.economyL100 / 100) * typicalPrice;
 
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={[styles.flex, { backgroundColor: colors.background }]} testID="settings-screen">
       <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl }} showsVerticalScrollIndicator={false}>
         <AppText variant="title" style={{ marginTop: spacing.sm }}>
-          Settings
+          {t('settings.title')}
         </AppText>
 
         <AppText variant="caption" tone="muted" style={{ marginTop: spacing.xs }}>
-          Showing {region.name} fuels and units.
+          {t('settings.showing', region.name)}
         </AppText>
 
-        <Section title="Your fuel">
+        <Section title={t('settings.fuel')}>
           <View style={styles.wrap}>
             {region.fuels.map((f) => (
               <View key={f.kind} style={styles.chipGap}>
@@ -114,12 +118,12 @@ export default function SettingsScreen() {
           </View>
         </Section>
 
-        <Section title="Search area" hint="How far to look for the cheapest station. The nearest one is always shown.">
+        <Section title={t('search.area')} hint={t('settings.areaHint')}>
           <View style={styles.wrap}>
             {region.radiusOptions.map((r) => (
               <View key={r} style={styles.chipGap}>
                 <Chip
-                  label={`${r} ${distanceUnit}`}
+                  label={radiusLabel(toKm(r, distanceUnit), distanceUnit)}
                   selected={sameRadius(settings.radiusKm, r, distanceUnit)}
                   onPress={() => updateSettings({ radiusKm: toKm(r, distanceUnit) })}
                   testID={`settings-radius-${r}`}
@@ -129,7 +133,7 @@ export default function SettingsScreen() {
           </View>
         </Section>
 
-        <Section title="Typical fill-up" hint="Used to show what you save.">
+        <Section title={t('settings.fill')} hint={t('settings.fillHint')}>
           <View style={styles.wrap}>
             {FILL_OPTIONS.map((l) => (
               <View key={l} style={styles.chipGap}>
@@ -140,8 +144,8 @@ export default function SettingsScreen() {
         </Section>
 
         <Section
-          title={region.economyUnit === 'mpg' ? "Your car's miles per gallon" : "Your car's fuel use"}
-          hint={`"Best value" adds the fuel to drive there and back. Each extra ${formatDistance(toKm(1, distanceUnit), distanceUnit).replace('1.0 ', '')} costs about ${formatMoney(unitCost, region.currency)} there and back.`}
+          title={region.economyUnit === 'mpg' ? t('settings.mpg') : t('settings.economy')}
+          hint={t('settings.economyHint', distanceUnit, formatMoney(unitCost, region))}
         >
           <View style={styles.wrap}>
             {region.economyOptions.map((m) => (
@@ -157,10 +161,10 @@ export default function SettingsScreen() {
           </View>
         </Section>
 
-        <Section title="Members-only stations" hint="Some stations, like Costco, only sell to members. Turn this on if you are one.">
+        <Section title={t('settings.members')} hint={t('settings.membersHint')}>
           <View style={[card, styles.switchRow, { paddingHorizontal: spacing.md, paddingVertical: spacing.sm }]}>
             <AppText variant="body" style={styles.flex}>
-              Include members-only stations
+              {t('settings.includeMembers')}
             </AppText>
             <Switch
               value={settings.includeMembersOnly}
@@ -168,20 +172,20 @@ export default function SettingsScreen() {
               trackColor={{ true: colors.accent, false: colors.border }}
               thumbColor="#FFFFFF"
               testID="settings-members"
-              accessibilityLabel="Include members-only stations"
+              accessibilityLabel={t('settings.includeMembers')}
             />
           </View>
         </Section>
 
-        <Section title="Directions open in">
+        <Section title={t('settings.directions')}>
           <SegmentedControl options={DIRECTIONS_APPS} value={settings.directionsApp} onChange={(key) => updateSettings({ directionsApp: key })} testID="settings-directions" />
         </Section>
 
-        <Section title="Search around">
+        <Section title={t('place.title')}>
           <View style={card}>
             <LinkRow
               icon={settings.locationMode === 'gps' ? 'locate' : 'map'}
-              label={settings.locationMode === 'gps' ? 'My location' : 'A chosen place'}
+              label={settings.locationMode === 'gps' ? t('settings.myLocation') : t('settings.chosenPlace')}
               detail={areaLabel}
               onPress={() => router.push('/place')}
               testID="settings-place"
@@ -189,22 +193,22 @@ export default function SettingsScreen() {
           </View>
         </Section>
 
-        <Section title="Appearance">
-          <SegmentedControl options={THEMES} value={settings.theme} onChange={(theme) => updateSettings({ theme })} testID="theme" />
+        <Section title={t('settings.appearance')}>
+          <SegmentedControl options={THEMES.map((o) => ({ key: o.key, label: t(o.label) }))} value={settings.theme} onChange={(theme) => updateSettings({ theme })} testID="theme" />
         </Section>
 
-        <Section title="About">
+        <Section title={t('settings.about')}>
           <View style={card}>
-            <LinkRow icon="information-circle-outline" label="Where the prices come from" onPress={() => router.push('/about')} testID="settings-about" />
-            <LinkRow icon="flag-outline" label="Report a wrong price" detail={region.source.name} onPress={() => void Linking.openURL(region.report.url)} />
-            <LinkRow icon="shield-checkmark-outline" label="Privacy" onPress={() => router.push('/legal/privacy')} testID="settings-privacy" />
+            <LinkRow icon="information-circle-outline" label={t('settings.whereFrom')} onPress={() => router.push('/about')} testID="settings-about" />
+            <LinkRow icon="flag-outline" label={t('settings.report')} detail={region.source.name} onPress={() => void Linking.openURL(region.report.url)} />
+            <LinkRow icon="shield-checkmark-outline" label={t('settings.privacy')} onPress={() => router.push('/legal/privacy')} testID="settings-privacy" />
             {adPrivacyRequired ? (
-              <LinkRow icon="options-outline" label="Ad privacy choices" onPress={() => void showAdPrivacyOptions()} testID="settings-ad-privacy" />
+              <LinkRow icon="options-outline" label={t('settings.adPrivacy')} onPress={() => void showAdPrivacyOptions()} testID="settings-ad-privacy" />
             ) : null}
-            <LinkRow icon="document-text-outline" label="Terms of use" onPress={() => router.push('/legal/terms')} testID="settings-terms" />
+            <LinkRow icon="document-text-outline" label={t('settings.terms')} onPress={() => router.push('/legal/terms')} testID="settings-terms" />
             <LinkRow
               icon="mail-outline"
-              label="Contact support"
+              label={t('settings.contact')}
               onPress={() => void Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Pumpwise')}`)}
             />
           </View>
@@ -218,11 +222,11 @@ export default function SettingsScreen() {
           testID="settings-reset"
         >
           <AppText variant="small" tone="muted">
-            Reset settings
+            {t('settings.reset')}
           </AppText>
         </Pressable>
         <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.lg }}>
-          Pumpwise {APP_VERSION} · No account. A small ad keeps it free.
+          {t('settings.footer', APP_VERSION)}
         </AppText>
       </ScrollView>
     </SafeAreaView>

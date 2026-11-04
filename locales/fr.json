@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Pumpwise",
+    "NSLocationWhenInUseUsageDescription": "Pumpwise utilise votre position quand l’app est ouverte pour afficher les stations les plus proches et les moins chères autour de vous. Votre position exacte reste sur votre iPhone.",
+    "NSUserTrackingUsageDescription": "Pumpwise affiche une petite publicité pour rester gratuite. Autoriser le suivi rend cette publicité plus pertinente. Votre position et vos réglages ne quittent jamais votre iPhone, dans tous les cas."
+  }
+}

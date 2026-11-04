@@ -9,11 +9,24 @@ import { askForLocation } from '@/components/PhaseState';
 import { PriceSign } from '@/components/PriceSign';
 import { PumpMark } from '@/components/PumpMark';
 import { type Coverage, coverageOf, useCoverage } from '@/hooks/useRegion';
-import { DEFAULT_REGION, REGIONS, regionList } from '@/lib/regions';
+import { deviceCountry, t } from '@/i18n';
+import type { RegionId } from '@/lib/feed';
+import { DEFAULT_REGION, type RegionInfo, REGIONS, regionList } from '@/lib/regions';
 import { fetchMeta } from '@/services/feedClient';
 import { selectionHaptic } from '@/services/haptics';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
+
+/** Where a new user probably is, from the phone's country, so the welcome shows their fuels and money. */
+const COUNTRY_REGION: Record<string, RegionId> = { AU: 'wa', ES: 'es', FR: 'fr', MX: 'mx', GB: 'uk' };
+
+/** Two believable signs for the welcome, in the feed's hundredths of the region's money. */
+function samplePrices(region: RegionInfo): [number, number] {
+  if (region.currencyCode === 'EUR') return [154.9, 169.9];
+  if (region.currencyCode === 'MXN') return [2399, 2459];
+  if (region.currencyCode === 'GBP') return [139.9, 147.9];
+  return [189.9, 204.5];
+}
 
 /** Three quick steps: what Pumpwise does, which fuel, and location. */
 export default function OnboardingScreen() {
@@ -35,6 +48,12 @@ export default function OnboardingScreen() {
     };
   }, []);
   const coverage = loaded.known ? loaded : fetched;
+  const country = deviceCountry();
+  const guess = country ? COUNTRY_REGION[country] : undefined;
+  const start = REGIONS[guess && (!coverage || coverage.live.includes(guess)) ? guess : DEFAULT_REGION];
+  const [cheapSample, nearSample] = samplePrices(start);
+  const fact =
+    start.currencyCode !== 'AUD' ? t('onboard.factOfficial') : coverage?.live.includes('nsw') ? t('onboard.factNsw') : t('onboard.factWa');
   const fuel = useStore((s) => s.settings.fuel);
   const updateSettings = useStore((s) => s.updateSettings);
   const completeOnboarding = useStore((s) => s.completeOnboarding);
@@ -61,7 +80,7 @@ export default function OnboardingScreen() {
         {step < 2 ? (
           <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={14} testID="onboarding-skip">
             <AppText variant="small" tone="muted">
-              Skip
+              {t('onboard.skip')}
             </AppText>
           </Pressable>
         ) : null}
@@ -72,25 +91,24 @@ export default function OnboardingScreen() {
           <View style={styles.center}>
             <PumpMark size={compact ? 80 : 120} />
             <AppText variant="title" align="center" style={{ fontSize: compact ? 38 : 44, lineHeight: compact ? 40 : 46, marginTop: gap }}>
-              Cheap fuel,{'\n'}close by.
+              {t('onboard.headline')}
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.md, maxWidth: 340 }}>
-              Open Pumpwise and see the nearest station and the cheapest one around you, with directions in one tap.{coverage && coverage.live.length > 0 ? ` Covering ${regionList(coverage.live)}.` : ''}
+              {t('onboard.pitch')}
+              {coverage && coverage.live.length > 0 ? t('onboard.covering', regionList(coverage.live)) : ''}
             </AppText>
             <View style={[styles.signs, { marginTop: gap, gap: spacing.md }]}>
               <View style={styles.center}>
-                <PriceSign pence={189.9} size={compact ? 'md' : 'lg'} tone="cheap" label="CHEAPEST" />
+                <PriceSign pence={cheapSample} region={start} size={compact ? 'md' : 'lg'} tone="cheap" label={t('onboard.cheapest')} />
               </View>
               <View style={styles.center}>
-                <PriceSign pence={204.5} size={compact ? 'md' : 'lg'} label="NEAREST" />
+                <PriceSign pence={nearSample} region={start} size={compact ? 'md' : 'lg'} label={t('onboard.nearest')} />
               </View>
             </View>
             <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: gap }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                {coverage?.live.includes('nsw')
-                  ? 'Official government prices that stations must report by law: FuelWatch in WA, FuelCheck in NSW, the ACT and Tasmania.'
-                  : "Official government prices. In WA every station's price is fixed for the day, and tomorrow's are out by 2:30pm."}
+                {fact}
               </AppText>
             </View>
           </View>
@@ -98,11 +116,11 @@ export default function OnboardingScreen() {
 
         {step === 1 ? (
           <View>
-            <AppText variant="title">What do you fill up with?</AppText>
+            <AppText variant="title">{t('onboard.fuelTitle')}</AppText>
             <AppText variant="body" tone="muted" style={{ marginTop: spacing.sm, marginBottom: spacing.lg }}>
-              You can switch any time from the top of the screen.
+              {t('onboard.fuelBody')}
             </AppText>
-            {REGIONS[DEFAULT_REGION].fuels.filter((f) => f.common).map((f) => {
+            {start.fuels.filter((f) => f.common).map((f) => {
               const selected = f.kind === fuel;
               return (
                 <Pressable
@@ -149,15 +167,15 @@ export default function OnboardingScreen() {
               <Ionicons name="navigate" size={44} color={colors.accent} />
             </View>
             <AppText variant="title" align="center" style={{ marginTop: spacing.xl }}>
-              Find stations around you
+              {t('onboard.locTitle')}
             </AppText>
             <AppText variant="body" tone="muted" align="center" style={{ marginTop: spacing.sm, maxWidth: 340 }}>
-              Pumpwise uses your location only while it is open, to work out what is near. Your exact location stays on your iPhone.
+              {t('onboard.locBody')}
             </AppText>
             <View style={[styles.fact, { backgroundColor: colors.warningSoft, borderRadius: radius.lg, padding: spacing.md, marginTop: spacing.xl }]}>
               <Ionicons name="car" size={20} color={colors.warning} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                Driving? Let a passenger check, or look before you set off. Directions open in your maps app.
+                {t('onboard.driving')}
               </AppText>
             </View>
           </View>
@@ -166,11 +184,11 @@ export default function OnboardingScreen() {
 
       <View style={{ padding: spacing.lg, gap: spacing.sm }}>
         {step < 2 ? (
-          <Button label="Continue" size="lg" fullWidth onPress={() => setStep(step + 1)} testID="onboarding-next" />
+          <Button label={t('action.continue')} size="lg" fullWidth onPress={() => setStep(step + 1)} testID="onboarding-next" />
         ) : (
           <>
-            <Button label="Allow location" size="lg" fullWidth onPress={() => void finish(true)} testID="onboarding-allow" />
-            <Button label="Not now" variant="ghost" size="lg" fullWidth onPress={() => void finish(false)} testID="onboarding-not-now" />
+            <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void finish(true)} testID="onboarding-allow" />
+            <Button label={t('onboard.notNow')} variant="ghost" size="lg" fullWidth onPress={() => void finish(false)} testID="onboarding-not-now" />
           </>
         )}
       </View>
