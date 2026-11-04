@@ -55,7 +55,7 @@ export const lightColors: ThemeColors = {
   cheapSoft: '#DCF4E6',
   pricey: '#C2363A',
   priceySoft: '#FBE3E3',
-  warning: '#A95A06',
+  warning: '#A15505',
   warningSoft: '#FCEBD2',
   danger: '#C2363A',
   overlay: 'rgba(18, 27, 38, 0.5)',

@@ -46,15 +46,35 @@ function PriceInfo({ item, now }: { item: RankedStation; now: Date }) {
   );
 }
 
-function SavingsLine({ savings, fillLitres, item, betterPick }: { savings: Savings; fillLitres: number; item: RankedStation; betterPick: boolean }) {
+/** A station that works out cheaper than the headline pick once the drive there and back is counted. */
+export interface BetterStill {
+  name: string;
+  /** Dollars (pounds) better than the headline pick, all in. */
+  amount: number;
+}
+
+function SavingsLine({
+  savings,
+  fillLitres,
+  item,
+  betterPick,
+  betterStill,
+}: {
+  savings: Savings;
+  fillLitres: number;
+  item: RankedStation;
+  betterPick: boolean;
+  betterStill: BetterStill | null;
+}) {
   const { colors, spacing, radius } = useTheme();
   const region = REGIONS[item.station.region];
   const extra =
     savings.extraKm >= 0.2 ? `, even after the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back` : '';
   // When a third station beats the nearest once the drive is counted, point there instead of at the nearest.
   const verdict = betterPick ? 'The best value pick below beats both.' : savings.amount > 0 ? 'The nearest is fine today.' : 'The nearest is the better deal.';
+  const still = betterStill ? ` ${betterStill.name}, below, is ${formatMoney(betterStill.amount, region.currency)} better again once you count the drive.` : '';
   const text = savings.worthIt
-    ? `Saves ${formatMoney(savings.amount, region.currency)} on a ${fillLitres} L fill-up compared with the nearest${extra}.`
+    ? null
     : savings.amount > 0
       ? `Only ${formatMoney(savings.amount, region.currency)} ahead on a ${fillLitres} L fill-up once you count the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back. ${verdict}`
       : `Cheaper at the pump, but the extra ${formatDistance(savings.extraKm, region.distanceUnit)} there and back costs more than it saves on ${fillLitres} L. ${verdict}`;
@@ -73,7 +93,17 @@ function SavingsLine({ savings, fillLitres, item, betterPick }: { savings: Savin
     >
       <Ionicons name={savings.worthIt ? 'trending-down' : 'swap-horizontal'} size={18} color={savings.worthIt ? colors.cheap : colors.textMuted} />
       <AppText variant="caption" style={{ flex: 1, marginLeft: spacing.sm }}>
-        {text}
+        {savings.worthIt ? (
+          <>
+            Saves{' '}
+            <AppText variant="caption" style={{ fontWeight: '700', color: colors.cheap }}>
+              {formatMoney(savings.amount, region.currency)}
+            </AppText>{' '}
+            on a {fillLitres} L fill-up compared with the nearest{extra}.{still}
+          </>
+        ) : (
+          text
+        )}
       </AppText>
     </View>
   );
@@ -88,13 +118,15 @@ interface CheapestCardProps {
   alsoNearest: boolean;
   /** A best value station (shown below) beats the nearest once the drive is counted. */
   betterPick?: boolean;
+  /** The best value station, when it beats this one once the drive is counted. */
+  betterStill?: BetterStill | null;
   now: Date;
   onDirections: () => void;
   onDetails: () => void;
 }
 
 /** The headline: the cheapest open station inside the search area. */
-export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, betterPick = false, now, onDirections, onDetails }: CheapestCardProps) {
+export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNearest, betterPick = false, betterStill = null, now, onDirections, onDetails }: CheapestCardProps) {
   const { colors, spacing, radius } = useTheme();
   const { station } = item;
   const region = REGIONS[station.region];
@@ -134,7 +166,7 @@ export function CheapestCard({ item, radiusKm, fuel, fillLitres, savings, alsoNe
           <PriceInfo item={item} now={now} />
         </View>
       </Pressable>
-      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} betterPick={betterPick} /> : null}
+      {savings ? <SavingsLine savings={savings} fillLitres={fillLitres} item={item} betterPick={betterPick} betterStill={betterStill} /> : null}
       <View style={[styles.actions, { marginTop: spacing.lg, gap: spacing.sm }]}>
         <Button
           label="Directions"

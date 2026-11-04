@@ -34,6 +34,11 @@ export interface RegionInfo {
   priceDayStartHour?: number;
   /** "reported" regions: days before an unchanged price gets a "not confirmed" warning (default 14). */
   trustDays?: number;
+  /**
+   * Stations must report every price change, so a price stands until the station changes it: an
+   * old price is still the current one ("Unchanged for 12 days"), not a stale one.
+   */
+  pricesStand?: boolean;
   /** Minutes ahead of UTC on a given date (for opening hours and "today"). */
   utcOffsetMinutes: (date: Date) => number;
   source: { name: string; url: string; credit: string };
@@ -123,6 +128,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'reported',
     trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: auEasternOffsetMinutes,
     source: {
       name: 'FuelCheck',
@@ -172,6 +178,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
     economyOptions: [5, 6, 7, 8, 9, 10, 11, 12, 14],
     priceMode: 'reported',
     trustDays: 30,
+    pricesStand: true,
     utcOffsetMinutes: auEasternOffsetMinutes,
     source: {
       name: 'FuelCheck TAS',

@@ -1,4 +1,4 @@
-import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, spokenPrice, timeAgo } from '@/lib/format';
+import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, spokenPrice, standingLabel, timeAgo } from '@/lib/format';
 import { distanceKm, regionForRadius } from '@/lib/geo';
 import { feedWarning, nearbyPhase, needsReload, RELOAD_AFTER_MS } from '@/lib/nearby';
 import { classifyQuery } from '@/lib/places';
@@ -19,6 +19,13 @@ import {
 const NOW = new Date('2026-10-29T04:00:00Z'); // 12:00 in Perth
 
 describe('format', () => {
+  test("where prices stand until changed, an old price reads as unchanged, not stale", () => {
+    const now = new Date('2026-11-04T04:00:00Z');
+    expect(standingLabel('2026-11-04T01:00:00Z', now)).toEqual({ text: 'Updated 3 h ago', level: 'fresh' });
+    expect(standingLabel('2026-10-23T04:00:00Z', now)).toEqual({ text: 'Unchanged for 12 days', level: 'recent' });
+    expect(standingLabel('2026-09-20T04:00:00Z', now, 30).level).toBe('old');
+  });
+
   test('prices, money and changes', () => {
     expect(formatPrice(139.9)).toBe('139.9');
     expect(formatPrice(200)).toBe('200.0');
