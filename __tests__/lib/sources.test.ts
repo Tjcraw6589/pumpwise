@@ -176,6 +176,21 @@ describe('France (prix-carburants.gouv.fr)', () => {
     expect(paris.town).toBe('Paris');
     expect(paris.tags).toEqual(['motorway']);
   });
+
+  test('a fuel the station has run out of is left out, but a shortage that has ended is not', () => {
+    const shortage = `<pdv_liste><pdv id="75013023" latitude="4882586" longitude="238433" cp="75013" pop="R">
+      <adresse>RUE JEAN-BAPTISTE BERLIER</adresse><ville>Paris</ville>
+      <prix nom="Gazole" id="1" maj="2026-11-04 06:00:00" valeur="2.250"/>
+      <prix nom="E10" id="5" maj="2026-11-01 08:00:00" valeur="1.989"/>
+      <prix nom="SP95" id="2" maj="2026-11-01 08:00:00" valeur="2.049"/>
+      <prix nom="SP98" id="6" maj="2026-11-03 09:00:00" valeur="2.099"/>
+      <rupture id="5" nom="E10" debut="2026-11-03 16:10:43" fin="" type="temporaire"/>
+      <rupture id="2" nom="SP95" debut="2022-10-10 13:36:55" fin="" type="definitive"/>
+      <rupture id="6" nom="SP98" debut="2026-10-29 22:10:13" fin="2026-11-02 07:00:00" type="temporaire"/>
+    </pdv></pdv_liste>`;
+    const [station] = buildFrStations(shortage, new Date('2026-11-04T08:00:00Z'));
+    expect(Object.keys(station?.prices ?? {}).sort()).toEqual(['diesel', 'super']);
+  });
 });
 
 describe('Mexico (CRE)', () => {
