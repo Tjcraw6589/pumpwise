@@ -26,9 +26,9 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx';
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt';
 /** In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France). */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx'];
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt'];
 /** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
 export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
 
@@ -70,7 +70,7 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 42.15, maxLat: 43.9, minLng: -9.4, maxLng: -1.75 }, // Galicia to the Basque Country
     { minLat: 35.9, maxLat: 42.15, minLng: -6.2, maxLng: -1.75 }, // the interior and the south
     { minLat: 36.9, maxLat: 41.0, minLng: -7.0, maxLng: -6.2 }, // Extremadura and western Andalucía
-    { minLat: 36.9, maxLat: 37.9, minLng: -7.45, maxLng: -7.0 }, // Huelva to the Guadiana
+    { minLat: 36.9, maxLat: 37.9, minLng: -7.41, maxLng: -7.0 }, // Huelva to the Guadiana (Ayamonte in, Vila Real de Santo António out)
     { minLat: 35.9, maxLat: 42.5, minLng: -1.75, maxLng: 4.4 }, // the east, Catalonia and the Balearics
     { minLat: 42.5, maxLat: 42.9, minLng: -1.75, maxLng: -0.75 }, // Navarra
     { minLat: 27.6, maxLat: 29.5, minLng: -18.2, maxLng: -13.3 }, // Canary Islands
@@ -78,6 +78,89 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
   ],
   fr: [{ minLat: 41.3, maxLat: 51.2, minLng: -5.3, maxLng: 9.7 }],
   mx: [{ minLat: 14.4, maxLat: 32.8, minLng: -118.5, maxLng: -86.6 }],
+  // Spain is checked first, so its border boxes win where the two overlap (Olivenza, Barrancos).
+  pt: [
+    { minLat: 36.9, maxLat: 42.16, minLng: -9.6, maxLng: -6.9 }, // the mainland
+    { minLat: 41.0, maxLat: 42.16, minLng: -6.9, maxLng: -6.18 }, // Trás-os-Montes: Bragança and Miranda do Douro
+    { minLat: 32.3, maxLat: 33.2, minLng: -17.4, maxLng: -16.2 }, // Madeira
+    { minLat: 36.8, maxLat: 39.8, minLng: -31.4, maxLng: -24.9 }, // the Azores
+  ],
+};
+
+/** Who owns each region's prices and what their licence asks for; written into every feed's meta.json. */
+export interface RegionLicence {
+  owner: string;
+  licence: string;
+  url: string;
+  attribution: string;
+  /** 'cc' and 'open' licences allow reuse of this part of the feed; 'owner-terms' means ask the owner; 'no-republish' forbids it. */
+  reuse: 'cc' | 'open' | 'owner-terms' | 'no-republish';
+}
+
+export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
+  wa: {
+    owner: 'Government of Western Australia (FuelWatch)',
+    licence: 'FuelWatch RSS feed terms: free, acknowledge FuelWatch with a link',
+    url: 'https://www.fuelwatch.wa.gov.au/tools/rss',
+    attribution: 'Prices from FuelWatch, Government of Western Australia, www.fuelwatch.wa.gov.au',
+    reuse: 'owner-terms',
+  },
+  nsw: {
+    owner: 'NSW Government (NSW Fair Trading, FuelCheck)',
+    licence: 'Creative Commons Attribution-ShareAlike 3.0 Australia',
+    url: 'https://creativecommons.org/licenses/by-sa/3.0/au/',
+    attribution: 'Prices from FuelCheck, NSW Government, www.fuelcheck.nsw.gov.au (CC BY-SA 3.0 AU)',
+    reuse: 'cc',
+  },
+  tas: {
+    owner: 'Tasmanian Government (Consumer, Building and Occupational Services, FuelCheck TAS)',
+    licence: 'No published licence; data obtained through the NSW Fuel API under its terms',
+    url: 'https://www.fuelcheck.tas.gov.au',
+    attribution: 'Prices from FuelCheck TAS, Tasmanian Government, www.fuelcheck.tas.gov.au',
+    reuse: 'owner-terms',
+  },
+  qld: {
+    owner: 'State of Queensland (Department of Energy and Climate)',
+    licence: 'Fuel Price Data Licence 2024: further publication prohibited',
+    url: 'https://www.fuelpricesqld.com.au/documents/LimitedUseLicence.pdf',
+    attribution: 'Based on or contains data provided by the State of Queensland (Department of Energy and Climate) 2026. The State gives no warranty in relation to the data and accepts no liability for any use of it. Data must not be used for direct marketing or be used in breach of the privacy laws.',
+    reuse: 'no-republish',
+  },
+  uk: {
+    owner: 'UK Government (Department for Energy Security and Net Zero, Fuel Finder)',
+    licence: 'Open Government Licence v3.0',
+    url: 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/',
+    attribution: 'Contains public sector information licensed under the Open Government Licence v3.0.',
+    reuse: 'open',
+  },
+  es: {
+    owner: 'Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO), Government of Spain',
+    licence: 'Creative Commons Attribution 4.0',
+    url: 'https://catalogo.datosabiertos.miteco.gob.es/catalogo/dataset/902a266d-5ba2-4735-a378-45818ba5a4f4',
+    attribution: 'Prices from the Geoportal de Gasolineras, MITECO, Government of Spain (CC BY 4.0)',
+    reuse: 'cc',
+  },
+  fr: {
+    owner: 'DGCCRF, Ministère de l’Économie, Government of France',
+    licence: 'Licence Ouverte / Open Licence 2.0 (Etalab)',
+    url: 'https://www.etalab.gouv.fr/licence-ouverte-open-licence/',
+    attribution: 'Prices from prix-carburants.gouv.fr, Ministère de l’Économie (Licence Ouverte 2.0); each price carries its last-update time',
+    reuse: 'open',
+  },
+  mx: {
+    owner: 'Comisión Nacional de Energía (CNE, formerly CRE), Government of Mexico',
+    licence: 'Creative Commons Attribution 4.0 / Términos de Libre Uso MX',
+    url: 'https://datos.gob.mx',
+    attribution: '“Precios de gasolinas y diésel reportados por los permisionarios”, CNE (formerly CRE), datos.gob.mx (CC BY 4.0); date consulted: the feed’s generatedAt',
+    reuse: 'cc',
+  },
+  pt: {
+    owner: 'Direção-Geral de Energia e Geologia (DGEG), Government of Portugal',
+    licence: 'DGEG site terms: free use, naming the DGEG as the source, with each price’s last-update time and a faithful reproduction',
+    url: 'https://precoscombustiveis.dgeg.gov.pt',
+    attribution: 'Prices from the Direção-Geral de Energia e Geologia (DGEG), precoscombustiveis.dgeg.gov.pt; each price carries its last-update time',
+    reuse: 'owner-terms',
+  },
 };
 
 /** First Sunday of a month at 02:00 Australian Eastern Standard Time (16:00 UTC the day before). */
@@ -183,6 +266,8 @@ export interface FeedMeta {
   /** Tile key to number of stations, for every tile that has at least one station. */
   tiles: Record<string, number>;
   regions: Partial<Record<RegionId, RegionStatus>>;
+  /** The licence each region's prices come under (see LEGAL.md). Older feeds may lack it. */
+  licences?: Partial<Record<RegionId, RegionLicence>>;
 }
 
 export function tileKey(lat: number, lng: number): string {
@@ -225,8 +310,9 @@ export function asNumber(value: unknown): number | null {
 const KEEP_UPPER = new Set(['BP', 'MFG', 'JET', 'EG', 'UK', 'MSA', 'A1', 'M1', 'M6', 'M25', 'II', 'III', 'HVO', 'BWOC', 'CO-OP', 'IOR', 'OPT', 'WA', 'UGO', 'OMG', 'CGL', 'FDWA']);
 
 /** Small words Spanish and French names keep in lower case ("Avenida de la Paz", "Quai de la Rapée"). */
-const SMALL_WORDS: Record<'es' | 'fr', { always: Set<string>; afterDe: Set<string> }> = {
+const SMALL_WORDS: Record<'es' | 'fr' | 'pt', { always: Set<string>; afterDe: Set<string> }> = {
   es: { always: new Set(['de', 'del', 'y', 'e']), afterDe: new Set(['la', 'las', 'los', 'el']) },
+  pt: { always: new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'na', 'no', 'nas', 'nos']), afterDe: new Set(['a', 'o', 'as', 'os']) },
   fr: { always: new Set(['de', 'du', 'des', 'et', 'sur', 'sous', 'aux', 'au', 'en']), afterDe: new Set(['la', 'le', 'les']) },
 };
 
@@ -237,7 +323,7 @@ const firstUpper = (text: string): string => text.replace(/^\p{Ll}/u, (ch) => ch
  * capital first letter. With a language, its small words stay small: "AVENIDA DE LA PAZ" becomes
  * "Avenida de la Paz", and "114 BD DE L HOPITAL" becomes "114 Bd de l'Hopital".
  */
-export function tidyName(value: string, lang?: 'es' | 'fr'): string {
+export function tidyName(value: string, lang?: 'es' | 'fr' | 'pt'): string {
   const text = value.replace(/\s+/g, ' ').trim();
   if (!text) return text;
   if (/\p{Ll}/u.test(text)) return firstUpper(text);
@@ -343,6 +429,7 @@ export function buildFeed(
       priceCount: tiled.priceCount,
       tiles: tiled.counts,
       regions,
+      licences: Object.fromEntries((Object.keys(regions) as RegionId[]).map((id) => [id, REGION_LICENCES[id]])),
     },
     tiles: tiled.tiles,
   };
