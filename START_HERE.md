@@ -54,9 +54,21 @@ Claude publishes to `production` only when you say so; to try a fix first, it pu
 - **Not for everything:** new native features, new permissions, SDK upgrades and AdMob ID changes still need a new build and App Store review.
 - **Matching versions:** an update only reaches builds of the same app version (`runtimeVersion` policy `appVersion`), so updates published for 1.1.0 reach 1.1.0 builds only. Version 1.0 has no EAS Update and never receives them.
 
+## Queensland: what you agree to if you sign up (decide first)
+
+Queensland gives its prices to apps that sign up as a "publisher" at https://www.fuelpricesqld.com.au (a short Microsoft form). The feed and the app are ready; the token they email goes into GitHub as the secret `QLD_FUEL_API_TOKEN` (https://github.com/Tjcraw6589/pumpwise/settings/secrets/actions/new). Submitting the form means accepting their Fuel Price Data Licence (https://www.fuelpricesqld.com.au/documents/LimitedUseLicence.pdf). In plain words it says:
+
+- **A  fee**, but only if the State asks for it.
+- **Prices must be current within 30 minutes.** The feed fetches Queensland every 15 minutes, so this is met.
+- **Their notice must be shown** and people must be told not to republish the prices. Both are in the app (credit line, About, terms).
+- **They can ask for usage figures within 10 business days**: monthly active, new and returning users for Queensland. Pumpwise has no analytics, so you could only give App Store Connect's download and usage numbers, which are not split by state. Tell them that if they ask.
+- **They can audit compliance**, and either side can end the agreement with 20 business days' notice (3 days if the publication isn't current).
+
+If that is fine with you, follow the checklist page's Queensland task. If not, Queensland simply stays off; nothing else is affected. The full register of every source's licence is in LEGAL.md.
+
 ## Adding more places later
 
-- **Spain and France**: free, no sign-up, but the app needs translating first.
+- **Spain, France, Portugal and Mexico**: live in feed v4 since November 2026; version 1.2 shows them in Spanish, French and Portuguese.
 - **United Kingdom**: the code is ready, but the UK Fuel Finder service refuses connections from outside the UK, including GitHub's servers, so it stays off unless that changes.
 
 ## How it works (for later)

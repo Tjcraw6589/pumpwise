@@ -128,7 +128,7 @@ Mexico's Ley Federal de Protección de Datos Personales en Posesión de los Part
 
 ### Portugal
 
-GDPR as above; consumer information in Portuguese is expected for consumers in Portugal `[Decreto-Lei 238/86, verify]`. Portugal was added to the feed and the app on 8 November 2026 with Portuguese fuel names; a Portuguese version of the app's words, store listing and legal documents is listed below as a remaining task before the app is offered in Portugal's App Store.
+GDPR as above; consumer information in Portuguese is expected for consumers in Portugal `[Decreto-Lei 238/86, verify]`. Portugal was added to the feed and the app on 8 November 2026 with the app's words, the store listing, the privacy policy and the terms in European Portuguese.
 
 ### App Store and AdMob
 
@@ -150,7 +150,7 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | Mexico: confirm the live XML endpoint is still official | Email the CNE (draft above) | Owner | Open, optional |
 | Western Australia: no written licence | Email FuelWatch (draft above) | Owner | Open, optional |
 | Queensland: reporting duty and $1 fee | Decide whether to sign; Pumpwise cannot report user numbers by state | Owner | Open |
-| Portuguese words, store listing and legal texts | Translate before offering the app in Portugal | Claude, when asked | Open |
+| Portuguese words, store listing and legal texts | Portuguese added to the app (src/i18n/pt.ts), STORE_LISTING.md and legal/*.pt.md | Claude | Done 8 Nov 2026 |
 
 ## Remaining sources investigated and not added (8 November 2026)
 
