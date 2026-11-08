@@ -68,6 +68,12 @@ export function spainOffsetMinutes(date: Date, lng?: number): number {
   return base + (isEuropeanSummerTime(date) ? 60 : 0);
 }
 
+/** Portugal: the mainland and Madeira keep UTC in winter and UTC+1 in summer; the Azores are an hour behind. */
+export function portugalOffsetMinutes(date: Date, lng?: number): number {
+  const azores = typeof lng === 'number' && lng < -20;
+  return (isEuropeanSummerTime(date) ? 60 : 0) - (azores ? 60 : 0);
+}
+
 export const REGIONS: Record<RegionId, RegionInfo> = {
   wa: {
     id: 'wa',
@@ -444,6 +450,49 @@ export const REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Toluca', detail: 'Mexico', lat: 19.2826, lng: -99.6557 },
       { name: 'Chihuahua', detail: 'Mexico', lat: 28.6353, lng: -106.0889 },
       { name: 'Aguascalientes', detail: 'Mexico', lat: 21.8853, lng: -102.2916 },
+    ],
+  },
+  pt: {
+    id: 'pt',
+    name: 'Portugal',
+    currency: '€',
+    priceUnit: 'c',
+    priceDecimals: 3,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Gasolina 95', pumpCode: '95', description: 'Unleaded 95', common: true },
+      { kind: 'diesel', label: 'Gasóleo', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'premium', label: 'Gasolina 95 aditivada', pumpCode: '95+', description: 'Premium unleaded 95', common: true },
+      { kind: 'super', label: 'Gasolina 98', pumpCode: '98', description: 'Unleaded 98', common: true },
+      { kind: 'premium-diesel', label: 'Gasóleo aditivado', pumpCode: 'B7+', description: 'Premium diesel', common: true },
+      { kind: 'lpg', label: 'GPL Auto', pumpCode: 'GPL', description: 'Autogas', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    priceMode: 'reported',
+    trustDays: 30,
+    pricesStand: true,
+    utcOffsetMinutes: portugalOffsetMinutes,
+    source: {
+      name: 'DGEG Preços dos Combustíveis',
+      url: 'https://precoscombustiveis.dgeg.gov.pt',
+      credit: 'Prices from the Direção-Geral de Energia e Geologia (DGEG), Government of Portugal',
+    },
+    report: {
+      label: 'Check it on precoscombustiveis.dgeg.gov.pt',
+      url: 'https://precoscombustiveis.dgeg.gov.pt',
+      note: 'Stations enter their own prices on the DGEG site. Write to precoscombustiveis@dgeg.gov.pt about a wrong one.',
+    },
+    about:
+      'In Portugal station operators publish their prices on the DGEG’s price service whenever they change. A price stands until the station enters a new one; Pumpwise collects them about every 30 minutes and shows when each was last updated.',
+    cities: [
+      { name: 'Lisboa', detail: 'Portugal', lat: 38.7223, lng: -9.1393 },
+      { name: 'Porto', detail: 'Portugal', lat: 41.1579, lng: -8.6291 },
+      { name: 'Braga', detail: 'Portugal', lat: 41.5454, lng: -8.4265 },
+      { name: 'Coimbra', detail: 'Portugal', lat: 40.2033, lng: -8.4103 },
+      { name: 'Faro', detail: 'Portugal', lat: 37.0194, lng: -7.9322 },
+      { name: 'Funchal', detail: 'Madeira', lat: 32.6669, lng: -16.9241 },
     ],
   },
 };

@@ -96,8 +96,13 @@ describe('shared helpers', () => {
     expect(regionAt(37.26, -6.95)).toBe('es'); // Huelva
     expect(regionAt(39.57, 2.65)).toBe('es'); // Palma
     expect(regionAt(28.12, -15.44)).toBe('es'); // Las Palmas, Canary Islands
-    expect(regionAt(38.72, -9.14)).toBeNull(); // Lisbon: Portugal is not covered
-    expect(regionAt(41.15, -8.61)).toBeNull(); // Porto
+    expect(regionAt(38.72, -9.14)).toBe('pt'); // Lisbon
+    expect(regionAt(41.15, -8.61)).toBe('pt'); // Porto
+    expect(regionAt(41.81, -6.76)).toBe('pt'); // Bragança, in the Trás-os-Montes box
+    expect(regionAt(37.19, -7.42)).toBe('pt'); // Vila Real de Santo António, across the Guadiana from Ayamonte
+    expect(regionAt(37.21, -7.4)).toBe('es'); // Ayamonte
+    expect(regionAt(32.65, -16.91)).toBe('pt'); // Funchal, Madeira
+    expect(regionAt(37.74, -25.67)).toBe('pt'); // Ponta Delgada, the Azores
     expect(regionAt(19.43, -99.13)).toBe('mx'); // Mexico City
     expect(regionAt(21.16, -86.85)).toBe('mx'); // Cancún
     expect(regionAt(40.71, -74.0)).toBeNull(); // New York

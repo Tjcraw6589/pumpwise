@@ -23,6 +23,7 @@ import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
 import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
 import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
+import { fetchPt, PT_MIN_STATIONS } from './sources/pt.ts';
 import { fetchQld, QLD_MIN_STATIONS, qldToken } from './sources/qld.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
 import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
@@ -76,6 +77,8 @@ const SOURCES: Source[] = [
   { id: 'fr', regions: ['fr'], everyMinutes: 10, minStations: FR_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchFr(now), tomorrow: false }) },
   // Mexico: the CRE lists change a few times a day at most, so every three hours.
   { id: 'mx', regions: ['mx'], everyMinutes: 170, minStations: MX_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchMx(now), tomorrow: false }) },
+  // Portugal: stations enter prices on the DGEG site as they change; one 5 MB request every other run.
+  { id: 'pt', regions: ['pt'], everyMinutes: 25, minStations: PT_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchPt(now), tomorrow: false }) },
   {
     id: 'uk',
     regions: ['uk'],

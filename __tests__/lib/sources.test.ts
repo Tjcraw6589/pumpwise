@@ -4,6 +4,7 @@ import { REGIONS, spainOffsetMinutes } from '@/lib/regions';
 import { buildEsStations, esNumber, parseEsHours, parseEsTime } from '../../scripts/feed/sources/es.ts';
 import { buildFrStations, parseFrHours, parseFrTime } from '../../scripts/feed/sources/fr.ts';
 import { buildMxStations, mxName, mxPrice } from '../../scripts/feed/sources/mx.ts';
+import { buildPtStations, parsePtTime, ptPrice } from '../../scripts/feed/sources/pt.ts';
 import { buildQldStations, qldFuelKind } from '../../scripts/feed/sources/qld.ts';
 import { firstFileInZip } from '../../scripts/feed/zip.ts';
 
@@ -314,5 +315,45 @@ describe('published feed versions', () => {
     expect(REGIONS.es.priceMode).toBe('current');
     expect(REGIONS.fr.pricesStand).toBe(true);
     expect(REGIONS.qld.pricesStand).toBe(true);
+  });
+});
+
+describe('Portugal (DGEG Preços dos Combustíveis)', () => {
+  const NOW = new Date('2026-11-08T21:00:00Z');
+  const rows = [
+    { Id: 87129, Nome: 'INTERMARCHÉ VIALONGA', TipoPosto: 'Área comercial (Hipermercados)', Municipio: 'Vila Franca de Xira', Preco: '0,899 €', Marca: 'INTERMARCHÉ', Combustivel: 'GPL Auto', DataAtualizacao: '2026-11-03 10:35', Distrito: 'Lisboa', Morada: 'Urb. Terras Compridas, Lote 8\nESTRADA DA VÁRZEA', Localidade: 'Vialonga', CodPostal: '2625-716', Latitude: 38.86376, Longitude: -9.09955 },
+    { Id: 87129, Nome: 'INTERMARCHÉ VIALONGA', TipoPosto: 'Área comercial (Hipermercados)', Municipio: 'Vila Franca de Xira', Preco: '1,949 €', Marca: 'INTERMARCHÉ', Combustivel: 'Gasolina simples 95', DataAtualizacao: '2026-11-03 10:35', Distrito: 'Lisboa', Morada: 'Urb. Terras Compridas, Lote 8', Localidade: 'Vialonga', CodPostal: '2625-716', Latitude: 38.86376, Longitude: -9.09955 },
+    { Id: 87129, Nome: 'INTERMARCHÉ VIALONGA', TipoPosto: 'Área comercial (Hipermercados)', Municipio: 'Vila Franca de Xira', Preco: '2,119 €', Marca: 'INTERMARCHÉ', Combustivel: 'Gasolina 98', DataAtualizacao: '2026-11-03 10:35', Distrito: 'Lisboa', Morada: 'Urb. Terras Compridas, Lote 8', Localidade: 'Vialonga', CodPostal: '2625-716', Latitude: 38.86376, Longitude: -9.09955 },
+    { Id: 87129, Nome: 'INTERMARCHÉ VIALONGA', TipoPosto: 'Área comercial (Hipermercados)', Municipio: 'Vila Franca de Xira', Preco: '2,099 €', Marca: 'INTERMARCHÉ', Combustivel: 'Gasolina especial 98', DataAtualizacao: '2026-11-03 10:35', Distrito: 'Lisboa', Morada: 'Urb. Terras Compridas, Lote 8', Localidade: 'Vialonga', CodPostal: '2625-716', Latitude: 38.86376, Longitude: -9.09955 },
+    { Id: 87129, Nome: 'INTERMARCHÉ VIALONGA', TipoPosto: 'Área comercial (Hipermercados)', Municipio: 'Vila Franca de Xira', Preco: '1,399 €', Marca: 'INTERMARCHÉ', Combustivel: 'Gasóleo colorido', DataAtualizacao: '2026-11-03 10:35', Distrito: 'Lisboa', Morada: 'Urb. Terras Compridas, Lote 8', Localidade: 'Vialonga', CodPostal: '2625-716', Latitude: 38.86376, Longitude: -9.09955 },
+    { Id: 500, Nome: 'POSTO DA AUTO-ESTRADA', TipoPosto: 'Auto-estrada', Municipio: 'Ponta Delgada', Preco: '1,759 €', Marca: 'GALP', Combustivel: 'Gasóleo simples', DataAtualizacao: '2026-11-08 19:30', Distrito: 'Açores', Morada: 'EN1', Localidade: 'Ponta Delgada', CodPostal: '9500-000', Latitude: 37.74, Longitude: -25.67 },
+    { Id: 501, Nome: 'TYPO', TipoPosto: 'Outro', Municipio: 'Faro', Preco: '17,590 €', Marca: 'BP', Combustivel: 'Gasóleo simples', DataAtualizacao: '2026-11-08 09:00', Distrito: 'Faro', Morada: 'Rua A', Localidade: 'Faro', CodPostal: '8000-000', Latitude: 37.02, Longitude: -7.93 },
+    { Id: 502, Nome: 'SPAIN', TipoPosto: 'Outro', Municipio: 'Madrid', Preco: '1,500 €', Marca: 'REPSOL', Combustivel: 'Gasóleo simples', DataAtualizacao: '2026-11-08 09:00', Distrito: 'Madrid', Morada: 'Calle', Localidade: 'Madrid', CodPostal: '28001', Latitude: 40.42, Longitude: -3.7 },
+  ];
+
+  test('euro prices to cents and Lisbon or Azores time to UTC', () => {
+    expect(ptPrice('1,769 €')).toBe(176.9);
+    expect(ptPrice('0,899 €/litro')).toBe(89.9);
+    expect(ptPrice('17,590 €')).toBeNull();
+    expect(parsePtTime('2026-11-06 10:30', NOW)).toBe('2026-11-06T10:30:00.000Z'); // winter: Lisbon is on UTC
+    expect(parsePtTime('2026-07-06 10:30', NOW)).toBe('2026-07-06T09:30:00.000Z'); // summer: UTC+1
+    expect(parsePtTime('2026-11-08 19:30', NOW, -25.67)).toBe('2026-11-08T20:30:00.000Z'); // the Azores, an hour behind
+    expect(parsePtTime('2026-11-09 10:00', NOW)).toBeNull(); // the future
+  });
+
+  test('groups rows into stations, keeps the cheaper of two 98s, drops farm diesel, typos and stations outside Portugal', () => {
+    const stations = buildPtStations(rows, NOW);
+    expect(stations.map((s) => s.id)).toEqual(['pt-87129', 'pt-500']);
+    const first = stations[0] as FeedStation;
+    expect(first.name).toBe('Intermarché Vialonga');
+    expect(first.address).toBe('Urb. Terras Compridas, Lote 8, Estrada da Várzea');
+    expect(first.tags).toEqual(['supermarket']);
+    expect(first.prices).toEqual({
+      lpg: { p: 89.9, at: '2026-11-03T10:35:00.000Z' },
+      regular: { p: 194.9, at: '2026-11-03T10:35:00.000Z' },
+      super: { p: 209.9, at: '2026-11-03T10:35:00.000Z' },
+    });
+    expect(stations[1]?.tags).toEqual(['motorway']);
+    expect(stations[1]?.prices.diesel?.at).toBe('2026-11-08T20:30:00.000Z');
   });
 });
