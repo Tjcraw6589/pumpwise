@@ -80,6 +80,12 @@ export function spainOffsetMinutes(date: Date, lng?: number): number {
   return base + (isEuropeanSummerTime(date) ? 60 : 0);
 }
 
+/** Portugal: the mainland and Madeira keep UTC in winter and UTC+1 in summer; the Azores are an hour behind. */
+export function portugalOffsetMinutes(date: Date, lng?: number): number {
+  const azores = typeof lng === 'number' && lng < -20;
+  return (isEuropeanSummerTime(date) ? 60 : 0) - (azores ? 60 : 0);
+}
+
 /** Every region as written here, in English. The app reads `REGIONS`, in the phone's language. */
 const BASE_REGIONS: Record<RegionId, RegionInfo> = {
   wa: {
@@ -158,7 +164,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     source: {
       name: 'FuelCheck',
       url: 'https://www.fuelcheck.nsw.gov.au',
-      credit: 'Prices from FuelCheck, NSW Government',
+      credit: 'Prices from FuelCheck, NSW Government (CC BY-SA 3.0 AU)',
     },
     report: {
       label: 'Report it in FuelCheck',
@@ -347,7 +353,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     source: {
       name: 'Geoportal de Gasolineras',
       url: 'https://geoportalgasolineras.es',
-      credit: 'Prices from the Geoportal de Gasolineras, Spanish Ministry for the Ecological Transition',
+      credit: 'Prices from MITECO’s Geoportal de Gasolineras, Government of Spain (CC BY 4.0)',
     },
     report: {
       label: 'Check it on the Geoportal',
@@ -452,17 +458,17 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     // Mexico City time; the CRE list has no opening hours, so this only marks the day.
     utcOffsetMinutes: () => -6 * 60,
     source: {
-      name: 'Comisión Reguladora de Energía',
-      url: 'https://www.gob.mx/cre',
-      credit: 'Prices from the Comisión Reguladora de Energía (CRE), Government of Mexico',
+      name: 'Comisión Nacional de Energía',
+      url: 'https://www.gob.mx/cne',
+      credit: 'Prices reported to the Comisión Nacional de Energía (CNE, formerly CRE), Government of Mexico (CC BY 4.0)',
     },
     report: {
       label: 'Report it to PROFECO',
       url: 'https://www.gob.mx/profeco',
-      note: 'Stations report their prices to the CRE; PROFECO handles complaints at the pump.',
+      note: 'Stations report their prices to the CNE; PROFECO handles complaints at the pump.',
     },
     about:
-      'In Mexico fuel stations report their prices to the Energy Regulatory Commission (CRE), which publishes them as open data. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices.',
+      'In Mexico fuel stations report their prices to the Comisión Nacional de Energía (CNE, formerly the CRE), which publishes them as open data. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices and the date they were collected.',
     cities: [
       { name: 'Ciudad de México', detail: 'Mexico', lat: 19.4326, lng: -99.1332 },
       { name: 'Guadalajara', detail: 'Mexico', lat: 20.6597, lng: -103.3496 },
@@ -476,6 +482,58 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Toluca', detail: 'Mexico', lat: 19.2826, lng: -99.6557 },
       { name: 'Chihuahua', detail: 'Mexico', lat: 28.6353, lng: -106.0889 },
       { name: 'Aguascalientes', detail: 'Mexico', lat: 21.8853, lng: -102.2916 },
+    ],
+  },
+  pt: {
+    id: 'pt',
+    name: 'Portugal',
+    currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'pt-PT',
+    decimalComma: true,
+    priceUnit: 'c',
+    priceDecimals: 3,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Gasolina 95', pumpCode: '95', description: 'Unleaded 95', common: true },
+      { kind: 'diesel', label: 'Gasóleo', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'premium', label: 'Gasolina 95 aditivada', pumpCode: '95+', description: 'Premium unleaded 95', common: true },
+      { kind: 'super', label: 'Gasolina 98', pumpCode: '98', description: 'Unleaded 98', common: true },
+      { kind: 'premium-diesel', label: 'Gasóleo aditivado', pumpCode: 'B7+', description: 'Premium diesel', common: true },
+      { kind: 'lpg', label: 'GPL Auto', pumpCode: 'GPL', description: 'Autogas', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    priceMode: 'reported',
+    trustDays: 30,
+    pricesStand: true,
+    utcOffsetMinutes: portugalOffsetMinutes,
+    source: {
+      name: 'DGEG Preços dos Combustíveis',
+      url: 'https://precoscombustiveis.dgeg.gov.pt',
+      credit: 'Prices from the Direção-Geral de Energia e Geologia (DGEG), Government of Portugal',
+    },
+    report: {
+      label: 'Check it on precoscombustiveis.dgeg.gov.pt',
+      url: 'https://precoscombustiveis.dgeg.gov.pt',
+      note: 'Stations enter their own prices on the DGEG site. Write to precoscombustiveis@dgeg.gov.pt about a wrong one.',
+    },
+    about:
+      'In Portugal station operators publish their prices on the DGEG’s price service whenever they change. A price stands until the station enters a new one; Pumpwise collects them about every 30 minutes and shows when each was last updated.',
+    cities: [
+      { name: 'Lisboa', detail: 'Portugal', lat: 38.7223, lng: -9.1393 },
+      { name: 'Porto', detail: 'Portugal', lat: 41.1579, lng: -8.6291 },
+      { name: 'Braga', detail: 'Portugal', lat: 41.5454, lng: -8.4265 },
+      { name: 'Coimbra', detail: 'Portugal', lat: 40.2033, lng: -8.4103 },
+      { name: 'Faro', detail: 'Portugal', lat: 37.0194, lng: -7.9322 },
+      { name: 'Setúbal', detail: 'Portugal', lat: 38.5244, lng: -8.8882 },
+      { name: 'Aveiro', detail: 'Portugal', lat: 40.6405, lng: -8.6538 },
+      { name: 'Leiria', detail: 'Portugal', lat: 39.7436, lng: -8.8071 },
+      { name: 'Évora', detail: 'Portugal', lat: 38.5667, lng: -7.9 },
+      { name: 'Viseu', detail: 'Portugal', lat: 40.6566, lng: -7.9125 },
+      { name: 'Funchal', detail: 'Madeira', lat: 32.6669, lng: -16.9241 },
+      { name: 'Ponta Delgada', detail: 'Açores', lat: 37.7412, lng: -25.6756 },
     ],
   },
 };
@@ -492,7 +550,7 @@ export const DEFAULT_REGION: RegionId = 'wa';
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx', 'pt'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];

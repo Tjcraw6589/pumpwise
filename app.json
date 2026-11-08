@@ -33,7 +33,8 @@
         "CFBundleLocalizations": [
           "en",
           "es",
-          "fr"
+          "fr",
+          "pt"
         ]
       },
       "privacyManifests": {
@@ -193,7 +194,8 @@
     },
     "locales": {
       "es": "./locales/es.json",
-      "fr": "./locales/fr.json"
+      "fr": "./locales/fr.json",
+      "pt": "./locales/pt.json"
     }
   }
 }

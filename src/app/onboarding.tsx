@@ -18,7 +18,7 @@ import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
 /** Where a new user probably is, from the phone's country, so the welcome shows their fuels and money. */
-const COUNTRY_REGION: Record<string, RegionId> = { AU: 'wa', ES: 'es', FR: 'fr', MX: 'mx', GB: 'uk' };
+const COUNTRY_REGION: Record<string, RegionId> = { AU: 'wa', ES: 'es', FR: 'fr', MX: 'mx', PT: 'pt', GB: 'uk' };
 
 /** Two believable signs for the welcome, in the feed's hundredths of the region's money. */
 function samplePrices(region: RegionInfo): [number, number] {

@@ -1,12 +1,12 @@
 /**
- * Region texts in Spanish and French: names, the About paragraph, the source credit and the
+ * Region texts in Spanish, French and Portuguese: names, the About paragraph, the source credit and the
  * report-a-price link, and fuel descriptions. Fuel names stay as the region's pumps say them
  * ("Unleaded 91", "Gasolina 95", "SP95-E10"). English is written in `src/lib/regions.ts`.
  */
 import type { RegionId } from '@/lib/feed';
 import type { RegionInfo } from '@/lib/regions';
 
-import { lang } from './index';
+import { type Lang, lang } from './index';
 
 interface RegionText {
   name: string;
@@ -30,7 +30,7 @@ const ES: Record<RegionId, RegionText> = {
     name: 'Nueva Gales del Sur',
     about:
       'En Nueva Gales del Sur y el Territorio de la Capital Australiana cada gasolinera debe comunicar sus precios a FuelCheck, y el precio en el surtidor debe coincidir. Un precio sigue vigente hasta que la gasolinera comunica otro. Pumpwise los recoge cada 45 minutos aproximadamente.',
-    credit: 'Precios de FuelCheck, Gobierno de Nueva Gales del Sur',
+    credit: 'Precios de FuelCheck, Gobierno de Nueva Gales del Sur (CC BY-SA 3.0 AU)',
     reportLabel: 'Avisar en FuelCheck',
     reportNote: 'En Nueva Gales del Sur las gasolineras deben vender al precio que comunican a FuelCheck.',
   },
@@ -64,7 +64,7 @@ const ES: Record<RegionId, RegionText> = {
     name: 'España',
     about:
       'En España cada gasolinera debe comunicar sus precios al Ministerio para la Transición Ecológica cada vez que cambian. El Ministerio los publica cada media hora y Pumpwise los recoge cada 30 minutos aproximadamente.',
-    credit: 'Precios del Geoportal de Gasolineras, Ministerio para la Transición Ecológica y el Reto Demográfico',
+    credit: 'Precios del Geoportal de Gasolineras del MITECO, Gobierno de España (CC BY 4.0)',
     reportLabel: 'Consultarlo en el Geoportal',
     reportNote: 'Las gasolineras deben comunicar sus precios al Ministerio cada vez que cambian.',
   },
@@ -79,10 +79,18 @@ const ES: Record<RegionId, RegionText> = {
   mx: {
     name: 'México',
     about:
-      'En México las gasolineras reportan sus precios a la Comisión Reguladora de Energía (CRE), que los publica como datos abiertos. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales.',
-    credit: 'Precios de la Comisión Reguladora de Energía (CRE), Gobierno de México',
+      'En México las gasolineras reportan sus precios a la Comisión Nacional de Energía (CNE, antes CRE), que los publica como datos abiertos. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales.',
+    credit: 'Precios comunicados a la Comisión Nacional de Energía (CNE, antes CRE), Gobierno de México (CC BY 4.0)',
     reportLabel: 'Denunciarlo ante PROFECO',
-    reportNote: 'Las gasolineras reportan sus precios a la CRE; PROFECO atiende las quejas en la bomba.',
+    reportNote: 'Las gasolineras reportan sus precios a la CNE; PROFECO atiende las quejas en la bomba.',
+  },
+  pt: {
+    name: 'Portugal',
+    about:
+      'En Portugal las gasolineras publican sus precios en el servicio de precios de la DGEG cada vez que cambian. Un precio sigue vigente hasta que la gasolinera introduce otro; Pumpwise los recoge cada 30 minutos aproximadamente y muestra cuándo se actualizó cada uno.',
+    credit: 'Precios de la Direção-Geral de Energia e Geologia (DGEG), Gobierno de Portugal',
+    reportLabel: 'Consultarlo en precoscombustiveis.dgeg.gov.pt',
+    reportNote: 'Las gasolineras introducen sus propios precios en el sitio de la DGEG. Escribe a precoscombustiveis@dgeg.gov.pt si uno es incorrecto.',
   },
 };
 
@@ -101,7 +109,7 @@ const FR: Record<RegionId, RegionText> = {
     nameInSentence: 'la Nouvelle-Galles du Sud',
     about:
       'En Nouvelle-Galles du Sud et dans le Territoire de la capitale australienne, chaque station doit déclarer ses prix à FuelCheck, et le prix à la pompe doit correspondre. Un prix reste valable jusqu’à ce que la station en déclare un nouveau. Pumpwise les récupère environ toutes les 45 minutes.',
-    credit: 'Prix de FuelCheck, gouvernement de la Nouvelle-Galles du Sud',
+    credit: 'Prix de FuelCheck, gouvernement de la Nouvelle-Galles du Sud (CC BY-SA 3.0 AU)',
     reportLabel: 'Le signaler dans FuelCheck',
     reportNote: 'En Nouvelle-Galles du Sud, les stations doivent vendre au prix déclaré à FuelCheck.',
   },
@@ -138,7 +146,7 @@ const FR: Record<RegionId, RegionText> = {
     nameInSentence: 'l’Espagne',
     about:
       'En Espagne, chaque station doit déclarer ses prix au ministère de la Transition écologique à chaque changement. Le ministère les publie toutes les demi-heures et Pumpwise les récupère environ toutes les 30 minutes.',
-    credit: 'Prix du Geoportal de Gasolineras, ministère espagnol de la Transition écologique',
+    credit: 'Prix du Geoportal de Gasolineras du MITECO, gouvernement espagnol (CC BY 4.0)',
     reportLabel: 'Le vérifier sur le Geoportal',
     reportNote: 'Les stations espagnoles doivent déclarer leurs prix au ministère à chaque changement.',
   },
@@ -155,15 +163,107 @@ const FR: Record<RegionId, RegionText> = {
     name: 'Mexique',
     nameInSentence: 'le Mexique',
     about:
-      'Au Mexique, les stations déclarent leurs prix à la Commission de régulation de l’énergie (CRE), qui les publie en données ouvertes. La liste donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels.',
-    credit: 'Prix de la Comisión Reguladora de Energía (CRE), gouvernement du Mexique',
+      'Au Mexique, les stations déclarent leurs prix à la Comisión Nacional de Energía (CNE, anciennement CRE), qui les publie en données ouvertes. La liste donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels, avec la date de leur relevé.',
+    credit: 'Prix déclarés à la Comisión Nacional de Energía (CNE, anciennement CRE), gouvernement du Mexique (CC BY 4.0)',
     reportLabel: 'Le signaler à la PROFECO',
-    reportNote: 'Les stations déclarent leurs prix à la CRE ; la PROFECO traite les réclamations à la pompe.',
+    reportNote: 'Les stations déclarent leurs prix à la CNE ; la PROFECO traite les réclamations à la pompe.',
+  },
+  pt: {
+    name: 'Portugal',
+    nameInSentence: 'le Portugal',
+    about:
+      'Au Portugal, les exploitants publient leurs prix sur le service de prix de la DGEG à chaque changement. Un prix reste valable jusqu’à ce que la station en saisisse un nouveau ; Pumpwise les relève environ toutes les 30 minutes et indique la date de chaque mise à jour.',
+    credit: 'Prix de la Direção-Geral de Energia e Geologia (DGEG), gouvernement du Portugal',
+    reportLabel: 'Le vérifier sur precoscombustiveis.dgeg.gov.pt',
+    reportNote: 'Les stations saisissent elles-mêmes leurs prix sur le site de la DGEG. Écrivez à precoscombustiveis@dgeg.gov.pt pour signaler une erreur.',
   },
 };
 
+const PT: Record<RegionId, RegionText> = {
+  wa: {
+    name: 'Austrália Ocidental',
+    nameInSentence: 'a Austrália Ocidental',
+    about:
+      'Na Austrália Ocidental cada posto tem de comunicar ao FuelWatch o preço do dia seguinte até às 14:00. Os preços ficam fixos 24 horas a partir das 6:00, por isso sabe o preço de hoje e, a partir das 14:30, o de amanhã.',
+    credit: 'Preços do FuelWatch, Governo da Austrália Ocidental',
+    reportLabel: 'Contactar o FuelWatch',
+    reportNote: 'Na Austrália Ocidental os preços são fixos durante o dia; o FuelWatch trata das queixas.',
+  },
+  nsw: {
+    name: 'Nova Gales do Sul',
+    nameInSentence: 'a Nova Gales do Sul',
+    about:
+      'Em Nova Gales do Sul e no Território da Capital Australiana cada posto tem de comunicar os seus preços ao FuelCheck, e o preço na bomba tem de coincidir. Um preço mantém-se até o posto comunicar outro. O Pumpwise recolhe-os a cada 45 minutos, aproximadamente.',
+    credit: 'Preços do FuelCheck, Governo de Nova Gales do Sul (CC BY-SA 3.0 AU)',
+    reportLabel: 'Comunicar no FuelCheck',
+    reportNote: 'Os postos têm de vender ao preço comunicado; o FuelCheck recebe as queixas.',
+  },
+  tas: {
+    name: 'Tasmânia',
+    nameInSentence: 'a Tasmânia',
+    about: 'Na Tasmânia os postos comunicam os seus preços ao FuelCheck TAS. Um preço mantém-se até o posto comunicar outro. O Pumpwise recolhe-os a cada 45 minutos, aproximadamente.',
+    credit: 'Preços do FuelCheck TAS, Governo da Tasmânia',
+    reportLabel: 'Abrir o FuelCheck TAS',
+    reportNote: 'Os postos comunicam os seus preços ao FuelCheck TAS.',
+  },
+  qld: {
+    name: 'Queensland',
+    nameInSentence: 'o Queensland',
+    about:
+      'No Queensland os postos têm de comunicar cada alteração de preço ao Governo do Queensland em 30 minutos. Um preço mantém-se até o posto comunicar outro. O Estado não dá qualquer garantia sobre os dados nem aceita responsabilidade pela sua utilização.',
+    credit: 'Based on data provided by the State of Queensland (Department of Energy and Climate) 2026',
+    reportLabel: 'Contactar o Governo do Queensland',
+    reportNote: 'No Queensland os postos têm de comunicar cada alteração de preço em 30 minutos.',
+  },
+  uk: {
+    name: 'Reino Unido',
+    nameInSentence: 'o Reino Unido',
+    about: 'Desde fevereiro de 2026 todos os postos do Reino Unido têm de comunicar os seus preços ao programa Fuel Finder e qualquer alteração em 30 minutos.',
+    credit: 'Preços do programa Fuel Finder do Governo do Reino Unido (Open Government Licence v3.0)',
+    reportLabel: 'Comunicar no GOV.UK',
+    reportNote: 'Os postos têm de comunicar as alterações em 30 minutos; o GOV.UK recebe as queixas.',
+  },
+  es: {
+    name: 'Espanha',
+    nameInSentence: 'a Espanha',
+    about:
+      'Em Espanha cada posto tem de comunicar os seus preços ao Ministério para a Transição Ecológica sempre que mudam. O Ministério publica-os de meia em meia hora e o Pumpwise recolhe-os a cada 30 minutos, aproximadamente.',
+    credit: 'Preços do Geoportal de Gasolineras do MITECO, Governo de Espanha (CC BY 4.0)',
+    reportLabel: 'Consultar no Geoportal',
+    reportNote: 'Os postos comunicam os seus próprios preços ao Ministério.',
+  },
+  fr: {
+    name: 'França',
+    nameInSentence: 'a França',
+    about:
+      'Em França cada posto tem de comunicar os seus preços ao Governo sempre que mudam, e o preço na bomba tem de coincidir. O Pumpwise recolhe-os a cada 15 minutos, aproximadamente. A lista oficial não tem marcas, por isso os postos aparecem pela morada.',
+    credit: 'Preços de prix-carburants.gouv.fr, Ministério da Economia francês (Licence Ouverte 2.0)',
+    reportLabel: 'Verificar em prix-carburants.gouv.fr',
+    reportNote: 'Os postos comunicam os seus próprios preços ao Governo.',
+  },
+  mx: {
+    name: 'México',
+    nameInSentence: 'o México',
+    about:
+      'No México os postos comunicam os seus preços à Comisión Nacional de Energía (CNE, antes CRE), que os publica como dados abertos. A lista dá os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais, com a data da recolha.',
+    credit: 'Preços comunicados à Comisión Nacional de Energía (CNE, antes CRE), Governo do México (CC BY 4.0)',
+    reportLabel: 'Denunciar à PROFECO',
+    reportNote: 'Os postos comunicam os seus preços à CNE; a PROFECO trata das queixas na bomba.',
+  },
+  pt: {
+    name: 'Portugal',
+    about:
+      'Em Portugal os operadores publicam os seus preços no serviço de preços da DGEG sempre que mudam. Um preço mantém-se até o posto introduzir outro; o Pumpwise recolhe-os a cada 30 minutos, aproximadamente, e mostra quando cada um foi atualizado.',
+    credit: 'Preços da Direção-Geral de Energia e Geologia (DGEG), Governo de Portugal',
+    reportLabel: 'Verificar em precoscombustiveis.dgeg.gov.pt',
+    reportNote: 'Os postos introduzem os seus próprios preços no sítio da DGEG. Escreva para precoscombustiveis@dgeg.gov.pt sobre um preço errado.',
+  },
+};
+
+const TEXTS: Record<Exclude<Lang, 'en'>, Record<RegionId, RegionText>> = { es: ES, fr: FR, pt: PT };
+
 /** Fuel descriptions, by their English wording (shared by several regions). */
-const FUEL_DESCRIPTIONS: Record<'es' | 'fr', Record<string, string>> = {
+const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
   es: {
     'Standard unleaded': 'Sin plomo normal',
     'Premium unleaded': 'Sin plomo premium',
@@ -222,19 +322,49 @@ const FUEL_DESCRIPTIONS: Record<'es' | 'fr', Record<string, string>> = {
     'Regular unleaded': 'Sans plomb ordinaire',
     Diesel: 'Gazole',
   },
+  pt: {
+    'Standard unleaded': 'Sem chumbo normal',
+    'Premium unleaded': 'Sem chumbo premium',
+    '98 RON unleaded': 'Sem chumbo 98',
+    '98 octane unleaded': 'Sem chumbo 98',
+    'Standard diesel': 'Gasóleo simples',
+    'Branded diesel': 'Gasóleo de marca',
+    Autogas: 'GPL Auto',
+    'Ethanol blend': 'Mistura com etanol',
+    '94 octane with 10% ethanol': '94 octanas com 10 % de etanol',
+    'Diesel with 20% biodiesel': 'Gasóleo com 20 % de biodiesel',
+    'Standard petrol': 'Gasolina normal',
+    'Premium petrol': 'Gasolina premium',
+    'Super diesel': 'Gasóleo super',
+    'Higher-bio diesel': 'Gasóleo com mais biocombustível',
+    'Renewable diesel': 'Gasóleo renovável',
+    'Unleaded 95 (E5)': 'Sem chumbo 95 (E5)',
+    'Gasóleo A, standard diesel': 'Gasóleo A, gasóleo simples',
+    'Unleaded 98': 'Sem chumbo 98',
+    'Premium diesel': 'Gasóleo aditivado',
+    'Premium unleaded 95': 'Sem chumbo 95 aditivada',
+    'Unleaded 95 with 10% ethanol': 'Sem chumbo 95 com 10 % de etanol',
+    'Liquefied petroleum gas': 'Gás de petróleo liquefeito',
+    'Unleaded 95 with up to 10% ethanol': 'Sem chumbo 95 com até 10 % de etanol',
+    'Unleaded 95': 'Sem chumbo 95',
+    Superethanol: 'Superetanol',
+    'Regular unleaded': 'Gasolina regular',
+    Diesel: 'Gasóleo',
+  },
 };
 
 /** Second lines of city suggestions that are not a region's own name. */
-const PLACE_DETAILS: Record<'es' | 'fr', Record<string, string>> = {
-  es: { 'Australian Capital Territory': 'Territorio de la Capital Australiana' },
-  fr: { 'Australian Capital Territory': 'Territoire de la capitale australienne' },
+const PLACE_DETAILS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
+  es: { 'Australian Capital Territory': 'Territorio de la Capital Australiana', Madeira: 'Madeira', Açores: 'Azores' },
+  fr: { 'Australian Capital Territory': 'Territoire de la capitale australienne', Madeira: 'Madère', Açores: 'Açores' },
+  pt: { 'Australian Capital Territory': 'Território da Capital Australiana', Mexico: 'México', Spain: 'Espanha', France: 'França' },
 };
 
 /** A region with its texts in the phone's language (English as written when the phone is in English). */
 export function localizeRegion(info: RegionInfo): RegionInfo {
   const current = lang();
   if (current === 'en') return info;
-  const text = (current === 'es' ? ES : FR)[info.id];
+  const text = TEXTS[current][info.id];
   const descriptions = FUEL_DESCRIPTIONS[current];
   const details = PLACE_DETAILS[current];
   return {

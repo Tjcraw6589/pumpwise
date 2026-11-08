@@ -5,7 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Header } from '@/components/Header';
 import { Screen } from '@/components/Screen';
 import { LEGAL_DOCS } from '@/content/legal.generated';
-import { t } from '@/i18n';
+import { lang, t } from '@/i18n';
 import { useTheme } from '@/theme/useTheme';
 
 /** Renders the small Markdown subset used by the legal documents: #, ##, ###, "- " bullets and paragraphs. */
@@ -60,14 +60,17 @@ function MarkdownLite({ source }: { source: string }) {
 export default function LegalScreen() {
   const { doc } = useLocalSearchParams<{ doc: string }>();
   const { spacing } = useTheme();
-  const entry = doc === 'terms' ? LEGAL_DOCS.terms : LEGAL_DOCS.privacy;
+  const versions = doc === 'terms' ? LEGAL_DOCS.terms : LEGAL_DOCS.privacy;
+  // The document in the phone's language when it exists, else the English one with a note saying so.
+  const translated = versions[lang()];
+  const entry = translated ?? versions.en;
   return (
     <Screen scroll edges={['top', 'bottom']} testID="legal-screen">
       <Header title={doc === 'terms' ? t('legal.terms') : t('legal.privacy')} dismiss="back" />
       <AppText variant="caption" tone="muted" style={{ marginBottom: spacing.sm }}>
         {t('legal.updated', entry.updated)}
       </AppText>
-      {t('legal.englishOnly') ? (
+      {!translated && t('legal.englishOnly') ? (
         <AppText variant="caption" tone="muted" style={{ marginBottom: spacing.sm }} testID="legal-english-only">
           {t('legal.englishOnly')}
         </AppText>

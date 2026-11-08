@@ -1,5 +1,5 @@
 /**
- * The words Pumpwise shows, in the phone's language: English, Spanish or French, with English as the
+ * The words Pumpwise shows, in the phone's language: English, Spanish, French or Portuguese, with English as the
  * fallback. Every dictionary has the same keys (the type system checks), and a value is either the
  * text or a small function where numbers or names go inside a sentence, so each language can order
  * the words its own way.
@@ -11,10 +11,11 @@ import { getLocales } from 'expo-localization';
 import { en, type Strings } from './en';
 import { es } from './es';
 import { fr } from './fr';
+import { pt } from './pt';
 
-export type Lang = 'en' | 'es' | 'fr';
+export type Lang = 'en' | 'es' | 'fr' | 'pt';
 
-const DICTIONARIES: Record<Lang, Strings> = { en, es, fr };
+const DICTIONARIES: Record<Lang, Strings> = { en, es, fr, pt };
 
 interface Reader {
   lang: Lang;
@@ -24,14 +25,14 @@ interface Reader {
   tag: string;
 }
 
-const DEFAULT_TAG: Record<Lang, string> = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR' };
+const DEFAULT_TAG: Record<Lang, string> = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT' };
 
 /** The first of the phone's preferred languages that Pumpwise speaks, or English, with its number style. */
 function detectReader(): Reader {
   try {
     for (const locale of getLocales()) {
       const code = locale.languageCode?.toLowerCase();
-      if (code === 'en' || code === 'es' || code === 'fr') {
+      if (code === 'en' || code === 'es' || code === 'fr' || code === 'pt') {
         const comma = locale.decimalSeparator ? locale.decimalSeparator === ',' : code !== 'en';
         return { lang: code, comma, tag: locale.languageTag || DEFAULT_TAG[code] };
       }

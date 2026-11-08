@@ -10,7 +10,7 @@ afterEach(() => setLang('en'));
 describe('dictionaries', () => {
   const english = ALL_DICTIONARIES.en as Record<string, unknown>;
 
-  test.each(['es', 'fr'] as const)('%s has every English key, each the same kind', (lang) => {
+  test.each(['es', 'fr', 'pt'] as const)('%s has every English key, each the same kind', (lang) => {
     const other = ALL_DICTIONARIES[lang] as Record<string, unknown>;
     expect(Object.keys(other).sort()).toEqual(Object.keys(english).sort());
     for (const key of Object.keys(english)) {
@@ -21,7 +21,7 @@ describe('dictionaries', () => {
     }
   });
 
-  test.each(['en', 'es', 'fr'] as const)('every %s sentence comes out whole', (lang) => {
+  test.each(['en', 'es', 'fr', 'pt'] as const)('every %s sentence comes out whole', (lang) => {
     for (const [key, value] of Object.entries(ALL_DICTIONARIES[lang] as Record<string, unknown>)) {
       const text = typeof value === 'function' ? (value as (...a: unknown[]) => string)('X', 'Y', 'Z', 'W') : value;
       expect(typeof text).toBe('string');
@@ -35,6 +35,7 @@ describe('dictionaries', () => {
       for (const fuel of region.fuels) {
         expect([fuel.description, FUEL_DESCRIPTION_TRANSLATIONS.es[fuel.description]]).toEqual([fuel.description, expect.any(String)]);
         expect([fuel.description, FUEL_DESCRIPTION_TRANSLATIONS.fr[fuel.description]]).toEqual([fuel.description, expect.any(String)]);
+        expect([fuel.description, FUEL_DESCRIPTION_TRANSLATIONS.pt[fuel.description]]).toEqual([fuel.description, expect.any(String)]);
       }
     }
   });
