@@ -105,6 +105,7 @@ describe('Spanish and French', () => {
   test('regions take the reader’s language for their names', () => {
     // REGIONS is translated once at start-up, so check the translation tables it reads.
     setLang('es');
-    expect(t('state.notCoveredTitle', 'España, Francia y México')).toBe('Pumpwise cubre España, Francia y México');
+    expect(t('state.notCoveredTitle')).toBe('Aquí todavía no hay precios oficiales');
+    expect(t('country.MX')).toBe('México');
   });
 });

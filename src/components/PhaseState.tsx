@@ -1,18 +1,21 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
 
 import { useCoverage, useRegion } from '@/hooks/useRegion';
 import { t } from '@/i18n';
+import type { RegionId } from '@/lib/feed';
 import type { NearbyPhase } from '@/lib/nearby';
 import type { Place } from '@/lib/places';
-import { fuelOption, REGIONS, regionList } from '@/lib/regions';
+import { fuelOption, regionHeading, REGIONS } from '@/lib/regions';
 import { radiusLabel, sameRadius, toKm } from '@/lib/units';
 import { currentPosition, openAppSettings, requestPermission } from '@/services/location';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/theme/useTheme';
 
+import { AppText } from './AppText';
 import { Button } from './Button';
 import { EmptyState } from './EmptyState';
 
@@ -48,6 +51,50 @@ export function LoadingCards() {
       {block(104, 'nearest')}
       {block(74, 'row1')}
       {block(74, 'row2')}
+    </View>
+  );
+}
+
+/** One row per covered place, each opening its main city: how a driver outside every covered region looks around. */
+function CoveredPlaces({ regions, onPick }: { regions: readonly RegionId[]; onPick: (place: Place) => void }) {
+  const { colors, spacing, radius } = useTheme();
+  return (
+    <View>
+      <AppText variant="overline" tone="muted" accessibilityRole="header" style={{ marginBottom: spacing.sm }}>
+        {t('state.coveredPlaces')}
+      </AppText>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg }]}>
+        {regions.map((id, index) => {
+          const city = REGIONS[id].cities[0] as Place;
+          return (
+            <Pressable
+              key={id}
+              accessibilityRole="button"
+              onPress={() => onPick(city)}
+              testID={index === 0 ? 'try-city' : `try-${id}`}
+              style={({ pressed }) => [
+                styles.row,
+                {
+                  paddingVertical: spacing.md,
+                  paddingHorizontal: spacing.md,
+                  backgroundColor: pressed ? colors.surfaceAlt : 'transparent',
+                  borderTopColor: colors.border,
+                  borderTopWidth: index === 0 ? 0 : StyleSheet.hairlineWidth,
+                },
+              ]}
+            >
+              <Ionicons name="location-outline" size={20} color={colors.accentText} />
+              <View style={[styles.flex, { marginLeft: spacing.md }]}>
+                <AppText variant="bodyBold">{regionHeading(id)}</AppText>
+                <AppText variant="caption" tone="muted">
+                  {t('state.lookAround', city.name)}
+                </AppText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -125,21 +172,18 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
           <Button label={t('action.choosePlace')} variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
-    case 'not-covered': {
-      const firstLive = REGIONS[coverage.live[0] ?? 'wa'];
-      const city = firstLive.cities[0] as Place;
+    case 'not-covered':
       return (
         <EmptyState
           icon="earth"
-          title={t('state.notCoveredTitle', regionList(coverage.live))}
+          title={t('state.notCoveredTitle')}
           body={t('state.notCoveredBody')}
           testID="state-not-covered"
         >
-          <Button label={t('state.lookAround', city.name)} size="lg" fullWidth onPress={() => choosePlace(city)} testID="try-city" />
+          <CoveredPlaces regions={coverage.live} onPick={choosePlace} />
           <Button label={t('action.choosePlace')} variant="secondary" size="lg" fullWidth onPress={choose} />
         </EmptyState>
       );
-    }
     case 'region-down':
       return (
         <EmptyState
@@ -183,3 +227,9 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
     }
   }
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  row: { flexDirection: 'row', alignItems: 'center' },
+  card: { borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden' },
+});

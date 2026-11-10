@@ -116,7 +116,9 @@ describe('Pumpwise end to end (router)', () => {
     useStore.getState().completeOnboarding();
     await renderRouter('./src/app', { initialUrl: '/' });
     await screen.findByTestId('state-not-covered');
-    expect(screen.getByText('Pumpwise covers Western Australia, New South Wales, Tasmania, Spain, France, Mexico and Portugal')).toBeTruthy();
+    expect(screen.getByText('No official fuel prices here yet')).toBeTruthy();
+    expect(screen.getByText('Spain')).toBeTruthy();
+    expect(screen.getByText('Western Australia · Australia')).toBeTruthy();
     await press('try-city');
     await screen.findByTestId('cheapest-card');
     expect(useStore.getState().settings.place?.name).toBe('Perth');

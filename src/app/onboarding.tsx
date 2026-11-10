@@ -52,8 +52,9 @@ export default function OnboardingScreen() {
   const guess = country ? COUNTRY_REGION[country] : undefined;
   const start = REGIONS[guess && (!coverage || coverage.live.includes(guess)) ? guess : DEFAULT_REGION];
   const [cheapSample, nearSample] = samplePrices(start);
+  // WA's "tomorrow's prices" line only for phones in Australia; anywhere else, the general line.
   const fact =
-    start.currencyCode !== 'AUD' ? t('onboard.factOfficial') : coverage?.live.includes('nsw') ? t('onboard.factNsw') : t('onboard.factWa');
+    !guess || start.currencyCode !== 'AUD' ? t('onboard.factOfficial') : coverage?.live.includes('nsw') ? t('onboard.factNsw') : t('onboard.factWa');
   const fuel = useStore((s) => s.settings.fuel);
   const updateSettings = useStore((s) => s.updateSettings);
   const completeOnboarding = useStore((s) => s.completeOnboarding);

@@ -546,6 +546,31 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 /** Where Pumpwise starts before it knows better: the first region to go live. */
 export const DEFAULT_REGION: RegionId = 'wa';
 
+/** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB'> = {
+  wa: 'AU',
+  nsw: 'AU',
+  tas: 'AU',
+  qld: 'AU',
+  uk: 'GB',
+  es: 'ES',
+  fr: 'FR',
+  mx: 'MX',
+  pt: 'PT',
+};
+
+/** "Western Australia · Australia", or just "Spain" where the region is the whole country. */
+export function regionHeading(id: RegionId): string {
+  const region = REGIONS[id].name;
+  const country = t(`country.${REGION_COUNTRY[id]}`);
+  return region === country ? region : `${region} · ${country}`;
+}
+
+/** Covered regions with the one the user is in (if any) first, then in the usual order. */
+export function regionsHereFirst(live: readonly RegionId[], here: RegionId | null): RegionId[] {
+  return here && live.includes(here) ? [here, ...live.filter((id) => id !== here)] : [...live];
+}
+
 /**
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.

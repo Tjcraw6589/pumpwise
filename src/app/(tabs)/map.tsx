@@ -74,6 +74,7 @@ export default function MapScreen() {
           setOverlay((o) => (o.top === top ? o : { ...o, top }));
         }}
       >
+        {phase === 'not-covered' ? null : (
         <View
           style={[
             styles.topCard,
@@ -89,6 +90,7 @@ export default function MapScreen() {
         >
           <SearchControls areaLabel={areaLabel} />
         </View>
+        )}
         {!showMap ? (
           <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg }}>
             {phase !== 'ready' ? <PhaseState phase={phase} /> : null}

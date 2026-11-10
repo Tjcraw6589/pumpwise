@@ -158,7 +158,7 @@ export default function NearbyScreen() {
           </AppText>
         ) : null}
       </Pressable>
-      <SearchControls areaLabel={areaLabel} showPlace={false} />
+      {phase === 'not-covered' ? null : <SearchControls areaLabel={areaLabel} showPlace={false} />}
       <View style={{ height: spacing.md }} />
 
       {feedError && phase === 'ready' && loadedAt ? (

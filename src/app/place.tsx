@@ -7,11 +7,13 @@ import { AppText } from '@/components/AppText';
 import { Header } from '@/components/Header';
 import { askForLocation } from '@/components/PhaseState';
 import { Screen } from '@/components/Screen';
+import { useSearchCenter } from '@/hooks/useLiveController';
 import { useCoverage } from '@/hooks/useRegion';
 import { t } from '@/i18n';
 import type { RegionId } from '@/lib/feed';
 import { classifyQuery, type Place } from '@/lib/places';
-import { regionList } from '@/lib/regions';
+import { regionAt } from '@/lib/feed';
+import { REGIONS, regionHeading, regionList, regionsHereFirst } from '@/lib/regions';
 import { openAppSettings } from '@/services/location';
 import { citiesFor, searchPlaces } from '@/services/placeSearch';
 import { useLive } from '@/store/useLive';
@@ -51,6 +53,8 @@ export default function PlaceScreen() {
   const permission = useLive((s) => s.permission);
   const canAskAgain = useLive((s) => s.canAskAgain);
   const coverage = useCoverage();
+  const center = useSearchCenter();
+  const here = center ? regionAt(center.lat, center.lng) : null;
   const liveKey = coverage.live.join(',');
   const [query, setQuery] = useState('');
   // Results belong to the query they were found for, so stale results never show for new text.
@@ -175,14 +179,16 @@ export default function PlaceScreen() {
         </View>
       ) : null}
 
-      <View style={{ marginTop: spacing.xl }}>
-        <AppText variant="overline" tone="muted">
-          {t('place.cities')}
-        </AppText>
-        {citiesFor(coverage.live).map((place) => (
-          <PlaceRow key={place.name} place={place} icon="business-outline" onPress={() => pick(place)} testID={`city-${place.name}`} />
-        ))}
-      </View>
+      {regionsHereFirst(coverage.live, here).map((id) => (
+        <View key={id} style={{ marginTop: spacing.xl }} testID={`cities-${id}`}>
+          <AppText variant="overline" tone="muted" accessibilityRole="header">
+            {regionHeading(id)}
+          </AppText>
+          {REGIONS[id].cities.map((place) => (
+            <PlaceRow key={place.name} place={place} icon="business-outline" onPress={() => pick(place)} testID={`city-${place.name}`} />
+          ))}
+        </View>
+      ))}
       <AppText variant="caption" tone="faint" style={{ marginTop: spacing.lg }}>
         {t('place.privacy')}
       </AppText>
