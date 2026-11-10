@@ -14,7 +14,7 @@ Everything below fits Apple's field limits (counts given per field). Paste as-is
 | Primary category | Navigation |
 | Secondary category | Travel |
 | Price | Free. No in-app purchases. 1.0 has no adverts; 1.1 adds one banner (AdMob). |
-| Availability | Australia; add Spain, France, Portugal and Mexico with 1.2 (see "Version 1.2.0") |
+| Availability | 1.0 and 1.1: Australia. 1.2: every country or region except China mainland (see "Version 1.2.0") |
 | Age rating | 4+ (answer "None" to every content question) |
 | Copyright | Use the same line as Bowerly |
 | Privacy policy URL | https://tjcraw6589.github.io/pumpwise/privacy.html |
@@ -124,14 +124,15 @@ New South Wales, the ACT and Tasmania are here, with official FuelCheck prices.
 Now also in New South Wales, the ACT and Tasmania, with official FuelCheck prices that stations must update whenever they change.
 ```
 
-## Version 1.2.0: Spain, France, Portugal and Mexico
+## Version 1.2.0: Spain, France, Portugal and Mexico, available worldwide
 
 1.2 reads feed v4 (WA, NSW/ACT, Tasmania, Spain, France, Portugal, Mexico; Queensland once its key is in) and speaks English, Spanish, French and Portuguese, picked from the iPhone's language. Prices show the way each country's pumps write them: 189.9 (cents) in Australia, 1,659 (euros) in Spain, France and Portugal, 24.59 (pesos) in Mexico. The privacy policy and terms exist in all four languages (legal/*.md).
 
 ### In App Store Connect (all free, nothing to pay)
 
-1. **Pricing and Availability** → Availability → **Edit** → tick **Spain**, **France**, **Portugal** and **Mexico** (keep Australia) → Done → Save.
-2. **App Information** → Localizable Information → the language menu at the top right → **Add Language**: add **Spanish (Spain)**, **Spanish (Mexico)**, **French** and **Portuguese (Portugal)**. For each one, paste the name and subtitle below.
+1. **Pricing and Availability** → Availability → **Edit** → tick **Select all**, then untick **China mainland** → Done → Save. Anyone anywhere can look around the covered places, so the app goes in every storefront Apple allows. China mainland is left out because Apple only lists apps there that have a Chinese government ICP filing number, which Pumpwise does not have.
+   Before the EU storefronts (Spain, France, Portugal and the rest of the EU) will show the app, Apple needs your **trader status** under the EU Digital Services Act: App Store Connect → **Business** (or Apps → Pumpwise → App Information) → **Digital Services Act compliance** → **Trader** or **Not a trader**. Pumpwise earns money from ads, which usually makes its developer a trader under EU law, but Apple says the choice is yours and suggests a lawyer if you are unsure. If you choose **Trader**, your name, address, phone number and email are shown on the EU App Store page. This is your declaration to make; Claude will not tick it. If you would rather not show those details, leave the EU storefronts unticked for now.
+2. **App Information** → Localizable Information → the language menu at the top right → **Add Language**: add **English (U.S.)**, **English (U.K.)**, **Spanish (Spain)**, **Spanish (Mexico)**, **French** and **Portuguese (Portugal)**. For each one, paste the name and subtitle below. English (U.S.) and English (U.K.) matter now the app is worldwide: without them, shoppers in the US, the UK and other English storefronts would see the English (Australia) listing, which talks about Western Australia's tomorrow prices.
 3. On the **1.2.0** version page, switch to each new language with the same menu and paste its promotional text, description, keywords and What's New. Screenshots: if you don't upload Spanish or French ones, App Store Connect uses the English ones.
 4. Nothing changes in **App Privacy**: no new data is collected.
 
@@ -144,6 +145,7 @@ Pumpwise now covers Spain, France, Portugal and Mexico, with official government
 • Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
 • Prices the way each country writes them: 1,659 in Spain, France and Portugal, 24.59 in Mexico.
 • Tidier station names and addresses.
+• Look around any covered place from anywhere, even from overseas.
 ```
 
 **Keywords, 1.2** (98 of 100 characters; Spanish and French words go in their own listings)
@@ -154,6 +156,106 @@ perth,sydney,nsw,wa,tas,hobart,canberra,servo,diesel,unleaded,ulp,e10,cheap,stat
 Description: add this line after the first paragraph.
 ```
 Also in Spain, France, Portugal and Mexico, with each government's official prices.
+```
+
+### English (U.K.)
+
+No "fill up now or wait" here. The UK itself is not covered yet (the UK service refuses connections from outside the UK), so this listing is about driving abroad.
+
+**Name** (28 of 30)
+```
+Pumpwise: Fuel Prices Abroad
+```
+**Subtitle** (28 of 30)
+```
+Cheap fuel in Spain & France
+```
+**Promotional text** (157 of 170)
+```
+Driving to Spain, France or Portugal? Pumpwise shows the cheapest official fuel prices around you, in euros and litres, and switches as you cross the border.
+```
+**Keywords** (94 of 100)
+```
+petrol,diesel,spain,france,portugal,road,trip,holiday,euro,motorway,cheap,station,map,gasolina
+```
+**Description**
+```
+Pumpwise shows you two things the moment it opens: the nearest filling station, and the cheapest one inside the area you choose. One tap gets you directions.
+
+MADE FOR THE ROAD TRIP
+Pumpwise covers Spain, France and Portugal with each government's official prices, plus Mexico and parts of Australia. Drive from one country to the next and the prices, money, units and fuel names switch for you, so a French SP95-E10 and a Spanish Gasolina 95 are never mixed up. Plan ahead by looking around any covered town before you leave, from wherever you are.
+
+WORTH THE DRIVE?
+A cheaper station 10 km away isn't always a saving. Pumpwise counts the fuel you'd burn getting there and back, using your car's fuel use, and tells you what you'd really save.
+
+PRICES YOU CAN TRUST
+• Official prices that stations are required to report to their government.
+• Closed stations and members-only sites are never picked as the cheapest.
+
+PRIVATE BY DESIGN
+No account. A small ad keeps it free. Your location is only used on your iPhone while the app is open, and is never sent to us.
+
+Please don't use Pumpwise while driving. Let a passenger check, or look before you set off.
+
+Prices from each government's official service: the Geoportal de Gasolineras (Spain), prix-carburants.gouv.fr (France), the DGEG (Portugal), the Comisión Nacional de Energía (Mexico), FuelWatch and FuelCheck (Australia). Pumpwise is not affiliated with any government, station or fuel brand.
+```
+**What's New**
+```
+Pumpwise now covers Spain, France, Portugal and Mexico, with each government's official prices.
+
+• Look around any covered place from anywhere, even from home before the trip.
+• Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
+• Prices the way each country writes them: 1,659 in Spain, France and Portugal, 24.59 in Mexico.
+```
+
+### English (U.S.)
+
+No "fill up now or wait" here: that feature exists only in Western Australia. The United States has no official station price feed, so this listing is about trips to Mexico and Europe.
+
+**Name** (27 of 30)
+```
+Pumpwise: Gas Prices Abroad
+```
+**Subtitle** (28 of 30)
+```
+Mexico, Spain, France & more
+```
+**Promotional text** (165 of 170)
+```
+Road trip to Mexico or Europe? Pumpwise shows the cheapest official gas prices around you, in pesos or euros, and switches as you cross from one country to the next.
+```
+**Keywords** (96 of 100)
+```
+gas,price,mexico,cancun,tijuana,baja,spain,france,portugal,travel,road,trip,diesel,cheap,station
+```
+**Description**
+```
+Pumpwise shows you two things the moment it opens: the nearest gas station, and the cheapest one inside the area you choose. One tap gets you directions.
+
+MADE FOR THE ROAD TRIP
+Pumpwise covers Mexico, Spain, France and Portugal with each government's official prices, plus parts of Australia. Cross a border and the prices, money, units and fuel names switch for you: Magna and Premium in Mexico, Gasolina 95 in Spain, SP95-E10 in France. Plan ahead by looking around any covered town before you leave, from wherever you are.
+
+WORTH THE DRIVE?
+A cheaper station 10 km away isn't always a saving. Pumpwise counts the fuel you'd burn getting there and back, using your car's fuel use, and tells you what you'd really save.
+
+PRICES YOU CAN TRUST
+• Official prices that stations are required to report to their government.
+• Closed stations and members-only sites are never picked as the cheapest.
+
+PRIVATE BY DESIGN
+No account. A small ad keeps it free. Your location is only used on your iPhone while the app is open, and is never sent to us.
+
+Please don't use Pumpwise while driving. Let a passenger check, or look before you set off.
+
+Prices from each government's official service: the Comisión Nacional de Energía (Mexico), the Geoportal de Gasolineras (Spain), prix-carburants.gouv.fr (France), the DGEG (Portugal), FuelWatch and FuelCheck (Australia). Pumpwise is not affiliated with any government, station or fuel brand.
+```
+**What's New**
+```
+Pumpwise now covers Mexico, Spain, France and Portugal, with each government's official prices.
+
+• Look around any covered place from anywhere, even from home before the trip.
+• Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
+• Prices the way each country writes them: 24.59 in Mexico, 1,659 in Spain, France and Portugal.
 ```
 
 ### Spanish (Spain)
@@ -211,6 +313,7 @@ Pumpwise ya está en España, Francia, Portugal y México, con los precios ofici
 
 • La app, en español, francés y portugués.
 • Los precios, como en el surtidor: 1,659 en España.
+• Consulta cualquier lugar cubierto desde donde estés, también desde el extranjero.
 ```
 
 ### Spanish (Mexico)
@@ -267,6 +370,7 @@ Pumpwise ya está en México, España, Francia y Portugal, con los precios ofici
 
 • La app, en español, francés y portugués.
 • Los precios, como en la bomba: 24.59 en México.
+• Consulta cualquier lugar cubierto desde donde estés, también desde el extranjero.
 ```
 
 ### French
@@ -324,6 +428,7 @@ Pumpwise arrive en France, en Espagne, au Portugal et au Mexique, avec les prix 
 
 • L’app en français, en espagnol et en portugais.
 • Les prix comme à la pompe : 1,659 en France.
+• Consultez n’importe quel lieu couvert où que vous soyez, même depuis l’étranger.
 ```
 
 ### Portuguese (Portugal)
@@ -380,13 +485,14 @@ O Pumpwise chegou a Portugal, Espanha, França e México, com os preços oficiai
 
 • A app em português, espanhol e francês.
 • Os preços como na bomba: 1,759 em Portugal.
+• Consulte qualquer local coberto onde quer que esteja, mesmo a partir do estrangeiro.
 ```
 
 ### Review notes for 1.2
 ```
 Pumpwise shows official fuel prices that stations must report to government schemes: FuelWatch (Western Australia), FuelCheck (New South Wales, the ACT and Tasmania), the Geoportal de Gasolineras (Spain), prix-carburants.gouv.fr (France), the DGEG (Portugal) and the Comisión Nacional de Energía (Mexico). Each source is credited, with a link, on every screen with prices; the licences are listed at https://tjcraw6589.github.io/pumpwise/data-licences.html.
 
-If you are reviewing somewhere else, the app says which places it covers after you allow location. Tap "Look around Perth", or choose a city such as Madrid, Paris, Lisboa or Ciudad de México from the place list, to see live prices. The app follows the iPhone's language: English, Spanish, French or Portuguese.
+Pumpwise is available worldwide, but official prices exist only in the places listed above. If you are reviewing somewhere else, the Nearby tab says "No official fuel prices here yet" and lists each place that has them: tap one (for example "Western Australia · Australia" or "Spain") to see live prices, or tap "Choose a place" and pick a city such as Madrid, Paris, Lisboa or Ciudad de México. The app follows the iPhone's language: English, Spanish, French or Portuguese.
 
 No account and no in-app purchases. One small banner ad on the Nearby tab. Location is used only while the app is open and never leaves the device.
 ```
