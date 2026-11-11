@@ -1,0 +1,66 @@
+# Builds the iPhone app on GitHub's own Mac computers, free for this public repository, and uploads it to
+# TestFlight. Use it when Expo's monthly free cloud builds are used up: the build runs here instead of on
+# Expo's servers, with the same signing certificate and profile Expo stores for Pumpwise, so it does not
+# count against Expo's limit.
+#
+# Runs only when started by hand (Actions → "iPhone build" → Run workflow). Never on pull requests, so the
+# Expo token can't reach code from forks. Uploading to TestFlight never submits to App Review: that stays
+# Tyler's click in App Store Connect.
+#
+# Needs one repository secret: EXPO_TOKEN (expo.dev → Account settings → Access tokens).
+name: iPhone build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch to build
+        required: true
+        default: regions-1.2
+      testflight:
+        description: Upload to TestFlight when the build succeeds
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'Tjcraw6589/pumpwise'
+    runs-on: macos-26
+    timeout-minutes: 120
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Check the Expo token is set
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::Add the EXPO_TOKEN repository secret first (expo.dev → Account settings → Access tokens)."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Tools on this Mac
+        run: |
+          xcodebuild -version
+          pod --version || true
+          fastlane --version | tail -1 || true
+      - name: Install
+        run: npm ci
+      - name: Expo account
+        run: npx --yes eas-cli@latest whoami
+      - name: Build (same signing as Expo's cloud builds; the build number goes up by one)
+        run: npx --yes eas-cli@latest build --platform ios --profile production --local --non-interactive --output "$RUNNER_TEMP/Pumpwise.ipa"
+      - name: Upload to TestFlight
+        if: ${{ inputs.testflight }}
+        run: npx --yes eas-cli@latest submit --platform ios --profile production --path "$RUNNER_TEMP/Pumpwise.ipa" --non-interactive --wait
