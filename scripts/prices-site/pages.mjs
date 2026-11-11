@@ -105,6 +105,7 @@ const T = {
     saving: (n, avg, save) => `The average across ${n} stations is ${avg}, so the cheapest saves about ${save} on a ${FILL_LITRES} litre fill.`,
     cheapest: 'Cheapest', average: 'Average', station: 'Station', address: 'Address', price: 'Price', reported: 'Reported', map: 'Map',
     showing: (k, n) => `The ${k} cheapest of ${n} stations.`, perLitre: 'per litre',
+    membersOnly: 'Members only', permitNeeded: 'Entry permit needed',
     nearby: 'Nearby places', allIn: (r) => `All places in ${r}`, places: 'Places', updated: 'Updated', source: 'Source', licence: 'Licence',
     disclaimer: 'Prices are the ones stations report to the official service. The price at the pump is what you pay.',
     reuse: 'The price tables on this page may be reused under the same licence.',
@@ -132,6 +133,7 @@ const T = {
     saving: (n, avg, save) => `La media de ${n} gasolineras es ${avg}: llenar ${FILL_LITRES} litros al precio más bajo ahorra unos ${save}.`,
     cheapest: 'Más barato', average: 'Media', station: 'Gasolinera', address: 'Dirección', price: 'Precio', reported: 'Comunicado', map: 'Mapa',
     showing: (k, n) => `Las ${k} más baratas de ${n} gasolineras.`, perLitre: 'por litro',
+    membersOnly: 'Solo socios', permitNeeded: 'Requiere permiso de acceso',
     nearby: 'Lugares cercanos', allIn: (r) => `Todos los lugares de ${r}`, places: 'Lugares', updated: 'Actualizado', source: 'Fuente', licence: 'Licencia',
     disclaimer: 'Los precios son los que las estaciones comunican al servicio oficial. El precio válido es el del surtidor.',
     reuse: 'Las tablas de precios de esta página pueden reutilizarse con la misma licencia.',
@@ -151,6 +153,7 @@ const T = {
     saving: (n, avg, save) => `La moyenne de ${n} stations est de ${avg} : un plein de ${FILL_LITRES} litres au prix le plus bas économise environ ${save}.`,
     cheapest: 'Le moins cher', average: 'Moyenne', station: 'Station', address: 'Adresse', price: 'Prix', reported: 'Déclaré', map: 'Carte',
     showing: (k, n) => `Les ${k} moins chères sur ${n} stations.`, perLitre: 'le litre',
+    membersOnly: 'Réservé aux adhérents', permitNeeded: 'Permis d’accès requis',
     nearby: 'À proximité', allIn: (r) => `Toutes les communes : ${r}`, places: 'Communes', updated: 'Mis à jour', source: 'Source', licence: 'Licence',
     disclaimer: 'Les prix sont ceux déclarés par les stations au service officiel. Le prix affiché à la pompe fait foi.',
     reuse: 'Les tableaux de prix de cette page peuvent être réutilisés sous la même licence.',
@@ -170,6 +173,7 @@ const T = {
     saving: (n, avg, save) => `A média de ${n} postos é ${avg}: abastecer ${FILL_LITRES} litros ao preço mais baixo poupa cerca de ${save}.`,
     cheapest: 'Mais barato', average: 'Média', station: 'Posto', address: 'Morada', price: 'Preço', reported: 'Comunicado', map: 'Mapa',
     showing: (k, n) => `Os ${k} mais baratos de ${n} postos.`, perLitre: 'por litro',
+    membersOnly: 'Só para sócios', permitNeeded: 'Requer autorização de entrada',
     nearby: 'Locais próximos', allIn: (r) => `Todos os locais em ${r}`, places: 'Locais', updated: 'Atualizado', source: 'Fonte', licence: 'Licença',
     disclaimer: 'Os preços são os comunicados pelos postos ao serviço oficial. O preço válido é o da bomba.',
     reuse: 'As tabelas de preços desta página podem ser reutilizadas com a mesma licença.',
@@ -254,6 +258,15 @@ function stationAddress(s) {
   const tail = [s.postcode, s.town].filter((x) => x && String(x).trim()).join(' ');
   if (tail) parts.push(tail);
   return parts.join(', ');
+}
+
+/**
+ * Stations not everyone can buy from: members only (Costco) or behind an entry permit. Like the app,
+ * the pages list them with a label but never name one as "the cheapest", and leave them out of averages.
+ */
+export function restriction(s) {
+  const tags = Array.isArray(s.tags) ? s.tags : [];
+  return tags.includes('members-only') ? 'membersOnly' : tags.includes('permit-required') ? 'permitNeeded' : null;
 }
 
 /** Fresh prices of one fuel in a list of stations, cheapest first. */
@@ -367,7 +380,8 @@ function summarise(place, cfg, cutoff) {
   const fuels = [];
   for (const kind of cfg.fuels) {
     const rows = ranked(place.stations, kind, cutoff);
-    if (rows.length >= 2) fuels.push({ kind, label: cfg.labels[kind] ?? kind, rows, min: rows[0], avg: mean(rows) });
+    const open = rows.filter((r) => !restriction(r.s));
+    if (open.length >= 2) fuels.push({ kind, label: cfg.labels[kind] ?? kind, rows, open, min: open[0], avg: mean(open) });
     if (fuels.length === MAX_FUELS) break;
   }
   return fuels;
@@ -383,11 +397,11 @@ function placePage(id, place, ctx) {
   const tiles = fuels.slice(0, 3).map((f) => `<div class="tile"><span class="fuel">${esc(f.label)}</span><span class="big">${esc(money(f.min.p, cfg.money))}</span><span class="sub">${esc(t.cheapest)} · ${esc(t.average)} ${esc(money(f.avg, cfg.money))}</span></div>`).join('\n');
   let lead = `<p class="lead">${esc(t.lead(main.label, money(main.min.p, cfg.money), place.name, stationName(main.min.s)))}`;
   const gap = (main.avg - main.min.p) * FILL_LITRES;
-  if (main.rows.length >= 3 && gap >= 50) lead += ` ${esc(t.saving(main.rows.length, money(main.avg, cfg.money), amount(gap, cfg.money)))}`;
+  if (main.open.length >= 3 && gap >= 50) lead += ` ${esc(t.saving(main.open.length, money(main.avg, cfg.money), amount(gap, cfg.money)))}`;
   lead += '</p>';
   const tables = fuels.map((f) => {
     const top = f.rows.slice(0, TOP);
-    const body = top.map((r) => `<tr><td><strong>${esc(stationName(r.s))}</strong><br><span class="addr">${esc(stationAddress(r.s))}</span> <a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=${r.s.lat},${r.s.lng}" rel="nofollow noopener">${esc(t.map)}</a></td><td class="num">${esc(money(r.p, cfg.money))}</td>${cfg.fixedDaily ? '' : `<td class="when">${esc(when(r.at, cfg, now))}</td>`}</tr>`).join('\n');
+    const body = top.map((r) => `<tr><td><strong>${esc(stationName(r.s))}</strong>${restriction(r.s) ? ` <span class="tag">${esc(t[restriction(r.s)])}</span>` : ''}<br><span class="addr">${esc(stationAddress(r.s))}</span> <a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=${r.s.lat},${r.s.lng}" rel="nofollow noopener">${esc(t.map)}</a></td><td class="num">${esc(money(r.p, cfg.money))}</td>${cfg.fixedDaily ? '' : `<td class="when">${esc(when(r.at, cfg, now))}</td>`}</tr>`).join('\n');
     const note = f.rows.length > TOP ? `<p class="note">${esc(t.showing(TOP, f.rows.length))}</p>` : '';
     return `<section>
 <h2>${esc(f.label)} · ${esc(place.name)}</h2>
@@ -404,7 +418,7 @@ ${note}
   if (t.tomorrow) {
     const lines = [];
     for (const f of fuels.slice(0, 3)) {
-      const both = f.rows.filter((r) => r.s.tomorrow && r.s.tomorrow[f.kind] > 0);
+      const both = f.open.filter((r) => r.s.tomorrow && r.s.tomorrow[f.kind] > 0);
       if (both.length < 2) continue;
       const avgT = both.reduce((a, r) => a + r.s.tomorrow[f.kind], 0) / both.length;
       const avgN = mean(both);
@@ -471,6 +485,7 @@ h1{font-size:32px;line-height:1.1;letter-spacing:-.4px;margin:12px 0 4px}
 h2{font-size:20px;margin:28px 0 8px}
 .crumbs,.count,.note,.addr,.when,small{color:var(--muted);font-size:14px}
 .lead{font-size:18px}
+.tag{display:inline-block;margin-left:6px;padding:1px 8px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap}
 .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}
 .tile{background:var(--sign);border-radius:14px;padding:10px 16px;display:flex;flex-direction:column;min-width:150px}
 .tile .fuel{color:#C9D1DB;font-size:13px}
