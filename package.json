@@ -18,7 +18,8 @@
     "legal:html": "node scripts/build-legal.mjs",
     "feed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/build.ts",
     "feed:fixture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/fixture.ts",
-    "admob": "node scripts/set-admob.mjs"
+    "admob": "node scripts/set-admob.mjs",
+    "prices": "node scripts/prices-site/build.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/barlow-condensed": "^0.4.1",

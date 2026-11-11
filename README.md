@@ -37,3 +37,18 @@ eas build -p ios --profile production  # store build
 `data/v2/meta.json` lists every half-degree tile with its station count, plus each region's status; `data/v2/tiles/<lat>_<lng>.json` holds that tile's stations with prices per litre (cents in WA) keyed by fuel kind (`regular`, `premium`, `super`, `diesel`, ...), when each applies, and tomorrow's price where published. The app fetches `meta.json` with a per-minute cache buster, then only the tiles around the search centre, keyed by the feed's build time so unchanged tiles are reused.
 
 Data: prices from FuelWatch, Government of Western Australia (www.fuelwatch.wa.gov.au), used with acknowledgement and a link as FuelWatch asks.
+
+## Price pages on the website
+
+`scripts/prices-site/` turns the feed into plain web pages at https://tjcraw6589.github.io/pumpwise/prices/:
+one page per town and city ("Fuel prices in Perth today"), one per region, an index and a sitemap. The feed
+job runs it after every feed build (about every 15 minutes), as a step that may fail without affecting the feed.
+
+- `pages.mjs` is pure (feed in, pages out); `build.mjs` reads `out/site/data/v4` and writes `out/site/prices`.
+- Each page shows the source's credit, licence and update time from `meta.json`; a region whose licence forbids
+  republishing (Queensland) gets no pages. Prices older than 10 days are left out.
+- Spain and Mexico are written in Spanish, France in French, Portugal in Portuguese.
+- The App Store link shows only where `app: true` in `REGIONS` (Western Australia until 1.2 is released; then
+  set it to true for the regions 1.2 covers).
+- Try it: `npm run feed` (or any folder holding `data/v4`), then `npm run prices`.
+
