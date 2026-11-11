@@ -17,7 +17,8 @@
     "assets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-assets.mjs",
     "legal:html": "node scripts/build-legal.mjs",
     "feed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/build.ts",
-    "feed:fixture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/fixture.ts"
+    "feed:fixture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/fixture.ts",
+    "prices": "node scripts/prices-site/build.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/barlow-condensed": "^0.4.1",

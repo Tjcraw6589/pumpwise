@@ -12,6 +12,8 @@
 # 1.1) and data/v2 (Western Australia only, for 1.0). The UK Fuel Finder source only runs
 # when FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET secrets exist, and that service refuses
 # connections from outside the UK, so it stays off on GitHub's servers.
+# After the feed, the job writes the price pages (prices/, see scripts/prices-site): a step that may
+# fail without affecting the feed.
 name: Price feed
 
 on:
@@ -24,6 +26,7 @@ on:
     paths:
       - 'site/**'
       - 'scripts/feed/**'
+      - 'scripts/prices-site/**'
       - 'src/lib/feed.ts'
       - '.github/workflows/feed.yml'
 
@@ -54,6 +57,13 @@ jobs:
           NSW_FUEL_API_KEY: ${{ secrets.NSW_FUEL_API_KEY }}
           NSW_FUEL_API_SECRET: ${{ secrets.NSW_FUEL_API_SECRET }}
           QLD_FUEL_API_TOKEN: ${{ secrets.QLD_FUEL_API_TOKEN }}
+      # Fuel price pages for the website (prices/: one page per town and city, made from the feed that
+      # was just built). Allowed to fail and limited to 3 minutes: if it goes wrong, the feed and the
+      # rest of the site are published as usual, only without these pages.
+      - name: Price pages for the website
+        continue-on-error: true
+        timeout-minutes: 3
+        run: node scripts/prices-site/build.mjs out/site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
