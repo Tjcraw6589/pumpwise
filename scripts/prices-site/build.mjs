@@ -27,7 +27,7 @@ for (const id of Object.keys(meta.regions ?? {})) {
   if (existsSync(file)) byRegion[id] = JSON.parse(readFileSync(file, 'utf8'));
 }
 
-const { files, stats } = buildSite(meta, byRegion);
+const { files, rootFiles, stats } = buildSite(meta, byRegion);
 
 // Written beside the final folder and swapped in at the end, so a failure never leaves half a site.
 const target = join(site, 'prices');
@@ -40,12 +40,19 @@ for (const [path, text] of files) {
   writeFileSync(file, text);
   bytes += Buffer.byteLength(text);
 }
-// The app icon is the favicon of every page.
-const icon = resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/favicon.png');
+// The app icon is the favicon of every page; og.png (drawn by og-image.mjs) is the picture shown when a
+// page is shared.
+const here = dirname(fileURLToPath(import.meta.url));
+const icon = resolve(here, '../../assets/favicon.png');
 if (existsSync(icon)) copyFileSync(icon, join(staging, 'favicon.png'));
+const og = resolve(here, 'og.png');
+if (existsSync(og)) copyFileSync(og, join(staging, 'og.png'));
 rmSync(target, { recursive: true, force: true });
 renameSync(staging, target);
+// Pages at the site root: 404.html, which GitHub Pages shows for any address that does not exist.
+for (const [path, text] of rootFiles) writeFileSync(join(site, path), text);
 console.log(
   `Price pages: ${stats.pages} pages (${stats.places} places in ${stats.regions} regions, ${stats.stations} stations), ` +
-    `${(bytes / 1e6).toFixed(1)} MB${stats.skipped.length ? `; not published by licence: ${stats.skipped.join(', ')}` : ''}`,
+    `${(bytes / 1e6).toFixed(1)} MB, ${stats.doubts} prices marked "Check price", ${stats.aliases} towns and postcodes in the search` +
+    `${stats.skipped.length ? `; not published by licence: ${stats.skipped.join(', ')}` : ''}`,
 );
