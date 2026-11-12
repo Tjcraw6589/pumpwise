@@ -95,144 +95,182 @@ export const REGIONS = {
   },
 };
 
+/** Page titles and descriptions: always in the page's own language, for search engines. */
 const T = {
   en: {
-    home: 'Fuel prices', stations: 'stations', today: 'today',
-    title: (p, r) => `Fuel prices in ${p} today: cheapest petrol and diesel | Pumpwise`,
-    h1: (p) => `Fuel prices in ${p} today`,
+    title: (p) => `Fuel prices in ${p} today: cheapest petrol and diesel | Pumpwise`,
     desc: (f, price, p, s, n) => `${f} from ${price} today in ${p} (${s}). Compare ${n} stations with official prices, updated through the day.`,
-    lead: (f, price, p, s) => `The cheapest ${f} in ${p} today is ${price} at ${s}.`,
-    saving: (n, avg, save) => `The average across ${n} stations is ${avg}, so the cheapest saves about ${save} on a ${FILL_LITRES} litre fill.`,
-    cheapest: 'Cheapest', average: 'Average', station: 'Station', address: 'Address', price: 'Price', reported: 'Reported', map: 'Map',
-    showing: (k, n) => `The ${k} cheapest of ${n} stations.`, perLitre: 'per litre',
-    membersOnly: 'Members only', permitNeeded: 'Entry permit needed',
-    nearby: 'Nearby places', allIn: (r) => `All places in ${r}`, places: 'Places', updated: 'Updated', source: 'Source', licence: 'Licence',
-    disclaimer: 'Prices are the ones stations report to the official service. The price at the pump is what you pay.',
-    reuse: 'The price tables on this page may be reused under the same licence.',
     regionTitle: (r) => `Fuel prices in ${r} today by town and city | Pumpwise`,
-    regionH1: (r) => `Fuel prices in ${r} today`,
     regionDesc: (r, n, k) => `Official fuel prices from ${n} stations in ${r}: today's cheapest petrol and diesel in ${k} towns and cities.`,
-    regionLead: (n, k) => `${n} stations, ${k} towns and cities. Pick a place to see its cheapest stations.`,
-    cheapPlaces: 'Cheapest places today', place: 'Place', from: 'from',
     indexTitle: 'Fuel prices today by town and city: official prices | Pumpwise',
-    indexH1: 'Find the cheapest fuel today',
     indexDesc: (n) => `Today's cheapest petrol and diesel from ${n} stations, using each government's official prices. Pick a country and a town.`,
-    indexLead: (n, k) => `Official prices from ${n} stations in ${k} countries and states, updated through the day.`,
-    app: 'Pumpwise for iPhone shows the cheapest station near you and whether it is worth the drive.', appLink: 'Get Pumpwise on the App Store',
-    appHome: 'Pumpwise for iPhone is in the Australian App Store now. More countries are coming.', appHomeLink: 'See Pumpwise on the App Store',
-    fixed: 'In Western Australia every station fixes its price for 24 hours from 6am.',
     tomorrow: (p) => `Tomorrow in ${p}`,
     tomorrowLine: (f, avg, diff, min, s) => `${f}: average ${avg} tomorrow, ${diff}. Cheapest tomorrow: ${min} at ${s}.`,
     up: (d) => `up ${d} on today`, down: (d) => `down ${d} on today`, same: 'the same as today',
-    find: 'Find a town', searchLabel: 'Search for a town or city', searchPh: 'Type a town or city',
-    noMatch: 'No place with that name. Try another spelling.', go: 'Go',
-    bestNow: 'Cheapest right now', directions: 'Directions', directionsTo: (s) => `Directions to ${s}`,
-    showAll: (n) => `Show all ${n} stations`, capped: (k) => `Showing the ${k} cheapest.`,
-    aToZ: 'All places A to Z', jump: 'Jump to a letter',
-    licences: 'Data licences', privacy: 'Privacy', siteHome: 'Pumpwise home',
-    popular: 'Popular places', regions: 'Countries and states', placesCount: (k) => `${k} places`,
-    trust: ['Official government prices', 'Updated through the day', 'Free to use, no sign up'],
-    nearBtn: 'Show stations near me', nearH: 'Closest stations to you', finding: 'Finding your location',
-    loading: 'Loading prices near you', denied: 'Location is off for this page. Allow it in your browser settings, or search for a town instead.',
+  },
+  es: {
+    title: (p) => `Precio de la gasolina hoy en ${p}: gasolineras más baratas | Pumpwise`,
+    desc: (f, price, p, s, n) => `${f} desde ${price} hoy en ${p} (${s}). Compara ${n} gasolineras con precios oficiales, actualizados durante el día.`,
+    regionTitle: (r) => `Precio de la gasolina hoy en ${r} por municipio | Pumpwise`,
+    regionDesc: (r, n, k) => `Precios oficiales de ${n} gasolineras de ${r}: la gasolina y el diésel más baratos hoy en ${k} municipios y ciudades.`,
+  },
+  fr: {
+    title: (p) => `Prix des carburants à ${p} aujourd'hui : stations les moins chères | Pumpwise`,
+    desc: (f, price, p, s, n) => `${f} à partir de ${price} aujourd'hui à ${p} (${s}). Comparez ${n} stations avec les prix officiels, mis à jour toute la journée.`,
+    regionTitle: (r) => `Prix des carburants aujourd'hui en ${r} par commune | Pumpwise`,
+    regionDesc: (r, n, k) => `Prix officiels de ${n} stations en ${r} : l'essence et le gazole les moins chers aujourd'hui dans ${k} communes.`,
+  },
+  pt: {
+    title: (p) => `Preços dos combustíveis em ${p} hoje: postos mais baratos | Pumpwise`,
+    desc: (f, price, p, s, n) => `${f} desde ${price} hoje em ${p} (${s}). Compare ${n} postos com preços oficiais, atualizados ao longo do dia.`,
+    regionTitle: (r) => `Preços dos combustíveis hoje em ${r} por localidade | Pumpwise`,
+    regionDesc: (r, n, k) => `Preços oficiais de ${n} postos em ${r}: a gasolina e o gasóleo mais baratos hoje em ${k} localidades.`,
+  },
+};
+
+/**
+ * Everything a visitor reads on a page, in every language the site speaks. The page is written in its
+ * own language (Spanish for Madrid) for search engines; site.js then switches these texts to the
+ * visitor's browser language, or to the one picked in the header (Tyler, 12 Nov 2026: someone in Lisbon
+ * who only reads English must be able to use the Lisbon page). {name} marks a value filled in per page.
+ */
+export const LANGS = { en: 'English', es: 'Español', fr: 'Français', pt: 'Português' };
+export const U = {
+  en: {
+    home: 'Fuel prices', find: 'Find a town', language: 'Language', stations: 'stations', nStations: '{n} stations',
+    h1: 'Fuel prices in {p} today', lead: 'The cheapest {f} in {p} today is {price} at {s}.',
+    saving: 'The average across {n} stations is {avg}, so the cheapest saves about {save} on a 50 litre fill.',
+    cheapest: 'Cheapest', average: 'Average', avgIs: 'Average {v}', reported: 'Reported', perLitre: 'per litre',
+    membersOnly: 'Members only', permitNeeded: 'Entry permit needed', nearby: 'Nearby places', allIn: 'All places in {r}',
+    updated: 'Updated', source: 'Source', licence: 'Licence',
+    disclaimer: 'Prices are the ones stations report to the official service. The price at the pump is what you pay.',
+    reuse: 'The price tables on this page may be reused under the same licence.',
+    regionH1: 'Fuel prices in {r} today', regionLead: '{n} stations, {k} towns and cities. Pick a place to see its cheapest stations.',
+    cheapPlaces: 'Cheapest places today', from: 'from',
+    indexH1: 'Find the cheapest fuel today', indexLead: 'Official prices from {n} stations in {k} countries and states, updated through the day.',
+    app: 'Pumpwise for iPhone shows the cheapest station near you and whether it is worth the drive.', appLink: 'Get Pumpwise on the App Store',
+    appHome: 'Pumpwise for iPhone is in the Australian App Store now. More countries are coming.', appHomeLink: 'See Pumpwise on the App Store',
+    fixed: 'In Western Australia every station fixes its price for 24 hours from 6am.',
+    searchLabel: 'Search for a town or city', searchPh: 'Type a town or city', noMatch: 'No place with that name. Try another spelling.', go: 'Go',
+    bestNow: 'Cheapest right now', directions: 'Directions', directionsTo: 'Directions to {s}',
+    showAll: 'Show all {n} stations', capped: 'Showing the {k} cheapest.', aToZ: 'All places A to Z', jump: 'Jump to a letter',
+    licences: 'Data licences', privacy: 'Privacy', popular: 'Popular places', regions: 'Countries and states', perLitreAvg: 'average, per litre',
+    placesCount: '{k} places', trust1: 'Official government prices', trust2: 'Updated through the day', trust3: 'Free to use, no sign up',
+    nearBtn: 'Show stations near me', nearH: 'Closest stations to you', finding: 'Finding your location', loading: 'Loading prices near you',
+    denied: 'Location is off for this page. Allow it in your browser settings, or search for a town instead.',
     failed: 'Your location could not be found. Search for a town instead.', none: 'No stations with prices within 120 km of you.',
     nearPrivacy: 'Your location stays in your browser. It is only used to pick which prices to load.', cheapestHere: 'Cheapest of these',
   },
   es: {
-    home: 'Precios de carburantes', stations: 'gasolineras', today: 'hoy',
-    title: (p) => `Precio de la gasolina hoy en ${p}: gasolineras más baratas | Pumpwise`,
-    h1: (p) => `Precio de la gasolina y el diésel hoy en ${p}`,
-    desc: (f, price, p, s, n) => `${f} desde ${price} hoy en ${p} (${s}). Compara ${n} gasolineras con precios oficiales, actualizados durante el día.`,
-    lead: (f, price, p, s) => `Hoy en ${p} el precio más bajo de ${f} es ${price}, en ${s}.`,
-    saving: (n, avg, save) => `La media de ${n} gasolineras es ${avg}: llenar ${FILL_LITRES} litros al precio más bajo ahorra unos ${save}.`,
-    cheapest: 'Más barato', average: 'Media', station: 'Gasolinera', address: 'Dirección', price: 'Precio', reported: 'Comunicado', map: 'Mapa',
-    showing: (k, n) => `Las ${k} más baratas de ${n} gasolineras.`, perLitre: 'por litro',
-    membersOnly: 'Solo socios', permitNeeded: 'Requiere permiso de acceso',
-    nearby: 'Lugares cercanos', allIn: (r) => `Todos los lugares de ${r}`, places: 'Lugares', updated: 'Actualizado', source: 'Fuente', licence: 'Licencia',
+    home: 'Precios de carburantes', find: 'Buscar un lugar', language: 'Idioma', stations: 'gasolineras', nStations: '{n} gasolineras',
+    h1: 'Precio de la gasolina y el diésel hoy en {p}', lead: 'Hoy en {p} el precio más bajo de {f} es {price}, en {s}.',
+    saving: 'La media de {n} gasolineras es {avg}: llenar 50 litros al precio más bajo ahorra unos {save}.',
+    cheapest: 'Más barato', average: 'Media', avgIs: 'Media {v}', reported: 'Comunicado', perLitre: 'por litro',
+    membersOnly: 'Solo socios', permitNeeded: 'Requiere permiso de acceso', nearby: 'Lugares cercanos', allIn: 'Todos los lugares de {r}',
+    updated: 'Actualizado', source: 'Fuente', licence: 'Licencia',
     disclaimer: 'Los precios son los que las estaciones comunican al servicio oficial. El precio válido es el del surtidor.',
     reuse: 'Las tablas de precios de esta página pueden reutilizarse con la misma licencia.',
-    regionTitle: (r) => `Precio de la gasolina hoy en ${r} por municipio | Pumpwise`,
-    regionH1: (r) => `Precio de la gasolina y el diésel hoy en ${r}`,
-    regionDesc: (r, n, k) => `Precios oficiales de ${n} gasolineras de ${r}: la gasolina y el diésel más baratos hoy en ${k} municipios y ciudades.`,
-    regionLead: (n, k) => `${n} gasolineras, ${k} municipios y ciudades. Elige un lugar para ver sus gasolineras más baratas.`,
-    cheapPlaces: 'Lugares más baratos hoy', place: 'Lugar', from: 'desde',
-    app: '', appLink: '',
-    find: 'Buscar un lugar', searchLabel: 'Buscar un municipio o ciudad', searchPh: 'Escribe un municipio o ciudad',
-    noMatch: 'Ningún lugar con ese nombre. Prueba a escribirlo de otra forma.', go: 'Ir',
-    bestNow: 'Lo más barato ahora', directions: 'Cómo llegar', directionsTo: (s) => `Cómo llegar a ${s}`,
-    showAll: (n) => `Ver las ${n} gasolineras`, capped: (k) => `Se muestran las ${k} más baratas.`,
-    aToZ: 'Todos los lugares de la A a la Z', jump: 'Ir a una letra',
-    licences: 'Licencias de datos', privacy: 'Privacidad', siteHome: 'Inicio de Pumpwise',
-    placesCount: (k) => `${k} lugares`,
-    nearBtn: 'Ver gasolineras cerca de mí', nearH: 'Las gasolineras más cercanas', finding: 'Buscando tu ubicación',
-    loading: 'Cargando precios cerca de ti', denied: 'La ubicación está desactivada para esta página. Actívala en los ajustes del navegador o busca un lugar.',
+    regionH1: 'Precio de la gasolina y el diésel hoy en {r}', regionLead: '{n} gasolineras, {k} municipios y ciudades. Elige un lugar para ver sus gasolineras más baratas.',
+    cheapPlaces: 'Lugares más baratos hoy', from: 'desde',
+    indexH1: 'Encuentra el combustible más barato hoy', indexLead: 'Precios oficiales de {n} gasolineras en {k} países y estados, actualizados durante el día.',
+    app: 'Pumpwise para iPhone muestra la gasolinera más barata cerca de ti y si merece la pena el viaje.', appLink: 'Descarga Pumpwise en el App Store',
+    appHome: 'Pumpwise para iPhone ya está en el App Store de Australia. Pronto llegará a más países.', appHomeLink: 'Ver Pumpwise en el App Store',
+    fixed: 'En Australia Occidental cada gasolinera fija su precio durante 24 horas desde las 6 de la mañana.',
+    searchLabel: 'Buscar un municipio o ciudad', searchPh: 'Escribe un municipio o ciudad', noMatch: 'Ningún lugar con ese nombre. Prueba a escribirlo de otra forma.', go: 'Ir',
+    bestNow: 'Lo más barato ahora', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}',
+    showAll: 'Ver las {n} gasolineras', capped: 'Se muestran las {k} más baratas.', aToZ: 'Todos los lugares de la A a la Z', jump: 'Ir a una letra',
+    licences: 'Licencias de datos', privacy: 'Privacidad', popular: 'Lugares populares', regions: 'Países y estados', perLitreAvg: 'media, por litro',
+    placesCount: '{k} lugares', trust1: 'Precios oficiales de los gobiernos', trust2: 'Actualizados durante el día', trust3: 'Gratis, sin registro',
+    nearBtn: 'Ver gasolineras cerca de mí', nearH: 'Las gasolineras más cercanas', finding: 'Buscando tu ubicación', loading: 'Cargando precios cerca de ti',
+    denied: 'La ubicación está desactivada para esta página. Actívala en los ajustes del navegador o busca un lugar.',
     failed: 'No se pudo encontrar tu ubicación. Busca un lugar.', none: 'No hay gasolineras con precios a menos de 120 km.',
     nearPrivacy: 'Tu ubicación no sale de tu navegador. Solo se usa para elegir qué precios cargar.', cheapestHere: 'La más barata de estas',
   },
   fr: {
-    home: 'Prix des carburants', stations: 'stations', today: "aujourd'hui",
-    title: (p) => `Prix des carburants à ${p} aujourd'hui : stations les moins chères | Pumpwise`,
-    h1: (p) => `Prix des carburants à ${p} aujourd'hui`,
-    desc: (f, price, p, s, n) => `${f} à partir de ${price} aujourd'hui à ${p} (${s}). Comparez ${n} stations avec les prix officiels, mis à jour toute la journée.`,
-    lead: (f, price, p, s) => `Aujourd'hui à ${p}, le prix le plus bas (${f}) est de ${price} : ${s}.`,
-    saving: (n, avg, save) => `La moyenne de ${n} stations est de ${avg} : un plein de ${FILL_LITRES} litres au prix le plus bas économise environ ${save}.`,
-    cheapest: 'Le moins cher', average: 'Moyenne', station: 'Station', address: 'Adresse', price: 'Prix', reported: 'Déclaré', map: 'Carte',
-    showing: (k, n) => `Les ${k} moins chères sur ${n} stations.`, perLitre: 'le litre',
-    membersOnly: 'Réservé aux adhérents', permitNeeded: 'Permis d’accès requis',
-    nearby: 'À proximité', allIn: (r) => `Toutes les communes : ${r}`, places: 'Communes', updated: 'Mis à jour', source: 'Source', licence: 'Licence',
+    home: 'Prix des carburants', find: 'Trouver une commune', language: 'Langue', stations: 'stations', nStations: '{n} stations',
+    h1: "Prix des carburants à {p} aujourd'hui", lead: "Aujourd'hui à {p}, le prix le plus bas ({f}) est de {price} : {s}.",
+    saving: 'La moyenne de {n} stations est de {avg} : un plein de 50 litres au prix le plus bas économise environ {save}.',
+    cheapest: 'Le moins cher', average: 'Moyenne', avgIs: 'Moyenne {v}', reported: 'Déclaré', perLitre: 'le litre',
+    membersOnly: 'Réservé aux adhérents', permitNeeded: 'Permis d’accès requis', nearby: 'À proximité', allIn: 'Toutes les communes : {r}',
+    updated: 'Mis à jour', source: 'Source', licence: 'Licence',
     disclaimer: 'Les prix sont ceux déclarés par les stations au service officiel. Le prix affiché à la pompe fait foi.',
     reuse: 'Les tableaux de prix de cette page peuvent être réutilisés sous la même licence.',
-    regionTitle: (r) => `Prix des carburants aujourd'hui en ${r} par commune | Pumpwise`,
-    regionH1: (r) => `Prix des carburants aujourd'hui en ${r}`,
-    regionDesc: (r, n, k) => `Prix officiels de ${n} stations en ${r} : l'essence et le gazole les moins chers aujourd'hui dans ${k} communes.`,
-    regionLead: (n, k) => `${n} stations, ${k} communes. Choisissez une commune pour voir ses stations les moins chères.`,
-    cheapPlaces: "Communes les moins chères aujourd'hui", place: 'Commune', from: 'dès',
-    app: '', appLink: '',
-    find: 'Trouver une commune', searchLabel: 'Rechercher une commune', searchPh: 'Tapez le nom d’une commune',
-    noMatch: 'Aucune commune de ce nom. Essayez une autre orthographe.', go: 'OK',
-    bestNow: 'Le moins cher maintenant', directions: 'Itinéraire', directionsTo: (s) => `Itinéraire vers ${s}`,
-    showAll: (n) => `Voir les ${n} stations`, capped: (k) => `Les ${k} moins chères sont affichées.`,
-    aToZ: 'Toutes les communes de A à Z', jump: 'Aller à une lettre',
-    licences: 'Licences des données', privacy: 'Confidentialité', siteHome: 'Accueil Pumpwise',
-    placesCount: (k) => `${k} communes`,
-    nearBtn: 'Voir les stations près de moi', nearH: 'Les stations les plus proches', finding: 'Recherche de votre position',
-    loading: 'Chargement des prix autour de vous', denied: 'La localisation est désactivée pour cette page. Autorisez-la dans les réglages du navigateur, ou cherchez une commune.',
+    regionH1: "Prix des carburants aujourd'hui en {r}", regionLead: '{n} stations, {k} communes. Choisissez une commune pour voir ses stations les moins chères.',
+    cheapPlaces: "Communes les moins chères aujourd'hui", from: 'dès',
+    indexH1: "Trouvez le carburant le moins cher aujourd'hui", indexLead: 'Prix officiels de {n} stations dans {k} pays et États, mis à jour toute la journée.',
+    app: 'Pumpwise pour iPhone montre la station la moins chère près de vous et si le détour en vaut la peine.', appLink: 'Télécharger Pumpwise sur l’App Store',
+    appHome: 'Pumpwise pour iPhone est disponible sur l’App Store australien. D’autres pays arrivent bientôt.', appHomeLink: 'Voir Pumpwise sur l’App Store',
+    fixed: 'Dans l’État d’Australie occidentale, chaque station fixe son prix pour 24 heures à partir de 6 heures.',
+    searchLabel: 'Rechercher une commune', searchPh: 'Tapez le nom d’une commune', noMatch: 'Aucune commune de ce nom. Essayez une autre orthographe.', go: 'OK',
+    bestNow: 'Le moins cher maintenant', directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}',
+    showAll: 'Voir les {n} stations', capped: 'Les {k} moins chères sont affichées.', aToZ: 'Toutes les communes de A à Z', jump: 'Aller à une lettre',
+    licences: 'Licences des données', privacy: 'Confidentialité', popular: 'Lieux populaires', regions: 'Pays et États', perLitreAvg: 'moyenne, le litre',
+    placesCount: '{k} communes', trust1: 'Prix officiels des gouvernements', trust2: 'Mis à jour toute la journée', trust3: 'Gratuit, sans inscription',
+    nearBtn: 'Voir les stations près de moi', nearH: 'Les stations les plus proches', finding: 'Recherche de votre position', loading: 'Chargement des prix autour de vous',
+    denied: 'La localisation est désactivée pour cette page. Autorisez-la dans les réglages du navigateur, ou cherchez une commune.',
     failed: 'Votre position est introuvable. Cherchez une commune.', none: 'Aucune station avec des prix à moins de 120 km.',
     nearPrivacy: 'Votre position reste dans votre navigateur. Elle sert seulement à choisir les prix à charger.', cheapestHere: 'La moins chère de celles-ci',
   },
   pt: {
-    home: 'Preços dos combustíveis', stations: 'postos', today: 'hoje',
-    title: (p) => `Preços dos combustíveis em ${p} hoje: postos mais baratos | Pumpwise`,
-    h1: (p) => `Preços dos combustíveis em ${p} hoje`,
-    desc: (f, price, p, s, n) => `${f} desde ${price} hoje em ${p} (${s}). Compare ${n} postos com preços oficiais, atualizados ao longo do dia.`,
-    lead: (f, price, p, s) => `Hoje em ${p}, o preço mais baixo de ${f} é ${price}, em ${s}.`,
-    saving: (n, avg, save) => `A média de ${n} postos é ${avg}: abastecer ${FILL_LITRES} litros ao preço mais baixo poupa cerca de ${save}.`,
-    cheapest: 'Mais barato', average: 'Média', station: 'Posto', address: 'Morada', price: 'Preço', reported: 'Comunicado', map: 'Mapa',
-    showing: (k, n) => `Os ${k} mais baratos de ${n} postos.`, perLitre: 'por litro',
-    membersOnly: 'Só para sócios', permitNeeded: 'Requer autorização de entrada',
-    nearby: 'Locais próximos', allIn: (r) => `Todos os locais em ${r}`, places: 'Locais', updated: 'Atualizado', source: 'Fonte', licence: 'Licença',
+    home: 'Preços dos combustíveis', find: 'Procurar um local', language: 'Idioma', stations: 'postos', nStations: '{n} postos',
+    h1: 'Preços dos combustíveis em {p} hoje', lead: 'Hoje em {p}, o preço mais baixo de {f} é {price}, em {s}.',
+    saving: 'A média de {n} postos é {avg}: abastecer 50 litros ao preço mais baixo poupa cerca de {save}.',
+    cheapest: 'Mais barato', average: 'Média', avgIs: 'Média {v}', reported: 'Comunicado', perLitre: 'por litro',
+    membersOnly: 'Só para sócios', permitNeeded: 'Requer autorização de entrada', nearby: 'Locais próximos', allIn: 'Todos os locais em {r}',
+    updated: 'Atualizado', source: 'Fonte', licence: 'Licença',
     disclaimer: 'Os preços são os comunicados pelos postos ao serviço oficial. O preço válido é o da bomba.',
     reuse: 'As tabelas de preços desta página podem ser reutilizadas com a mesma licença.',
-    regionTitle: (r) => `Preços dos combustíveis hoje em ${r} por localidade | Pumpwise`,
-    regionH1: (r) => `Preços dos combustíveis hoje em ${r}`,
-    regionDesc: (r, n, k) => `Preços oficiais de ${n} postos em ${r}: a gasolina e o gasóleo mais baratos hoje em ${k} localidades.`,
-    regionLead: (n, k) => `${n} postos, ${k} localidades. Escolha um local para ver os postos mais baratos.`,
-    cheapPlaces: 'Locais mais baratos hoje', place: 'Local', from: 'desde',
-    app: '', appLink: '',
-    find: 'Procurar um local', searchLabel: 'Procurar uma localidade', searchPh: 'Escreva uma localidade',
-    noMatch: 'Nenhum local com esse nome. Tente outra grafia.', go: 'Ir',
-    bestNow: 'O mais barato agora', directions: 'Direções', directionsTo: (s) => `Direções para ${s}`,
-    showAll: (n) => `Ver os ${n} postos`, capped: (k) => `Mostram-se os ${k} mais baratos.`,
-    aToZ: 'Todos os locais de A a Z', jump: 'Ir para uma letra',
-    licences: 'Licenças dos dados', privacy: 'Privacidade', siteHome: 'Início do Pumpwise',
-    placesCount: (k) => `${k} locais`,
-    nearBtn: 'Ver postos perto de mim', nearH: 'Os postos mais próximos', finding: 'A procurar a sua localização',
-    loading: 'A carregar preços perto de si', denied: 'A localização está desligada para esta página. Ative-a nas definições do navegador ou procure um local.',
+    regionH1: 'Preços dos combustíveis hoje em {r}', regionLead: '{n} postos, {k} localidades. Escolha um local para ver os postos mais baratos.',
+    cheapPlaces: 'Locais mais baratos hoje', from: 'desde',
+    indexH1: 'Encontre o combustível mais barato hoje', indexLead: 'Preços oficiais de {n} postos em {k} países e estados, atualizados ao longo do dia.',
+    app: 'O Pumpwise para iPhone mostra o posto mais barato perto de si e se vale a pena a viagem.', appLink: 'Obter o Pumpwise na App Store',
+    appHome: 'O Pumpwise para iPhone já está na App Store da Austrália. Em breve chegará a mais países.', appHomeLink: 'Ver o Pumpwise na App Store',
+    fixed: 'Na Austrália Ocidental cada posto fixa o preço durante 24 horas a partir das 6 da manhã.',
+    searchLabel: 'Procurar uma localidade', searchPh: 'Escreva uma localidade', noMatch: 'Nenhum local com esse nome. Tente outra grafia.', go: 'Ir',
+    bestNow: 'O mais barato agora', directions: 'Direções', directionsTo: 'Direções para {s}',
+    showAll: 'Ver os {n} postos', capped: 'São mostrados os {k} mais baratos.', aToZ: 'Todos os locais de A a Z', jump: 'Ir para uma letra',
+    licences: 'Licenças dos dados', privacy: 'Privacidade', popular: 'Locais populares', regions: 'Países e estados', perLitreAvg: 'média, por litro',
+    placesCount: '{k} locais', trust1: 'Preços oficiais dos governos', trust2: 'Atualizados ao longo do dia', trust3: 'Grátis, sem registo',
+    nearBtn: 'Ver postos perto de mim', nearH: 'Os postos mais próximos', finding: 'A procurar a sua localização', loading: 'A carregar preços perto de si',
+    denied: 'A localização está desligada para esta página. Ative-a nas definições do navegador ou procure um local.',
     failed: 'Não foi possível encontrar a sua localização. Procure um local.', none: 'Não há postos com preços a menos de 120 km.',
     nearPrivacy: 'A sua localização fica no seu navegador. Só é usada para escolher que preços carregar.', cheapestHere: 'O mais barato destes',
   },
 };
 
-/** Short codes on the region cards of the home page. */
+/** Plain names of each fuel, added after a pump's own label when the visitor reads another language. */
+export const FUEL_WORDS = {
+  en: { regular: 'unleaded', e10: 'E10 unleaded', premium: 'premium unleaded', super: 'premium unleaded 98', diesel: 'diesel', 'premium-diesel': 'premium diesel', lpg: 'LPG', e85: 'E85', b20: 'B20 diesel', hvo: 'renewable diesel' },
+  es: { regular: 'gasolina sin plomo', e10: 'gasolina E10', premium: 'gasolina premium', super: 'gasolina 98', diesel: 'diésel', 'premium-diesel': 'diésel premium', lpg: 'GLP', e85: 'E85', b20: 'diésel B20', hvo: 'diésel renovable' },
+  fr: { regular: 'sans plomb', e10: 'sans plomb E10', premium: 'sans plomb premium', super: 'sans plomb 98', diesel: 'gazole', 'premium-diesel': 'gazole premium', lpg: 'GPL', e85: 'E85', b20: 'gazole B20', hvo: 'gazole renouvelable' },
+  pt: { regular: 'gasolina sem chumbo', e10: 'gasolina E10', premium: 'gasolina premium', super: 'gasolina 98', diesel: 'gasóleo', 'premium-diesel': 'gasóleo premium', lpg: 'GPL', e85: 'E85', b20: 'gasóleo B20', hvo: 'gasóleo renovável' },
+};
+
+/** A text with its {values} filled in. */
+export function fill(str, v) {
+  return String(str).replace(/\{(\w+)\}/g, (m, k) => (v && v[k] != null ? String(v[k]) : m));
+}
+
+/** One text in one language (English when that language lacks it). */
+export function say(lang, key, v) {
+  return fill((U[lang] && U[lang][key]) ?? U.en[key] ?? key, v);
+}
+
+/** Visible text that site.js can switch into the visitor's language. */
+function w(lang, key, v, tag = 'span', attrs = '') {
+  return `<${tag}${attrs} data-k="${key}"${v ? ` data-v="${esc(JSON.stringify(v))}"` : ''}>${esc(say(lang, key, v))}</${tag}>`;
+}
+
+/** A pump's own fuel label; site.js adds the plain fuel name in the visitor's language when it differs. */
+function fuelLabel(f) {
+  return `<span data-fuel="${f.kind}">${esc(f.label)}</span>`;
+}
+
+/** A date and time that site.js rewrites in the visitor's language, in the place's own time zone. */
+function timeTag(now, tz, text) {
+  return `<time datetime="${esc(now.toISOString())}" data-tz="${esc(tz)}">${esc(text)}</time>`;
+}
+
 const CODES = { wa: 'WA', nsw: 'NSW', tas: 'TAS', es: 'ES', fr: 'FR', mx: 'MX', pt: 'PT' };
 /** How many stations are listed under a fuel at most (the first TOP show, the rest open with "Show all"). */
 const MAX_ROWS = 100;
@@ -400,13 +438,13 @@ function mapsUrl(s) {
   return `https://www.google.com/maps/search/?api=1&amp;query=${s.lat},${s.lng}`;
 }
 
-/** The search box: hidden until the script below runs, so pages without scripts show only the lists. */
-function searchBox(t, region) {
+/** The search box: hidden until site.js runs, so pages without scripts show only the lists. */
+function searchBox(L, region) {
   return `<form class="find" id="find" role="search" hidden data-src="${BASE}/places.json"${region ? ` data-region="${esc(region)}"` : ''}>
-<label for="q">${esc(t.searchLabel)}</label>
-<div class="field">${ICON_SEARCH}<input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(t.searchPh)}"><button type="submit">${esc(t.go)}</button></div>
+${w(L, 'searchLabel', null, 'label', ' for="q"')}
+<div class="field">${ICON_SEARCH}<input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="${esc(say(L, 'searchPh'))}" data-kp="searchPh">${w(L, 'go', null, 'button', ' type="submit"')}</div>
 <ol class="hits" aria-live="polite"></ol>
-<p class="none" hidden>${esc(t.noMatch)}</p>
+${w(L, 'noMatch', null, 'p', ' class="none" hidden')}
 </form>`;
 }
 
@@ -415,22 +453,46 @@ function searchBox(t, region) {
  * position; it never leaves the browser. site.js then loads the feed's 0.5 degree tiles around it (the same
  * public files the app uses) and lists the closest stations.
  */
-function nearBox(t, dataBase) {
-  const words = { finding: t.finding, loading: t.loading, denied: t.denied, failed: t.failed, none: t.none, cheapestHere: t.cheapestHere, directions: t.directions, membersOnly: t.membersOnly, permitNeeded: t.permitNeeded };
-  return `<div class="near" id="near" hidden data-base="${esc(dataBase)}" data-t="${esc(JSON.stringify(words))}">
-<button type="button" class="btn nearbtn">${ICON_PIN}<span>${esc(t.nearBtn)}</span></button>
+function nearBox(L, dataBase) {
+  return `<div class="near" id="near" hidden data-base="${esc(dataBase)}">
+<button type="button" class="btn nearbtn">${ICON_PIN}${w(L, 'nearBtn')}</button>
 <p class="nearstatus" aria-live="polite"></p>
-<section class="nearres" hidden><h2>${esc(t.nearH)}</h2><ol class="list"></ol><p class="note">${esc(t.nearPrivacy)}</p></section>
+<section class="nearres" hidden>${w(L, 'nearH', null, 'h2')}<ol class="list"></ol>${w(L, 'nearPrivacy', null, 'p', ' class="note"')}</section>
 </div>`;
 }
 
-/** Our own small script (site.js): the search box and the "Near me" box. Pages work without it. */
+/** Our own small script (site.js): language, the search box and the "Near me" box. Pages work without it. */
 function siteJs() {
   const reg = {};
-  for (const [id, cfg] of Object.entries(REGIONS)) reg[id] = { m: cfg.money, f: cfg.fuels, l: cfg.labels };
+  for (const [id, cfg] of Object.entries(REGIONS)) reg[id] = { m: cfg.money, f: cfg.fuels, l: cfg.labels, g: cfg.lang };
   return `(function(){
-function fold(s){return s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();}
+var U=${JSON.stringify(U)},G=${JSON.stringify(FUEL_WORDS)},REG=${JSON.stringify(reg)};
+var root=document.documentElement,P=(root.getAttribute('lang')||'en').slice(0,2),L=P;
+function fold(s){return String(s).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();}
 function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fill(s,v){return String(s).replace(/\\{(\\w+)\\}/g,function(m,k){return v&&v[k]!=null?v[k]:m;});}
+function word(k,v){var s=(U[L]&&U[L][k]);if(s==null)s=U.en[k];return s==null?'':fill(s,v);}
+function each(q,fn){var a=document.querySelectorAll(q);for(var i=0;i<a.length;i++)fn(a[i]);}
+function vals(el){var v=el.getAttribute('data-v');try{return v?JSON.parse(v):null;}catch(x){return null;}}
+function fuelText(label,kind,lang){var g=lang!==L&&G[L]&&G[L][kind];return g&&fold(g)!==fold(label)?label+' ('+g+')':label;}
+/* Language: a choice made in the header wins, then the browser's languages, then English. Search engines
+   keep the page's own language so each page is found in the language people search in. */
+function pick(){try{var s=localStorage.getItem('pw-lang');if(s&&U[s])return s;}catch(x){}
+if(/bot|crawl|spider|slurp|lighthouse/i.test(navigator.userAgent||''))return P;
+var ls=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];
+for(var i=0;i<ls.length;i++){var b=String(ls[i]).slice(0,2).toLowerCase();if(U[b])return b;}return 'en';}
+function apply(l){L=l;
+each('[data-k]',function(el){el.textContent=word(el.getAttribute('data-k'),vals(el));});
+each('[data-kp]',function(el){el.setAttribute('placeholder',word(el.getAttribute('data-kp')));});
+each('[data-kl]',function(el){el.setAttribute('aria-label',word(el.getAttribute('data-kl'),vals(el)));});
+each('[data-fuel]',function(el){if(el.getAttribute('data-o')==null)el.setAttribute('data-o',el.textContent);el.textContent=fuelText(el.getAttribute('data-o'),el.getAttribute('data-fuel'),P);});
+each('time[data-tz]',function(el){try{el.textContent=new Intl.DateTimeFormat(l,{timeZone:el.getAttribute('data-tz'),day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false,timeZoneName:'short'}).format(new Date(el.getAttribute('datetime')));}catch(x){}});
+root.setAttribute('lang',l);
+each('select.lang',function(s){s.value=l;});}
+var start=pick();
+each('select.lang',function(s){s.hidden=false;s.value=start;s.addEventListener('change',function(){try{localStorage.setItem('pw-lang',s.value);}catch(x){}apply(s.value);});});
+each('.langwrap',function(x){x.hidden=false;});
+if(start!==P)apply(start);
 var f=document.getElementById('find');
 if(f&&window.fetch){f.hidden=false;
 var i=f.querySelector('input'),o=f.querySelector('.hits'),m=f.querySelector('.none'),want=f.getAttribute('data-region')||'',data=null,wait=null;
@@ -443,9 +505,8 @@ i.addEventListener('input',show);i.addEventListener('focus',load);
 f.addEventListener('submit',function(ev){ev.preventDefault();var a=o.querySelector('a');if(a)location.href=a.href;});}
 var n=document.getElementById('near');
 if(!n||!window.fetch||!navigator.geolocation)return;n.hidden=false;
-var REG=${JSON.stringify(reg)},RADII=[8,20,50,120],lang=document.documentElement.lang||'en';
-var t=JSON.parse(n.getAttribute('data-t')),base=n.getAttribute('data-base'),btn=n.querySelector('button'),st=n.querySelector('.nearstatus'),res=n.querySelector('.nearres'),list=res.querySelector('ol'),cache={},meta=null;
-function say(s){st.textContent=s||'';}
+var RADII=[8,20,50,120],base=n.getAttribute('data-base'),btn=n.querySelector('button'),st=n.querySelector('.nearstatus'),res=n.querySelector('.nearres'),list=res.querySelector('ol'),cache={},meta=null,last=null;
+function say(k){st.textContent=k?word(k):'';}
 function money(p,k){if(k==='cents')return p.toFixed(1)+'c';if(k==='peso')return '$'+(p/100).toFixed(2);return (p/100).toFixed(3).replace('.',',')+' \\u20ac';}
 function km(a,b,c,d){var r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;return Math.sqrt(x*x+y*y)*6371;}
 function keys(lat,lng,r){var D=meta.tileDeg||0.5,dl=r/111,dg=r/Math.max(1,111.32*Math.cos(lat*Math.PI/180)),k=[];
@@ -459,34 +520,42 @@ var d=km(lat,lng,s.lat,s.lng);if(d>r)return;
 for(var j=0;j<g.f.length;j++){var pr=s.prices&&s.prices[g.f[j]];if(pr&&pr.p>0&&!(Date.parse(pr.at)<cut)){rows.push({s:s,d:d,k:g.f[j],p:pr.p,g:g});return;}}});});
 if(rows.length<5&&step<RADII.length-1)return find(lat,lng,step+1);
 return rows.sort(function(a,b){return a.d-b.d;}).slice(0,10);});}
-function limit(s){var tg=s.tags||[];return tg.indexOf('members-only')>=0?t.membersOnly:tg.indexOf('permit-required')>=0?t.permitNeeded:'';}
+function limit(s){var tg=s.tags||[];return tg.indexOf('members-only')>=0?'membersOnly':tg.indexOf('permit-required')>=0?'permitNeeded':'';}
 function draw(rows){var k=rows[0].k,rg=rows[0].s.region,best=null;
 rows.forEach(function(x){if(x.k===k&&x.s.region===rg&&!limit(x.s)&&(!best||x.p<best.p))best=x;});
 list.innerHTML=rows.map(function(x,i){var s=x.s,name=(s.name||s.brand||'').trim(),lim=limit(s),cheap=x===best&&rows.length>1;
-var dist=(x.d<10?x.d.toLocaleString(lang,{maximumFractionDigits:1}):Math.round(x.d).toLocaleString(lang))+' km';
+var dist=(x.d<10?x.d.toLocaleString(L,{maximumFractionDigits:1}):Math.round(x.d).toLocaleString(L))+' km';
 var addr=[s.address,s.town].filter(function(v){return v&&String(v).trim();}).join(', ');
-return '<li class="st'+(cheap?' first':'')+'"><span class="rk">'+(i+1)+'</span><div class="who"><strong>'+e(name)+'</strong>'+(lim?'<span class="tag">'+e(lim)+'</span>':'')
-+'<span class="addr">'+e(dist)+(addr?' \\u00b7 '+e(addr):'')+'</span>'+(cheap?'<span class="when cheap">'+e(t.cheapestHere)+'</span>':'')+'</div>'
-+'<span class="pp">'+e(money(x.p,x.g.m))+'<small>'+e(x.g.l[x.k]||x.k)+'</small></span>'
-+'<a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query='+s.lat+','+s.lng+'" rel="nofollow noopener" aria-label="'+e(t.directions+': '+name)+'"><span class="i-pin"></span></a></li>';}).join('');
+var label=x.g.l[x.k]||x.k;
+return '<li class="st'+(cheap?' first':'')+'"><span class="rk">'+(i+1)+'</span><div class="who"><strong>'+e(name)+'</strong>'+(lim?'<span class="tag" data-k="'+lim+'">'+e(word(lim))+'</span>':'')
++'<span class="addr">'+e(dist)+(addr?' \\u00b7 '+e(addr):'')+'</span>'+(cheap?'<span class="when cheap" data-k="cheapestHere">'+e(word('cheapestHere'))+'</span>':'')+'</div>'
++'<span class="pp">'+e(money(x.p,x.g.m))+'<small data-fuel="'+e(x.k)+'" data-o="'+e(label)+'">'+e(fuelText(label,x.k,x.g.g))+'</small></span>'
++'<a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query='+s.lat+','+s.lng+'" rel="nofollow noopener" data-kl="directionsTo" data-v="'+e(JSON.stringify({s:name}))+'" aria-label="'+e(word('directionsTo',{s:name}))+'"><span class="i-pin"></span></a></li>';}).join('');
 res.hidden=false;}
-btn.addEventListener('click',function(){btn.disabled=true;say(t.finding);
-navigator.geolocation.getCurrentPosition(function(pos){var lat=pos.coords.latitude,lng=pos.coords.longitude;say(t.loading);
+btn.addEventListener('click',function(){btn.disabled=true;say('finding');
+navigator.geolocation.getCurrentPosition(function(pos){var lat=pos.coords.latitude,lng=pos.coords.longitude;say('loading');
 (meta?Promise.resolve(meta):fetch(base+'meta.json?t='+Math.floor(Date.now()/6e4)).then(function(r){return r.json();}).then(function(x){meta=x;return x;}))
-.then(function(){return find(lat,lng,0);}).then(function(rows){if(!rows.length){say(t.none);res.hidden=true;return;}say('');draw(rows);})
-.catch(function(){say(t.failed);}).then(function(){btn.disabled=false;});},
-function(err){say(err&&err.code===1?t.denied:t.failed);btn.disabled=false;},{enableHighAccuracy:false,timeout:15000,maximumAge:300000});});
+.then(function(){return find(lat,lng,0);}).then(function(rows){if(!rows.length){say('none');res.hidden=true;return;}say('');draw(rows);})
+.catch(function(){say('failed');}).then(function(){btn.disabled=false;});},
+function(err){say(err&&err.code===1?'denied':'failed');btn.disabled=false;},{enableHighAccuracy:false,timeout:15000,maximumAge:300000});});
 })();
 `;
 }
 
-function layout({ lang, t, title, desc, canonical, crumbs, body, modified, search }) {
+/** The language picker in the header: hidden until site.js runs. */
+function langPicker(L) {
+  return `<label class="langwrap" hidden><span class="sr" data-k="language">${esc(say(L, 'language'))}</span><select class="lang" hidden>${Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === L ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>`;
+}
+
+function layout({ lang, title, desc, canonical, crumbs, body, modified }) {
+  const L = lang;
   const ld = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url })),
   };
+  const label = (c) => (c.k ? w(L, c.k) : esc(c.name));
   const trail = crumbs.length > 1
-    ? `<nav class="crumbs" aria-label="Breadcrumb">${crumbs.map((c, i) => (i === crumbs.length - 1 ? `<span aria-current="page">${esc(c.name)}</span>` : `<a href="${esc(c.url)}">${esc(c.name)}</a>`)).join('<span class="sep" aria-hidden="true">›</span>')}</nav>`
+    ? `<nav class="crumbs" aria-label="Breadcrumb">${crumbs.map((c, i) => (i === crumbs.length - 1 ? `<span aria-current="page">${label(c)}</span>` : `<a href="${esc(c.url)}">${label(c)}</a>`)).join('<span class="sep" aria-hidden="true">›</span>')}</nav>`
     : '';
   return `<!doctype html>
 <html lang="${lang}">
@@ -506,11 +575,12 @@ function layout({ lang, t, title, desc, canonical, crumbs, body, modified, searc
 <link rel="icon" type="image/png" href="${BASE}/favicon.png">
 <link rel="stylesheet" href="${BASE}/style.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
+<script src="${BASE}/site.js" defer></script>
 </head>
 <body>
 <header class="top"><div class="bar">
 <a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
-<nav class="menu"><a href="${BASE}/">${esc(t.home)}</a><a class="findlink" href="${BASE}/#find">${ICON_SEARCH}<span>${esc(t.find)}</span></a></nav>
+<nav class="menu">${langPicker(L)}<a class="home" href="${BASE}/">${w(L, 'home')}</a><a class="findlink" href="${BASE}/#find">${ICON_SEARCH}${w(L, 'find')}</a></nav>
 </div></header>
 <main>
 ${trail}
@@ -518,21 +588,21 @@ ${body}
 </main>
 <footer class="site"><div class="bar">
 <a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
-<nav><a href="${BASE}/">${esc(t.home)}</a><a href="${SITE_BASE}/data-licences.html">${esc(t.licences)}</a><a href="${SITE_BASE}/privacy.html">${esc(t.privacy)}</a></nav>
+<nav><a href="${BASE}/">${w(L, 'home')}</a><a href="${SITE_BASE}/data-licences.html">${w(L, 'licences')}</a><a href="${SITE_BASE}/privacy.html">${w(L, 'privacy')}</a></nav>
 </div></footer>
-${search ? `<script src="${BASE}/site.js" defer></script>` : ''}
 </body>
 </html>
 `;
 }
 
-function credit(cfg, licence, t, now) {
+function credit(cfg, licence, now) {
   if (!licence) return '';
-  const reuse = licence.reuse === 'cc' || licence.reuse === 'open' ? ` ${esc(t.reuse)}` : '';
+  const L = cfg.lang;
+  const reuse = licence.reuse === 'cc' || licence.reuse === 'open' ? ` ${w(L, 'reuse')}` : '';
   return `<section class="credit">
-<p><strong>${esc(t.updated)}:</strong> <time datetime="${esc(now.toISOString())}">${esc(stamp(now, cfg))}</time></p>
-<p><strong>${esc(t.source)}:</strong> ${esc(licence.attribution)}. <strong>${esc(t.licence)}:</strong> <a href="${esc(licence.url)}" rel="nofollow">${esc(licence.licence)}</a>.${reuse}</p>
-<p>${esc(t.disclaimer)}</p>
+<p><strong>${w(L, 'updated')}:</strong> ${timeTag(now, cfg.tz, stamp(now, cfg))}</p>
+<p><strong>${w(L, 'source')}:</strong> ${esc(licence.attribution)}. <strong>${w(L, 'licence')}:</strong> <a href="${esc(licence.url)}" rel="nofollow">${esc(licence.licence)}</a>.${reuse}</p>
+${w(L, 'disclaimer', null, 'p')}
 </section>`;
 }
 
@@ -548,41 +618,45 @@ function summarise(place, cfg, cutoff) {
   return fuels;
 }
 
-function stationRow(r, rank, cfg, t, now) {
-  const tag = restriction(r.s) ? `<span class="tag">${esc(t[restriction(r.s)])}</span>` : '';
-  const time = cfg.fixedDaily ? '' : `<span class="when">${esc(t.reported)} ${esc(when(r.at, cfg, now))}</span>`;
+function stationRow(r, rank, cfg, now) {
+  const L = cfg.lang;
+  const lim = restriction(r.s);
+  const tag = lim ? w(L, lim, null, 'span', ' class="tag"') : '';
+  const time = cfg.fixedDaily ? '' : `<span class="when">${w(L, 'reported')} ${esc(when(r.at, cfg, now))}</span>`;
   const name = stationName(r.s);
-  return `<li class="st${rank === 1 ? ' first' : ''}"><span class="rk">${rank}</span><div class="who"><strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" rel="nofollow noopener" aria-label="${esc(t.directionsTo(name))}"><span class="i-pin"></span></a></li>`;
+  return `<li class="st${rank === 1 ? ' first' : ''}"><span class="rk">${rank}</span><div class="who"><strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" rel="nofollow noopener" aria-label="${esc(say(L, 'directionsTo', { s: name }))}" data-kl="directionsTo" data-v="${esc(JSON.stringify({ s: name }))}"><span class="i-pin"></span></a></li>`;
 }
 
 function placePage(id, place, ctx) {
   const { cfg, t, licence, now, regionUrl, nearby } = ctx;
+  const L = cfg.lang;
   const fuels = place.fuels;
   const main = fuels[0];
   const url = `${regionUrl}${place.slug}/`;
   const title = t.title(place.name);
   const desc = t.desc(main.label, money(main.min.p, cfg.money), place.name, stationName(main.min.s), place.stations.length);
-  const tiles = fuels.map((f) => `<a class="tile" href="#f-${f.kind}"><span class="fuel">${esc(f.label)}</span><span class="big">${esc(money(f.min.p, cfg.money))}</span><span class="sub">${esc(t.average)} ${esc(money(f.avg, cfg.money))}</span></a>`).join('\n');
-  let lead = `<p class="lead">${esc(t.lead(main.label, money(main.min.p, cfg.money), place.name, stationName(main.min.s)))}`;
+  const tiles = fuels.map((f) => `<a class="tile" href="#f-${f.kind}"><span class="fuel" data-fuel="${f.kind}">${esc(f.label)}</span><span class="big">${esc(money(f.min.p, cfg.money))}</span>${w(L, 'avgIs', { v: money(f.avg, cfg.money) }, 'span', ' class="sub"')}</a>`).join('\n');
+  const leadVars = { f: main.label, p: place.name, price: money(main.min.p, cfg.money), s: stationName(main.min.s) };
+  let lead = `<p class="lead">${w(L, 'lead', leadVars)}`;
   const gap = (main.avg - main.min.p) * FILL_LITRES;
-  if (main.open.length >= 3 && gap >= 50) lead += ` ${esc(t.saving(main.open.length, money(main.avg, cfg.money), amount(gap, cfg.money)))}`;
+  if (main.open.length >= 3 && gap >= 50) lead += ` ${w(L, 'saving', { n: main.open.length, avg: money(main.avg, cfg.money), save: amount(gap, cfg.money) })}`;
   lead += '</p>';
   const best = main.min;
   const bestName = stationName(best.s);
-  const bestCard = `<section class="best" aria-label="${esc(t.bestNow)}">
-<div class="bestinfo"><span class="kicker">${esc(t.bestNow)} · ${esc(main.label)}</span><strong>${esc(bestName)}</strong><span class="addr">${esc(stationAddress(best.s))}</span></div>
+  const bestCard = `<section class="best">
+<div class="bestinfo"><span class="kicker">${w(L, 'bestNow')} · ${fuelLabel(main)}</span><strong>${esc(bestName)}</strong><span class="addr">${esc(stationAddress(best.s))}</span></div>
 <span class="bestprice">${esc(money(best.p, cfg.money))}</span>
-<a class="btn" href="${mapsUrl(best.s)}" rel="nofollow noopener">${ICON_PIN}<span>${esc(t.directions)}</span></a>
+<a class="btn" href="${mapsUrl(best.s)}" rel="nofollow noopener">${ICON_PIN}${w(L, 'directions')}</a>
 </section>`;
   const tables = fuels.map((f) => {
     const rows = f.rows.slice(0, MAX_ROWS);
-    const top = rows.slice(0, TOP).map((r, i) => stationRow(r, i + 1, cfg, t, now)).join('\n');
+    const top = rows.slice(0, TOP).map((r, i) => stationRow(r, i + 1, cfg, now)).join('\n');
     const rest = rows.slice(TOP);
     const more = rest.length
-      ? `<details class="more"><summary>${esc(t.showAll(f.rows.length))}</summary><ol class="list" start="${TOP + 1}">${rest.map((r, i) => stationRow(r, TOP + i + 1, cfg, t, now)).join('\n')}</ol>${f.rows.length > MAX_ROWS ? `<p class="note">${esc(t.capped(MAX_ROWS))}</p>` : ''}</details>`
+      ? `<details class="more"><summary>${w(L, 'showAll', { n: f.rows.length })}</summary><ol class="list" start="${TOP + 1}">${rest.map((r, i) => stationRow(r, TOP + i + 1, cfg, now)).join('\n')}</ol>${f.rows.length > MAX_ROWS ? w(L, 'capped', { k: MAX_ROWS }, 'p', ' class="note"') : ''}</details>`
       : '';
     return `<section class="fuel" id="f-${f.kind}">
-<h2>${esc(f.label)} <span class="unit">${esc(t.perLitre)}</span></h2>
+<h2>${fuelLabel(f)} ${w(L, 'perLitre', null, 'span', ' class="unit"')}</h2>
 <ol class="list">
 ${top}
 </ol>
@@ -590,7 +664,7 @@ ${more}
 </section>`;
   }).join('\n');
   let tomorrow = '';
-  if (t.tomorrow) {
+  if (L === 'en' && t.tomorrow) {
     const lines = [];
     for (const f of fuels.slice(0, 3)) {
       const both = f.open.filter((r) => r.s.tomorrow && r.s.tomorrow[f.kind] > 0);
@@ -605,14 +679,14 @@ ${more}
     if (lines.length) tomorrow = `<section class="panel"><h2>${esc(t.tomorrow(place.name))}</h2><ul>${lines.join('')}</ul></section>`;
   }
   const chips = nearby.map((n) => `<a class="chip" href="${regionUrl}${n.slug}/">${esc(n.name)}</a>`).join('');
-  const near = `<section class="nearby">${nearby.length ? `<h2>${esc(t.nearby)}</h2><nav class="chips">${chips}</nav>` : ''}<a class="btn ghost" href="${regionUrl}">${esc(t.allIn(cfg.name))}${ICON_ARROW}</a></section>`;
-  const app = cfg.app && t.app ? `<p class="app">${esc(t.app)} <a href="${APP_STORE}">${esc(t.appLink)}</a>.</p>` : '';
-  const fixed = cfg.fixedDaily && t.fixed ? `<p class="note">${esc(t.fixed)}</p>` : '';
+  const near = `<section class="nearby">${nearby.length ? `${w(L, 'nearby', null, 'h2')}<nav class="chips">${chips}</nav>` : ''}<a class="btn ghost" href="${regionUrl}">${w(L, 'allIn', { r: cfg.name })}${ICON_ARROW}</a></section>`;
+  const app = cfg.app ? `<p class="app">${w(L, 'app')} <a href="${APP_STORE}">${w(L, 'appLink')}</a>.</p>` : '';
+  const fixed = cfg.fixedDaily ? w(L, 'fixed', null, 'p', ' class="note"') : '';
   const body = `<div class="head">
-<h1>${esc(t.h1(place.name))}</h1>
-<p class="meta">${place.stations.length.toLocaleString(cfg.locale)} ${esc(t.stations)} · ${esc(cfg.name)} · ${esc(t.updated)} <time datetime="${esc(now.toISOString())}">${esc(stamp(now, cfg))}</time></p>
+${w(L, 'h1', { p: place.name }, 'h1')}
+<p class="meta">${w(L, 'nStations', { n: place.stations.length.toLocaleString(cfg.locale) })} · ${esc(cfg.name)} · ${w(L, 'updated')} ${timeTag(now, cfg.tz, stamp(now, cfg))}</p>
 </div>
-<nav class="tiles n${fuels.length}" aria-label="${esc(t.cheapest)}">
+<nav class="tiles n${fuels.length}">
 ${tiles}
 </nav>
 ${bestCard}
@@ -622,9 +696,9 @@ ${tomorrow}
 ${tables}
 ${app}
 ${near}
-${credit(cfg, licence, t, now)}`;
-  const crumbs = [{ name: t.home, url: `${BASE}/` }, { name: cfg.name, url: regionUrl }, { name: place.name, url }];
-  return layout({ lang: cfg.lang, t, title, desc, canonical: url, crumbs, body, modified: now.toISOString() });
+${credit(cfg, licence, now)}`;
+  const crumbs = [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }, { name: cfg.name, url: regionUrl }, { name: place.name, url }];
+  return layout({ lang: L, title, desc, canonical: url, crumbs, body, modified: now.toISOString() });
 }
 
 /** First letter for the A to Z index, without accents ("Ávila" goes under A). */
@@ -634,12 +708,14 @@ function letterOf(name) {
 }
 
 function regionPage(id, places, total, ctx) {
-  const { cfg, t, licence, now, regionUrl } = ctx;
+  const { cfg, t, licence, now, regionUrl, dataBase } = ctx;
+  const L = cfg.lang;
   const mainKind = cfg.fuels[0];
+  const mainFuel = { kind: mainKind, label: cfg.labels[mainKind] };
   const cheap = places.filter((p) => p.stations.length >= 5 && p.fuels[0].kind === mainKind && p.fuels[0].rows.length >= 4)
     .slice().sort((a, b) => a.fuels[0].avg - b.fuels[0].avg).slice(0, 10);
-  const cheapHtml = cheap.length >= 5 ? `<section><h2>${esc(t.cheapPlaces)} <span class="unit">${esc(cfg.labels[mainKind])}</span></h2>
-<ol class="rank">${cheap.map((p, i) => `<li><a href="${regionUrl}${p.slug}/"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}<small>${esc(t.average)} ${esc(money(p.fuels[0].avg, cfg.money))}</small></span><span class="pp"><small>${esc(t.from)}</small>${esc(money(p.fuels[0].min.p, cfg.money))}</span></a></li>`).join('')}</ol></section>` : '';
+  const cheapHtml = cheap.length >= 5 ? `<section><h2>${w(L, 'cheapPlaces')} <span class="unit">${fuelLabel(mainFuel)}</span></h2>
+<ol class="rank">${cheap.map((p, i) => `<li><a href="${regionUrl}${p.slug}/"><span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}${w(L, 'avgIs', { v: money(p.fuels[0].avg, cfg.money) }, 'small')}</span><span class="pp">${w(L, 'from', null, 'small')}${esc(money(p.fuels[0].min.p, cfg.money))}</span></a></li>`).join('')}</ol></section>` : '';
   const groups = new Map();
   for (const p of places) {
     const l = letterOf(p.name);
@@ -647,61 +723,68 @@ function regionPage(id, places, total, ctx) {
     groups.get(l).push(p);
   }
   const letters = [...groups.keys()].sort((a, b) => (a === '#' ? 1 : b === '#' ? -1 : a.localeCompare(b)));
-  const az = places.length > 24 ? `<nav class="az" aria-label="${esc(t.jump)}">${letters.map((l) => `<a href="#l-${l === '#' ? 'other' : l}">${l}</a>`).join('')}</nav>` : '';
+  const az = places.length > 24 ? `<nav class="az" aria-label="${esc(say(L, 'jump'))}" data-kl="jump">${letters.map((l) => `<a href="#l-${l === '#' ? 'other' : l}">${l}</a>`).join('')}</nav>` : '';
   const lists = letters.map((l) => `<section class="letter" id="l-${l === '#' ? 'other' : l}"><h3>${l}</h3><ul class="rows">${groups.get(l).map((p) => {
     const f = p.fuels.find((x) => x.kind === mainKind) ?? p.fuels[0];
-    return `<li><a href="${regionUrl}${p.slug}/"><span class="nm">${esc(p.name)}<small>${p.stations.length.toLocaleString(cfg.locale)} ${esc(t.stations)}${f.kind === mainKind ? '' : ` · ${esc(f.label)}`}</small></span><span class="pp"><small>${esc(t.from)}</small>${esc(money(f.min.p, cfg.money))}</span></a></li>`;
+    return `<li><a href="${regionUrl}${p.slug}/"><span class="nm">${esc(p.name)}<small>${w(L, 'nStations', { n: p.stations.length.toLocaleString(cfg.locale) })}${f.kind === mainKind ? '' : ` · ${fuelLabel(f)}`}</small></span><span class="pp">${w(L, 'from', null, 'small')}${esc(money(f.min.p, cfg.money))}</span></a></li>`;
   }).join('')}</ul></section>`).join('\n');
   const body = `<div class="head">
-<h1>${esc(t.regionH1(cfg.name))}</h1>
-<p class="lead">${esc(t.regionLead(total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)))}</p>
-<p class="meta">${esc(t.updated)} <time datetime="${esc(now.toISOString())}">${esc(stamp(now, cfg))}</time></p>
+${w(L, 'regionH1', { r: cfg.name }, 'h1')}
+${w(L, 'regionLead', { n: total.toLocaleString(cfg.locale), k: places.length.toLocaleString(cfg.locale) }, 'p', ' class="lead"')}
+<p class="meta">${w(L, 'updated')} ${timeTag(now, cfg.tz, stamp(now, cfg))}</p>
 </div>
-${searchBox(t, cfg.name)}
-${nearBox(t, ctx.dataBase)}
+${searchBox(L, cfg.name)}
+${nearBox(L, dataBase)}
 ${cheapHtml}
-<section class="all"><h2>${esc(t.aToZ)} <span class="unit">${esc(cfg.labels[mainKind])}</span></h2>
+<section class="all"><h2>${w(L, 'aToZ')} <span class="unit">${fuelLabel(mainFuel)}</span></h2>
 ${az}
 ${lists}
 </section>
-${credit(cfg, licence, t, now)}`;
-  const crumbs = [{ name: t.home, url: `${BASE}/` }, { name: cfg.name, url: regionUrl }];
-  return layout({ lang: cfg.lang, t, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString(), search: true });
+${credit(cfg, licence, now)}`;
+  const crumbs = [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }, { name: cfg.name, url: regionUrl }];
+  return layout({ lang: L, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString() });
 }
 
 function homePage(cards, total, now, dataBase) {
+  const L = 'en';
   const t = T.en;
   const popular = cards.flatMap((c) => c.top.map((p) => ({ ...p, url: `${c.regionUrl}${p.slug}/` })))
     .sort((a, b) => b.stations - a.stations).slice(0, 12)
     .map((p) => `<a class="chip" href="${p.url}">${esc(p.name)}</a>`).join('');
-  const grid = cards.map((c) => `<li><a class="region" href="${c.regionUrl}" lang="${c.cfg.lang}">
+  const grid = cards.map((c) => `<li><a class="region" href="${c.regionUrl}">
 <span class="code">${CODES[c.id] ?? esc(c.id.toUpperCase())}</span>
-<span class="rname">${esc(c.cfg.name)}<small>${c.stations.toLocaleString(c.cfg.locale)} ${esc(c.t.stations)} · ${esc(c.t.placesCount(c.places.toLocaleString(c.cfg.locale)))}</small></span>
-<span class="board">${c.fuels.slice(0, 2).map((f) => `<span class="line"><span class="fuel">${esc(f.label)}</span><span class="digits">${esc(money(f.avg, c.cfg.money))}</span></span>`).join('')}</span>
+<span class="rname"><span lang="${c.cfg.lang}">${esc(c.cfg.name)}</span><small>${w(L, 'nStations', { n: c.stations.toLocaleString('en-US') })} · ${w(L, 'placesCount', { k: c.places.toLocaleString('en-US') })}</small></span>
+<span class="board">${c.fuels.slice(0, 2).map((f) => `<span class="line"><span class="fuel" data-fuel="${f.kind}">${esc(f.label)}</span><span class="digits">${esc(money(f.avg, c.cfg.money))}</span></span>`).join('')}</span>
 <span class="go">${ICON_ARROW}</span>
 </a></li>`).join('\n');
-  const when = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(now).replace(',', ' at');
+  const when = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }).format(now).replace(',', ' at');
   const body = `<section class="hero">
-<h1>${esc(t.indexH1)}</h1>
-<p class="lead">${esc(t.indexLead(total, cards.length))}</p>
-${searchBox(t, '')}
-${nearBox(t, dataBase)}
-<p class="poplabel">${esc(t.popular)}</p>
+${w(L, 'indexH1', null, 'h1')}
+${w(L, 'indexLead', { n: total, k: cards.length }, 'p', ' class="lead"')}
+${searchBox(L, '')}
+${nearBox(L, dataBase)}
+${w(L, 'popular', null, 'p', ' class="poplabel"')}
 <nav class="chips">${popular}</nav>
 </section>
-<ul class="trust">${t.trust.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-<section><h2>${esc(t.regions)} <span class="unit">${esc(t.average)}, ${esc(t.perLitre)}</span></h2>
+<ul class="trust">${w(L, 'trust1', null, 'li')}${w(L, 'trust2', null, 'li')}${w(L, 'trust3', null, 'li')}</ul>
+<section><h2>${w(L, 'regions')} ${w(L, 'perLitreAvg', null, 'span', ' class="unit"')}</h2>
 <ul class="regions">
 ${grid}
 </ul></section>
-<p class="app">${esc(t.appHome)} <a href="${APP_STORE}">${esc(t.appHomeLink)}</a>.</p>
-<section class="credit"><p><strong>${esc(t.updated)}:</strong> <time datetime="${esc(now.toISOString())}">${esc(when)} UTC</time></p><p>${esc(t.disclaimer)}</p></section>`;
-  return layout({ lang: 'en', t, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: t.home, url: `${BASE}/` }], body, modified: now.toISOString(), search: true });
+<p class="app">${w(L, 'appHome')} <a href="${APP_STORE}">${w(L, 'appHomeLink')}</a>.</p>
+<section class="credit"><p><strong>${w(L, 'updated')}:</strong> ${timeTag(now, 'UTC', when)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
+  return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString() });
 }
 
 export const STYLE = `:root{color-scheme:light dark;--bg:#F4F1EA;--fg:#121B26;--muted:#5A6372;--card:#FFFFFF;--card2:#EBE6DA;--border:#E0D9CB;--link:#9A5B00;--sign:#101820;--amber:#FFB000;--green:#3BE38C;--cheap:#087A43;--cheapbg:#DCF4E6;--shadow:0 1px 2px rgba(18,27,38,.06),0 4px 14px rgba(18,27,38,.06)}
 @media (prefers-color-scheme:dark){:root{--bg:#0A0F15;--fg:#F3F0E8;--muted:#A4ACB7;--card:#131B24;--card2:#1A2430;--border:#24303C;--link:#FFC54D;--sign:#05090D;--cheap:#3BE38C;--cheapbg:rgba(59,227,140,.12);--shadow:none}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.langwrap{display:inline-flex;align-items:center}
+select.lang{min-height:44px;padding:0 28px 0 10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:#101820 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23F3F0E8' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") right 8px center/14px no-repeat;color:#F3F0E8;font:inherit;font-size:15px;font-weight:600;-webkit-appearance:none;appearance:none;cursor:pointer}
+select.lang:hover{background-color:#1A2430}
+@media (max-width:380px){.brand span{display:none}}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 a{color:var(--link)}
@@ -736,7 +819,7 @@ h3{font-size:15px;margin:20px 0 8px;color:var(--muted);letter-spacing:.5px}
 .tiles.n1{grid-template-columns:minmax(0,1fr)}
 .tile{background:var(--sign);border-radius:14px;padding:10px 14px 12px;display:flex;flex-direction:column;text-decoration:none;border:1px solid #24303C;border-top:4px solid var(--amber);min-height:44px;transition:transform .12s}
 .tile:hover{transform:translateY(-2px)}
-.tile .fuel{color:#C9D1DB;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .fuel{color:#C9D1DB;font-size:13px;font-weight:600;line-height:1.3}
 .tile .big{color:var(--green);font:700 clamp(26px,7vw,36px)/1.1 "Arial Narrow","Roboto Condensed","Helvetica Neue",sans-serif;font-stretch:condensed;letter-spacing:.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tile .sub{color:#A4ACB7;font-size:12px}
 /* Cheapest right now */
@@ -882,7 +965,7 @@ export function buildSite(meta, byRegion) {
       stats.skipped.push(id);
       continue;
     }
-    const t = { ...T.en, ...T[cfg.lang], ...(cfg.lang === 'en' ? {} : { tomorrow: null, fixed: '' }) };
+    const t = { ...T.en, ...T[cfg.lang] };
     const regionUrl = `${BASE}/${cfg.slug}/`;
     const places = placesFor(id, stations).map((p) => ({ ...p, fuels: summarise(p, cfg, cutoff) })).filter((p) => p.fuels.length);
     if (!places.length) continue;
