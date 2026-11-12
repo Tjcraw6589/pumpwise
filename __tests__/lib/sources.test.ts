@@ -222,6 +222,9 @@ describe('Mexico (CRE)', () => {
     const stations = buildMxStations(places, prices, NOW);
     expect(stations.map((s) => s.id)).toEqual(['mx-2039', 'mx-2040']);
     expect(stations[0]).toMatchObject({ region: 'mx', name: 'Estacion Hipodromo', lat: 32.47641, lng: -116.9214, hours: null });
+    // The source has no address: the town and state come from the municipality the station is in.
+    expect(stations[0]).toMatchObject({ address: '', town: 'Tijuana', state: 'Baja California', postcode: '' });
+    expect(stations[1]).toMatchObject({ town: 'Cuauhtémoc', state: 'Ciudad de México' });
     expect(stations[0]?.prices).toEqual({ regular: { p: 2295, at: NOW.toISOString() }, premium: { p: 2790, at: NOW.toISOString() } });
     expect(stations[1]?.prices).toEqual({ diesel: { p: 2700, at: NOW.toISOString() } });
   });

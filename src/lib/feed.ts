@@ -229,6 +229,8 @@ export interface FeedStation {
   brand: string;
   address: string;
   town: string;
+  /** State or province, where the source's town names repeat across states (Mexico). */
+  state?: string;
   postcode: string;
   lat: number;
   lng: number;
