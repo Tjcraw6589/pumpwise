@@ -5,8 +5,9 @@
 // The feed job runs this as a separate step that is allowed to fail: if anything goes wrong here the
 // price feed and the rest of the site are published exactly as before, without the price pages.
 import { Buffer } from 'node:buffer';
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { buildSite } from './pages.mjs';
 
@@ -39,6 +40,9 @@ for (const [path, text] of files) {
   writeFileSync(file, text);
   bytes += Buffer.byteLength(text);
 }
+// The app icon is the favicon of every page.
+const icon = resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/favicon.png');
+if (existsSync(icon)) copyFileSync(icon, join(staging, 'favicon.png'));
 rmSync(target, { recursive: true, force: true });
 renameSync(staging, target);
 console.log(
