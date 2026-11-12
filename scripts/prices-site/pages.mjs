@@ -132,6 +132,10 @@ const T = {
     licences: 'Data licences', privacy: 'Privacy', siteHome: 'Pumpwise home',
     popular: 'Popular places', regions: 'Countries and states', placesCount: (k) => `${k} places`,
     trust: ['Official government prices', 'Updated through the day', 'Free to use, no sign up'],
+    nearBtn: 'Show stations near me', nearH: 'Closest stations to you', finding: 'Finding your location',
+    loading: 'Loading prices near you', denied: 'Location is off for this page. Allow it in your browser settings, or search for a town instead.',
+    failed: 'Your location could not be found. Search for a town instead.', none: 'No stations with prices within 120 km of you.',
+    nearPrivacy: 'Your location stays in your browser. It is only used to pick which prices to load.', cheapestHere: 'Cheapest of these',
   },
   es: {
     home: 'Precios de carburantes', stations: 'gasolineras', today: 'hoy',
@@ -159,6 +163,10 @@ const T = {
     aToZ: 'Todos los lugares de la A a la Z', jump: 'Ir a una letra',
     licences: 'Licencias de datos', privacy: 'Privacidad', siteHome: 'Inicio de Pumpwise',
     placesCount: (k) => `${k} lugares`,
+    nearBtn: 'Ver gasolineras cerca de mí', nearH: 'Las gasolineras más cercanas', finding: 'Buscando tu ubicación',
+    loading: 'Cargando precios cerca de ti', denied: 'La ubicación está desactivada para esta página. Actívala en los ajustes del navegador o busca un lugar.',
+    failed: 'No se pudo encontrar tu ubicación. Busca un lugar.', none: 'No hay gasolineras con precios a menos de 120 km.',
+    nearPrivacy: 'Tu ubicación no sale de tu navegador. Solo se usa para elegir qué precios cargar.', cheapestHere: 'La más barata de estas',
   },
   fr: {
     home: 'Prix des carburants', stations: 'stations', today: "aujourd'hui",
@@ -186,6 +194,10 @@ const T = {
     aToZ: 'Toutes les communes de A à Z', jump: 'Aller à une lettre',
     licences: 'Licences des données', privacy: 'Confidentialité', siteHome: 'Accueil Pumpwise',
     placesCount: (k) => `${k} communes`,
+    nearBtn: 'Voir les stations près de moi', nearH: 'Les stations les plus proches', finding: 'Recherche de votre position',
+    loading: 'Chargement des prix autour de vous', denied: 'La localisation est désactivée pour cette page. Autorisez-la dans les réglages du navigateur, ou cherchez une commune.',
+    failed: 'Votre position est introuvable. Cherchez une commune.', none: 'Aucune station avec des prix à moins de 120 km.',
+    nearPrivacy: 'Votre position reste dans votre navigateur. Elle sert seulement à choisir les prix à charger.', cheapestHere: 'La moins chère de celles-ci',
   },
   pt: {
     home: 'Preços dos combustíveis', stations: 'postos', today: 'hoje',
@@ -213,6 +225,10 @@ const T = {
     aToZ: 'Todos os locais de A a Z', jump: 'Ir para uma letra',
     licences: 'Licenças dos dados', privacy: 'Privacidade', siteHome: 'Início do Pumpwise',
     placesCount: (k) => `${k} locais`,
+    nearBtn: 'Ver postos perto de mim', nearH: 'Os postos mais próximos', finding: 'A procurar a sua localização',
+    loading: 'A carregar preços perto de si', denied: 'A localização está desligada para esta página. Ative-a nas definições do navegador ou procure um local.',
+    failed: 'Não foi possível encontrar a sua localização. Procure um local.', none: 'Não há postos com preços a menos de 120 km.',
+    nearPrivacy: 'A sua localização fica no seu navegador. Só é usada para escolher que preços carregar.', cheapestHere: 'O mais barato destes',
   },
 };
 
@@ -394,18 +410,75 @@ function searchBox(t, region) {
 </form>`;
 }
 
-/** Our own small script for the search box: loads places.json on first use and ignores accents and capitals. */
-const SEARCH_JS = `(function(){var f=document.getElementById('find');if(!f||!window.fetch)return;f.hidden=false;
-var i=f.querySelector('input'),o=f.querySelector('.hits'),m=f.querySelector('.none'),want=f.getAttribute('data-region')||'',data=null,wait=null;
+/**
+ * The "Near me" box: hidden until site.js runs. With the visitor's permission the browser gives site.js a
+ * position; it never leaves the browser. site.js then loads the feed's 0.5 degree tiles around it (the same
+ * public files the app uses) and lists the closest stations.
+ */
+function nearBox(t, dataBase) {
+  const words = { finding: t.finding, loading: t.loading, denied: t.denied, failed: t.failed, none: t.none, cheapestHere: t.cheapestHere, directions: t.directions, membersOnly: t.membersOnly, permitNeeded: t.permitNeeded };
+  return `<div class="near" id="near" hidden data-base="${esc(dataBase)}" data-t="${esc(JSON.stringify(words))}">
+<button type="button" class="btn nearbtn">${ICON_PIN}<span>${esc(t.nearBtn)}</span></button>
+<p class="nearstatus" aria-live="polite"></p>
+<section class="nearres" hidden><h2>${esc(t.nearH)}</h2><ol class="list"></ol><p class="note">${esc(t.nearPrivacy)}</p></section>
+</div>`;
+}
+
+/** Our own small script (site.js): the search box and the "Near me" box. Pages work without it. */
+function siteJs() {
+  const reg = {};
+  for (const [id, cfg] of Object.entries(REGIONS)) reg[id] = { m: cfg.money, f: cfg.fuels, l: cfg.labels };
+  return `(function(){
 function fold(s){return s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();}
 function e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+var f=document.getElementById('find');
+if(f&&window.fetch){f.hidden=false;
+var i=f.querySelector('input'),o=f.querySelector('.hits'),m=f.querySelector('.none'),want=f.getAttribute('data-region')||'',data=null,wait=null;
 function load(){if(!wait)wait=fetch(f.getAttribute('data-src')).then(function(r){return r.json();}).then(function(d){data=d.map(function(x){return x.concat([fold(x[0])]);});});return wait;}
 function show(){var q=fold(i.value.trim());if(!q){o.innerHTML='';m.hidden=true;return;}
 load().then(function(){var a=[],b=[];data.forEach(function(x){if(want&&x[1]!==want)return;var k=x[4].indexOf(q);if(k===0)a.push(x);else if(k>0&&q.length>1)b.push(x);});
 var r=a.sort(function(x,y){return y[3]-x[3];}).concat(b).slice(0,8);
 o.innerHTML=r.map(function(x){return '<li><a href="'+e(x[2])+'"><span>'+e(x[0])+'</span><small>'+e(x[1])+'</small></a></li>';}).join('');m.hidden=r.length>0;});}
 i.addEventListener('input',show);i.addEventListener('focus',load);
-f.addEventListener('submit',function(ev){ev.preventDefault();var a=o.querySelector('a');if(a)location.href=a.href;});})();`;
+f.addEventListener('submit',function(ev){ev.preventDefault();var a=o.querySelector('a');if(a)location.href=a.href;});}
+var n=document.getElementById('near');
+if(!n||!window.fetch||!navigator.geolocation)return;n.hidden=false;
+var REG=${JSON.stringify(reg)},RADII=[8,20,50,120],lang=document.documentElement.lang||'en';
+var t=JSON.parse(n.getAttribute('data-t')),base=n.getAttribute('data-base'),btn=n.querySelector('button'),st=n.querySelector('.nearstatus'),res=n.querySelector('.nearres'),list=res.querySelector('ol'),cache={},meta=null;
+function say(s){st.textContent=s||'';}
+function money(p,k){if(k==='cents')return p.toFixed(1)+'c';if(k==='peso')return '$'+(p/100).toFixed(2);return (p/100).toFixed(3).replace('.',',')+' \\u20ac';}
+function km(a,b,c,d){var r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;return Math.sqrt(x*x+y*y)*6371;}
+function keys(lat,lng,r){var D=meta.tileDeg||0.5,dl=r/111,dg=r/Math.max(1,111.32*Math.cos(lat*Math.PI/180)),k=[];
+for(var y=Math.floor((lat-dl)/D);y<=Math.floor((lat+dl)/D);y++)for(var x=Math.floor((lng-dg)/D);x<=Math.floor((lng+dg)/D);x++)k.push(y+'_'+x);return k;}
+function tile(k){if(!cache[k])cache[k]=fetch(base+'tiles/'+k+'.json?v='+encodeURIComponent(meta.generatedAt)).then(function(r){return r.ok?r.json():{};}).catch(function(){return {};});return cache[k];}
+function find(lat,lng,step){var r=RADII[step],ks=keys(lat,lng,r).filter(function(k){return meta.tiles&&meta.tiles[k];});
+return Promise.all(ks.map(tile)).then(function(ts){var seen={},rows=[],cut=Date.parse(meta.generatedAt)-864e6;
+ts.forEach(function(tl){(tl.stations||[]).forEach(function(s){if(seen[s.id])return;seen[s.id]=1;
+var g=REG[s.region],lic=meta.licences&&meta.licences[s.region];if(!g||!lic||lic.reuse==='no-republish')return;
+var d=km(lat,lng,s.lat,s.lng);if(d>r)return;
+for(var j=0;j<g.f.length;j++){var pr=s.prices&&s.prices[g.f[j]];if(pr&&pr.p>0&&!(Date.parse(pr.at)<cut)){rows.push({s:s,d:d,k:g.f[j],p:pr.p,g:g});return;}}});});
+if(rows.length<5&&step<RADII.length-1)return find(lat,lng,step+1);
+return rows.sort(function(a,b){return a.d-b.d;}).slice(0,10);});}
+function limit(s){var tg=s.tags||[];return tg.indexOf('members-only')>=0?t.membersOnly:tg.indexOf('permit-required')>=0?t.permitNeeded:'';}
+function draw(rows){var k=rows[0].k,rg=rows[0].s.region,best=null;
+rows.forEach(function(x){if(x.k===k&&x.s.region===rg&&!limit(x.s)&&(!best||x.p<best.p))best=x;});
+list.innerHTML=rows.map(function(x,i){var s=x.s,name=(s.name||s.brand||'').trim(),lim=limit(s),cheap=x===best&&rows.length>1;
+var dist=(x.d<10?x.d.toLocaleString(lang,{maximumFractionDigits:1}):Math.round(x.d).toLocaleString(lang))+' km';
+var addr=[s.address,s.town].filter(function(v){return v&&String(v).trim();}).join(', ');
+return '<li class="st'+(cheap?' first':'')+'"><span class="rk">'+(i+1)+'</span><div class="who"><strong>'+e(name)+'</strong>'+(lim?'<span class="tag">'+e(lim)+'</span>':'')
++'<span class="addr">'+e(dist)+(addr?' \\u00b7 '+e(addr):'')+'</span>'+(cheap?'<span class="when cheap">'+e(t.cheapestHere)+'</span>':'')+'</div>'
++'<span class="pp">'+e(money(x.p,x.g.m))+'<small>'+e(x.g.l[x.k]||x.k)+'</small></span>'
++'<a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query='+s.lat+','+s.lng+'" rel="nofollow noopener" aria-label="'+e(t.directions+': '+name)+'"><span class="i-pin"></span></a></li>';}).join('');
+res.hidden=false;}
+btn.addEventListener('click',function(){btn.disabled=true;say(t.finding);
+navigator.geolocation.getCurrentPosition(function(pos){var lat=pos.coords.latitude,lng=pos.coords.longitude;say(t.loading);
+(meta?Promise.resolve(meta):fetch(base+'meta.json?t='+Math.floor(Date.now()/6e4)).then(function(r){return r.json();}).then(function(x){meta=x;return x;}))
+.then(function(){return find(lat,lng,0);}).then(function(rows){if(!rows.length){say(t.none);res.hidden=true;return;}say('');draw(rows);})
+.catch(function(){say(t.failed);}).then(function(){btn.disabled=false;});},
+function(err){say(err&&err.code===1?t.denied:t.failed);btn.disabled=false;},{enableHighAccuracy:false,timeout:15000,maximumAge:300000});});
+})();
+`;
+}
 
 function layout({ lang, t, title, desc, canonical, crumbs, body, modified, search }) {
   const ld = {
@@ -447,7 +520,7 @@ ${body}
 <a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
 <nav><a href="${BASE}/">${esc(t.home)}</a><a href="${SITE_BASE}/data-licences.html">${esc(t.licences)}</a><a href="${SITE_BASE}/privacy.html">${esc(t.privacy)}</a></nav>
 </div></footer>
-${search ? `<script>${SEARCH_JS}</script>` : ''}
+${search ? `<script src="${BASE}/site.js" defer></script>` : ''}
 </body>
 </html>
 `;
@@ -585,6 +658,7 @@ function regionPage(id, places, total, ctx) {
 <p class="meta">${esc(t.updated)} <time datetime="${esc(now.toISOString())}">${esc(stamp(now, cfg))}</time></p>
 </div>
 ${searchBox(t, cfg.name)}
+${nearBox(t, ctx.dataBase)}
 ${cheapHtml}
 <section class="all"><h2>${esc(t.aToZ)} <span class="unit">${esc(cfg.labels[mainKind])}</span></h2>
 ${az}
@@ -595,7 +669,7 @@ ${credit(cfg, licence, t, now)}`;
   return layout({ lang: cfg.lang, t, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString(), search: true });
 }
 
-function homePage(cards, total, now) {
+function homePage(cards, total, now, dataBase) {
   const t = T.en;
   const popular = cards.flatMap((c) => c.top.map((p) => ({ ...p, url: `${c.regionUrl}${p.slug}/` })))
     .sort((a, b) => b.stations - a.stations).slice(0, 12)
@@ -611,6 +685,7 @@ function homePage(cards, total, now) {
 <h1>${esc(t.indexH1)}</h1>
 <p class="lead">${esc(t.indexLead(total, cards.length))}</p>
 ${searchBox(t, '')}
+${nearBox(t, dataBase)}
 <p class="poplabel">${esc(t.popular)}</p>
 <nav class="chips">${popular}</nav>
 </section>
@@ -676,7 +751,7 @@ h3{font-size:15px;margin:20px 0 8px;color:var(--muted);letter-spacing:.5px}
 .btn.ghost{background:transparent;color:var(--link);border:1px solid var(--border);margin-top:14px}
 .btn.ghost:hover{background:var(--card)}
 /* Station lists */
-.list{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.list{list-style:none;margin:0;padding:0;color:var(--fg);background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
 .st{display:grid;grid-template-columns:28px minmax(0,1fr) auto 44px;gap:10px;align-items:center;padding:10px 8px 10px 12px;border-bottom:1px solid var(--border)}
 .st:last-child{border-bottom:0}
 .st .rk{width:26px;height:26px;border-radius:50%;background:var(--card2);color:var(--muted);font-size:13px;font-weight:700;display:grid;place-items:center}
@@ -710,6 +785,15 @@ h3{font-size:15px;margin:20px 0 8px;color:var(--muted);letter-spacing:.5px}
 .hits li:only-child a{border-radius:14px}
 .hits a:hover,.hits a:focus{background:var(--card2)}
 .none{color:var(--muted)}
+.near{margin:12px 0 4px}
+.nearbtn{border:0;font:inherit;font-weight:700;cursor:pointer}
+.nearbtn:disabled{opacity:.7;cursor:progress}
+.nearstatus{margin:8px 0 0;color:var(--muted);font-size:15px}
+.nearstatus:empty{display:none}
+.nearres h2{margin-top:18px}
+.nearres .pp small{display:block;font-size:11px;font-weight:600;color:var(--muted);max-width:9em;white-space:normal;line-height:1.2}
+.when.cheap{color:var(--cheap);font-weight:700}
+.hero .nearstatus,.hero .note{color:#C9D1DB}
 /* Home */
 .hero{background:#101820;color:#F3F0E8;margin:0 -16px;padding:28px 16px 22px;border-radius:0 0 22px 22px}
 .hero h1{color:#FFFFFF;max-width:16ch}
@@ -785,6 +869,8 @@ export function buildSite(meta, byRegion) {
   const urls = [];
   const cards = [];
   const index = [];
+  // The feed's own folder (data/v4/...), where the "Near me" box finds the tiles.
+  const dataBase = `${SITE_BASE}/data/v${meta.v ?? 4}/`;
   const stats = { regions: 0, places: 0, stations: 0, skipped: [] };
   for (const id of Object.keys(REGIONS)) {
     const cfg = REGIONS[id];
@@ -800,7 +886,7 @@ export function buildSite(meta, byRegion) {
     const regionUrl = `${BASE}/${cfg.slug}/`;
     const places = placesFor(id, stations).map((p) => ({ ...p, fuels: summarise(p, cfg, cutoff) })).filter((p) => p.fuels.length);
     if (!places.length) continue;
-    const ctx = { cfg, t, licence, now, regionUrl };
+    const ctx = { cfg, t, licence, now, regionUrl, dataBase };
     for (const p of places) {
       const nearby = places.filter((q) => q !== p).map((q) => ({ q, d: km(p.lat, p.lng, q.lat, q.lng) })).sort((a, b) => a.d - b.d).slice(0, 8).map((x) => x.q);
       files.set(`${cfg.slug}/${p.slug}/index.html`, placePage(id, p, { ...ctx, nearby }));
@@ -819,12 +905,13 @@ export function buildSite(meta, byRegion) {
   }
   if (!cards.length) throw new Error('No region produced any price page.');
   const total = stats.stations.toLocaleString('en-US');
-  files.set('index.html', homePage(cards, total, now));
+  files.set('index.html', homePage(cards, total, now, dataBase));
   urls.unshift(`${BASE}/`);
   const lastmod = now.toISOString().slice(0, 10);
   files.set('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`);
   // The search box's list: [name, region, path on this site, stations] per place.
   files.set('places.json', JSON.stringify(index));
   files.set('style.css', STYLE);
+  files.set('site.js', siteJs());
   return { files, stats: { ...stats, pages: urls.length } };
 }
