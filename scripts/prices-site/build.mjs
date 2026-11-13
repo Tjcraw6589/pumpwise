@@ -80,7 +80,9 @@ try {
     const list = [`https://${HOST}/`, ...urls];
     let sent = 0;
     for (let i = 0; i < list.length; i += 10000) {
-      const r = await fetch('https://api.indexnow.org/indexnow', {
+      // Bing's own endpoint: it shares every submission with the other IndexNow engines. (13 Nov 2026: the
+      // shared api.indexnow.org answered 403 for a key Bing accepts.)
+      const r = await fetch('https://www.bing.com/indexnow', {
         method: 'POST', headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: JSON.stringify({ host: HOST, key: INDEXNOW_KEY, keyLocation: `https://${HOST}/${INDEXNOW_KEY}.txt`, urlList: list.slice(i, i + 10000) }),
         signal: AbortSignal.timeout(20000),
@@ -88,7 +90,8 @@ try {
       console.log(`IndexNow: ${r.status} for ${list.slice(i, i + 10000).length} pages`);
       if (r.ok) sent += 1;
     }
-    writeFileSync(join(site, 'indexnow-last.txt'), sent ? today : last.trim());
+    // Recorded even when the ping failed, so a refusal is retried tomorrow, not every 15 minutes.
+    writeFileSync(join(site, 'indexnow-last.txt'), today);
   }
 } catch (e) {
   console.log(`IndexNow skipped: ${e.message}`);
