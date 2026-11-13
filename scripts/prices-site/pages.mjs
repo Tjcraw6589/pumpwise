@@ -175,7 +175,7 @@ export const U = {
     tomorrowUp: '{f}: average {avg} tomorrow, up {d} on today. Cheapest tomorrow: {min} at {s}.',
     tomorrowDown: '{f}: average {avg} tomorrow, down {d} on today. Cheapest tomorrow: {min} at {s}.',
     tomorrowSame: '{f}: average {avg} tomorrow, the same as today. Cheapest tomorrow: {min} at {s}.',
-    searchLabel: 'Search for a town, suburb or postcode', searchPh: 'Type a town or postcode', noMatch: 'No place with that name. Try another spelling.', go: 'Go',
+    searchLabel: 'Search for a town, postcode or address', searchPh: 'Town, postcode or address', noMatch: 'No town or postcode with that name. Press Go to look it up as an address.', go: 'Go',
     nearPlace: '{a}, near {p}',
     bestNow: 'Cheapest right now', directions: 'Directions', directionsTo: 'Directions to {s}',
     cheapestFuel: 'Cheapest price of each fuel', fuelPick: 'Fuel',
@@ -187,6 +187,9 @@ export const U = {
     failed: 'Your location could not be found. Search for a town instead.', none: 'No stations with prices within 120 km of you.',
     nearPrivacy: 'Your location stays in your browser. It is only used to pick which prices to load.', cheapestHere: 'Cheapest of these',
     sortBy: 'Sort by', sortNear: 'Nearest', sortCheap: 'Cheapest',
+    radiusH: 'Search area', withinOf: 'Within {d} of {p}', youWord: 'you',
+    noneIn: 'No stations with prices within {d} of {p}. Try a bigger search area.', addrLooking: 'Looking up that address',
+    addrNone: 'That address was not found. Try a town or postcode.', osmCredit: 'Address search by OpenStreetMap',
     notFoundH: 'Page not found', notFoundLead: 'This page does not exist or has moved. Search for a town, or pick a country or state.',
     // Home page at the domain root (13 Nov 2026)
     rootH1: "Find the cheapest fuel near you",
@@ -251,7 +254,7 @@ export const U = {
     tomorrowUp: '{f}: media de {avg} mañana, {d} más que hoy. Lo más barato mañana: {min} en {s}.',
     tomorrowDown: '{f}: media de {avg} mañana, {d} menos que hoy. Lo más barato mañana: {min} en {s}.',
     tomorrowSame: '{f}: media de {avg} mañana, igual que hoy. Lo más barato mañana: {min} en {s}.',
-    searchLabel: 'Buscar un municipio, barrio o código postal', searchPh: 'Escribe un lugar o código postal', noMatch: 'Ningún lugar con ese nombre. Prueba a escribirlo de otra forma.', go: 'Ir',
+    searchLabel: 'Buscar un municipio, código postal o dirección', searchPh: 'Lugar, código postal o dirección', noMatch: 'Ningún lugar ni código postal con ese nombre. Pulsa Ir para buscarlo como dirección.', go: 'Ir',
     nearPlace: '{a}, cerca de {p}',
     bestNow: 'Lo más barato ahora', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}',
     cheapestFuel: 'Precio más bajo de cada combustible', fuelPick: 'Combustible',
@@ -263,6 +266,9 @@ export const U = {
     failed: 'No se pudo encontrar tu ubicación. Busca un lugar.', none: 'No hay gasolineras con precios a menos de 120 km.',
     nearPrivacy: 'Tu ubicación no sale de tu navegador. Solo se usa para elegir qué precios cargar.', cheapestHere: 'La más barata de estas',
     sortBy: 'Ordenar por', sortNear: 'Más cerca', sortCheap: 'Más barato',
+    radiusH: 'Zona de búsqueda', withinOf: 'A menos de {d} de {p}', youWord: 'ti',
+    noneIn: 'No hay gasolineras con precios a menos de {d} de {p}. Prueba una zona más grande.', addrLooking: 'Buscando esa dirección',
+    addrNone: 'No se encontró esa dirección. Prueba con un lugar o un código postal.', osmCredit: 'Búsqueda de direcciones de OpenStreetMap',
     notFoundH: 'Página no encontrada', notFoundLead: 'Esta página no existe o ha cambiado de dirección. Busca un lugar o elige un país o estado.',
     // Home page at the domain root (13 Nov 2026)
     rootH1: "Encuentra el combustible más barato cerca de ti",
@@ -327,7 +333,7 @@ export const U = {
     tomorrowUp: '{f} : moyenne de {avg} demain, en hausse de {d}. Le moins cher demain : {min} chez {s}.',
     tomorrowDown: '{f} : moyenne de {avg} demain, en baisse de {d}. Le moins cher demain : {min} chez {s}.',
     tomorrowSame: '{f} : moyenne de {avg} demain, sans changement. Le moins cher demain : {min} chez {s}.',
-    searchLabel: 'Rechercher une commune, un quartier ou un code postal', searchPh: 'Tapez une commune ou un code postal', noMatch: 'Aucune commune de ce nom. Essayez une autre orthographe.', go: 'OK',
+    searchLabel: 'Rechercher une commune, un code postal ou une adresse', searchPh: 'Commune, code postal ou adresse', noMatch: 'Aucune commune ni code postal de ce nom. Appuyez sur OK pour la chercher comme adresse.', go: 'OK',
     nearPlace: '{a}, près de {p}',
     bestNow: 'Le moins cher maintenant', directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}',
     cheapestFuel: 'Prix le plus bas de chaque carburant', fuelPick: 'Carburant',
@@ -339,6 +345,9 @@ export const U = {
     failed: 'Votre position est introuvable. Cherchez une commune.', none: 'Aucune station avec des prix à moins de 120 km.',
     nearPrivacy: 'Votre position reste dans votre navigateur. Elle sert seulement à choisir les prix à charger.', cheapestHere: 'La moins chère de celles-ci',
     sortBy: 'Trier par', sortNear: 'La plus proche', sortCheap: 'La moins chère',
+    radiusH: 'Zone de recherche', withinOf: 'À moins de {d} de {p}', youWord: 'vous',
+    noneIn: 'Aucune station avec des prix à moins de {d} de {p}. Essayez une zone plus grande.', addrLooking: 'Recherche de cette adresse',
+    addrNone: 'Adresse introuvable. Essayez une commune ou un code postal.', osmCredit: 'Recherche d’adresse par OpenStreetMap',
     notFoundH: 'Page introuvable', notFoundLead: 'Cette page n’existe pas ou a été déplacée. Cherchez une commune ou choisissez un pays ou un État.',
     // Home page at the domain root (13 Nov 2026)
     rootH1: "Trouvez le carburant le moins cher près de chez vous",
@@ -403,7 +412,7 @@ export const U = {
     tomorrowUp: '{f}: média de {avg} amanhã, mais {d} do que hoje. O mais barato amanhã: {min} em {s}.',
     tomorrowDown: '{f}: média de {avg} amanhã, menos {d} do que hoje. O mais barato amanhã: {min} em {s}.',
     tomorrowSame: '{f}: média de {avg} amanhã, igual a hoje. O mais barato amanhã: {min} em {s}.',
-    searchLabel: 'Procurar uma localidade, bairro ou código postal', searchPh: 'Escreva um local ou código postal', noMatch: 'Nenhum local com esse nome. Tente outra grafia.', go: 'Ir',
+    searchLabel: 'Procurar uma localidade, código postal ou morada', searchPh: 'Local, código postal ou morada', noMatch: 'Nenhum local ou código postal com esse nome. Carregue em Ir para o procurar como morada.', go: 'Ir',
     nearPlace: '{a}, perto de {p}',
     bestNow: 'O mais barato agora', directions: 'Direções', directionsTo: 'Direções para {s}',
     cheapestFuel: 'Preço mais baixo de cada combustível', fuelPick: 'Combustível',
@@ -415,6 +424,9 @@ export const U = {
     failed: 'Não foi possível encontrar a sua localização. Procure um local.', none: 'Não há postos com preços a menos de 120 km.',
     nearPrivacy: 'A sua localização fica no seu navegador. Só é usada para escolher que preços carregar.', cheapestHere: 'O mais barato destes',
     sortBy: 'Ordenar por', sortNear: 'Mais perto', sortCheap: 'Mais barato',
+    radiusH: 'Área de pesquisa', withinOf: 'A menos de {d} de {p}', youWord: 'si',
+    noneIn: 'Não há postos com preços a menos de {d} de {p}. Experimente uma área maior.', addrLooking: 'A procurar essa morada',
+    addrNone: 'Não foi possível encontrar essa morada. Experimente uma localidade ou um código postal.', osmCredit: 'Pesquisa de moradas do OpenStreetMap',
     notFoundH: 'Página não encontrada', notFoundLead: 'Esta página não existe ou mudou de endereço. Procure um local ou escolha um país ou estado.',
     // Home page at the domain root (13 Nov 2026)
     rootH1: "Encontre o combustível mais barato perto de si",
@@ -814,19 +826,28 @@ ${w(L, 'noMatch', null, 'p', ' class="none" hidden')}
 }
 
 /**
- * The "Near me" box: hidden until site.js runs. With the visitor's permission the browser gives site.js a
- * position; it never leaves the browser. site.js then loads the feed's 0.5 degree tiles around it (the same
- * public files the app uses) and lists the closest stations of the chosen fuel.
+ * The "Near me" box: hidden until site.js runs. It lists every station of the chosen fuel inside the chosen
+ * search area, cheapest first, round a centre: the visitor's position (with their permission; it never leaves
+ * the browser), a town or postcode picked in the search box, or an address looked up with OpenStreetMap.
+ * site.js loads the feed's 0.5 degree tiles round the centre (the same public files the app uses).
  */
+/** The search areas the visitor can pick, in km, and the one picked at first. */
+const NEAR_RADII = [5, 10, 25, 50];
+const NEAR_DEFAULT = 10;
+
 function nearBox(L, dataBase) {
+  const radii = NEAR_RADII.map((r) => `<button type="button" data-r="${r}" aria-pressed="${r === NEAR_DEFAULT}">${r} km</button>`).join('');
   return `<div class="near" id="near" hidden data-base="${esc(dataBase)}">
 <button type="button" class="btn nearbtn">${ICON_PIN}${w(L, 'nearBtn')}</button>
+<div class="radius">${w(L, 'radiusH', null, 'span', ' class="rlabel" id="rlabel"')}<div class="seg rseg" role="group" aria-labelledby="rlabel">${radii}</div></div>
 <p class="nearstatus" aria-live="polite"></p>
 <section class="nearres" hidden>
-<h2>${w(L, 'nearH')} <span class="unit nearfuel"></span></h2>
+<h2><span class="nearwhere"></span> <span class="unit nearfuel"></span></h2>
 <div class="fuels nearfuels" role="group" aria-label="${esc(say(L, 'fuelPick'))}" data-kl="fuelPick"></div>
-<div class="seg" role="group" aria-label="${esc(say(L, 'sortBy'))}" data-kl="sortBy"><button type="button" data-sort="d" aria-pressed="true">${w(L, 'sortNear')}</button><button type="button" data-sort="p" aria-pressed="false">${w(L, 'sortCheap')}</button></div>
+<div class="seg" role="group" aria-label="${esc(say(L, 'sortBy'))}" data-kl="sortBy"><button type="button" data-sort="p" aria-pressed="true">${w(L, 'sortCheap')}</button><button type="button" data-sort="d" aria-pressed="false">${w(L, 'sortNear')}</button></div>
 <ol class="list"></ol>
+<p class="morewrap" hidden><button type="button" class="btn ghost nearmore"></button></p>
+<p class="note osm" hidden><a href="https://www.openstreetmap.org/copyright" rel="nofollow noopener">${w(L, 'osmCredit')}</a></p>
 ${w(L, 'nearPrivacy', null, 'p', ' class="note"')}
 </section>
 </div>`;
@@ -1038,6 +1059,8 @@ function siteMain(D) {
     if (q.length > 2) pages.filter((x) => x.k.indexOf(q) > 0).sort((a, b) => b.c - a.c).forEach((x) => push(x.n, x));
     return out;
   }
+  // Filled in by the Near box below: search round a point, or look an address up first.
+  const NEAR = {};
   all('form.find').forEach((f) => {
     if (!window.fetch) return;
     if (!f.hasAttribute('data-pop')) f.hidden = false;
@@ -1045,12 +1068,16 @@ function siteMain(D) {
     const o = f.querySelector('.hits');
     const m = f.querySelector('.none');
     const want = f.getAttribute('data-region') || '';
+    // On a page with the Near box a place is searched round in place; elsewhere it opens the place's page.
+    const inPlace = !f.hasAttribute('data-pop') && !!document.getElementById('near');
+    let last = [];
     function show() {
       const typed = fold(i.value);
       // A full Portuguese postcode (3230-292) is found by its first four digits.
       const pc = /^([0-9]{4})[- ]?[0-9]{3}$/.exec(typed);
       const q = pc ? pc[1] : typed;
       if (!q) {
+        last = [];
         o.innerHTML = '';
         m.hidden = true;
         return Promise.resolve();
@@ -1059,12 +1086,14 @@ function siteMain(D) {
         (ix) => {
           if (fold(i.value) !== typed) return;
           const r = search(ix, q, pc ? 'pt' : want);
-          o.innerHTML = r.map((x) => `<li><a href="${e(x.page.url)}"><span>${e(x.label)}</span><small>${e(word(`rn_${x.page.r}`))}</small></a></li>`).join('');
+          last = r;
+          o.innerHTML = r.map((x, j) => `<li><a href="${e(x.page.url)}" data-j="${j}"><span>${e(x.label)}</span><small>${e(word(`rn_${x.page.r}`))}</small></a></li>`).join('');
           m.setAttribute('data-k', 'noMatch');
           m.textContent = word('noMatch');
           m.hidden = r.length > 0;
         },
         () => {
+          last = [];
           o.innerHTML = '';
           m.setAttribute('data-k', 'searchFailed');
           m.textContent = word('searchFailed');
@@ -1072,14 +1101,43 @@ function siteMain(D) {
         },
       );
     }
+    function pick(x) {
+      o.innerHTML = '';
+      m.hidden = true;
+      i.blur();
+      NEAR.at(x.page.lat, x.page.lng, x.label.split(',')[0], false);
+    }
+    o.addEventListener('click', (ev) => {
+      const a = ev.target.closest && ev.target.closest('a[data-j]');
+      if (!a || !inPlace || !NEAR.at || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+      const x = last[Number(a.getAttribute('data-j'))];
+      if (!x) return;
+      ev.preventDefault();
+      i.value = x.label;
+      pick(x);
+    });
+    function go() {
+      const text = i.value.trim();
+      if (!text) return Promise.resolve();
+      return show().then(() => {
+        if (last.length) {
+          if (inPlace && NEAR.at) pick(last[0]);
+          else location.href = last[0].page.url;
+        } else if (inPlace && NEAR.addr) {
+          o.innerHTML = '';
+          m.hidden = true;
+          NEAR.addr(text);
+        } else {
+          location.href = `${D.site}/?q=${encodeURIComponent(text)}`;
+        }
+      });
+    }
+    f.go = go;
     i.addEventListener('input', show);
     i.addEventListener('focus', () => index().catch(() => null));
     f.addEventListener('submit', (ev) => {
       ev.preventDefault();
-      show().then(() => {
-        const a = o.querySelector('a');
-        if (a) location.href = a.href;
-      });
+      go();
     });
   });
   // The header's search button works where you are: it opens or focuses this page's search box.
@@ -1095,26 +1153,49 @@ function siteMain(D) {
   );
 
   const n = document.getElementById('near');
-  if (!n || !window.fetch || !navigator.geolocation) return;
+  if (!n || !window.fetch) return;
   n.hidden = false;
-  const RADII = [8, 20, 50, 120];
   const base = n.getAttribute('data-base');
   const btn = n.querySelector('.nearbtn');
+  if (!navigator.geolocation) btn.hidden = true;
   const st = n.querySelector('.nearstatus');
   const res = n.querySelector('.nearres');
   const list = res.querySelector('ol');
   const fuelsEl = res.querySelector('.nearfuels');
   const unit = res.querySelector('.nearfuel');
+  const where = res.querySelector('.nearwhere');
+  const moreWrap = res.querySelector('.morewrap');
+  const moreBtn = res.querySelector('.nearmore');
+  const osm = res.querySelector('.osm');
+  const radiusBtns = all('.rseg button', n);
+  const SHOW = 20;
   const cache = {};
   let meta = null;
   let found = null;
-  let sort = 'd';
+  let sort = 'p';
   let picked = null;
   let lastIx = null;
-  const status = (k) => {
-    st.textContent = k ? word(k) : '';
-  };
-  const money = (p, k) => (k === 'cents' ? `${p.toFixed(1)}c` : k === 'peso' ? `$${(p / 100).toFixed(2)}` : `${(p / 100).toFixed(3).replace('.', ',')} \u20ac`);
+  let at = null;
+  let full = false;
+  let run = 0;
+  let radius = Number(store.get('pw-radius'));
+  if (D.radii.indexOf(radius) < 0) radius = D.nr;
+  radiusBtns.forEach((b) => b.setAttribute('aria-pressed', String(Number(b.getAttribute('data-r')) === radius)));
+  // A text that follows the language switch: data-k and data-v are redrawn by apply().
+  function say2(el, k, v) {
+    el.setAttribute('data-k', k);
+    el.setAttribute('data-v', v ? JSON.stringify(v) : '');
+    el.textContent = word(k, v);
+  }
+  function status(k, v) {
+    if (k) say2(st, k, v);
+    else {
+      st.removeAttribute('data-k');
+      st.textContent = '';
+    }
+  }
+  const area = () => ({ d: `${radius} km`, p: at.p });
+  const money = (p, k) => (k === 'cents' ? `${p.toFixed(1)}c` : k === 'peso' ? `$${(p / 100).toFixed(2)}` : `${(p / 100).toFixed(3).replace('.', ',')} €`);
   function dist(a, b, c, d) {
     const r = Math.PI / 180;
     const x = (d - b) * r * Math.cos(((a + c) / 2) * r);
@@ -1142,9 +1223,8 @@ function siteMain(D) {
         });
     return cache[k];
   }
-  // Every station with a fresh price within the radius; the radius grows until there are at least five.
-  function find(lat, lng, step) {
-    const r = RADII[step];
+  // Every station with a fresh price inside the search area.
+  function find(lat, lng, r) {
     const ks = keys(lat, lng, r).filter((k) => meta.tiles && meta.tiles[k]);
     return Promise.all(ks.map(tile)).then((ts) => {
       const seen = {};
@@ -1172,7 +1252,6 @@ function siteMain(D) {
         }),
       );
       if (!rows.length && ts.some((tl) => tl.failed)) throw new Error('tiles');
-      if (rows.length < 5 && step < RADII.length - 1) return find(lat, lng, step + 1);
       return rows.sort((a, b) => a.d - b.d);
     });
   }
@@ -1180,9 +1259,9 @@ function siteMain(D) {
     const tg = s.tags || [];
     return tg.indexOf('members-only') >= 0 ? 'membersOnly' : tg.indexOf('permit-required') >= 0 ? 'permitNeeded' : '';
   };
-  function reported(at, g) {
+  function reported(at2, g) {
     if (g.fx) return '';
-    const d = new Date(at);
+    const d = new Date(at2);
     if (Number.isNaN(d.getTime())) return '';
     const loc = LOC[L] || L;
     try {
@@ -1230,6 +1309,7 @@ function siteMain(D) {
     lastIx = ix;
     const saved = picked || store.get('pw-fuel');
     const kind = kinds.indexOf(saved) >= 0 ? saved : kinds[0];
+    say2(where, 'withinOf', area());
     fuelsEl.innerHTML = kinds
       .map((k) => `<button type="button" class="fchip" data-k2="${e(k)}" aria-pressed="${k === kind}"><span data-fuel="${e(k)}" data-o="${e(labels[k].l)}" data-lang="${e(labels[k].g)}">${e(fuelText(labels[k].l, k, labels[k].g))}</span></button>`)
       .join('');
@@ -1243,28 +1323,32 @@ function siteMain(D) {
         if (r.p < m * 0.8) r.doubt = true;
       });
     }
-    const shown = rows.slice().sort(sort === 'p' ? (a, b) => a.p - b.p || a.x.d - b.x.d : (a, b) => a.x.d - b.x.d).slice(0, 10);
+    const sorted = rows.slice().sort(sort === 'p' ? (a, b) => a.p - b.p || a.x.d - b.x.d : (a, b) => a.x.d - b.x.d);
+    const shown = full ? sorted : sorted.slice(0, SHOW);
     let best = null;
-    shown.forEach((r) => {
-      if (!limit(r.x.s) && !r.doubt && (!best || r.p < best.p)) best = r;
+    rows.forEach((r) => {
+      if (!limit(r.x.s) && !r.doubt && (!best || r.p < best.p || (r.p === best.p && r.x.d < best.x.d))) best = r;
     });
     list.innerHTML = shown
       .map((r, i) => {
         const s = r.x.s;
         const name = tidy(s.name || s.brand || s.address || '');
         const lim = limit(s);
-        const cheap = r === best && shown.length > 1;
+        const cheap = r === best && rows.length > 1;
         const km = `${r.x.d < 10 ? r.x.d.toLocaleString(L, { maximumFractionDigits: 1 }) : Math.round(r.x.d).toLocaleString(L)} km`;
         const addr = [tidy(s.address || ''), tidy(s.town || ''), s.state || ''].filter((v, j, a) => v && fold(v) !== fold(name) && a.indexOf(v) === j).join(', ');
         const page = pageOf(ix, s);
         const when = reported(r.at, r.x.g);
         const who = `<strong>${e(name)}</strong>${lim ? `<span class="tag" data-k="${lim}">${e(word(lim))}</span>` : ''}${r.doubt ? `<span class="tag warn" data-k="checkPrice">${e(word('checkPrice'))}</span>` : ''}`
-          + `<span class="addr">${e(km)}${addr ? ` \u00b7 ${e(addr)}` : ''}</span>${when ? `<span class="when">${e(when)}</span>` : ''}${cheap ? `<span class="when cheap" data-k="cheapestHere">${e(word('cheapestHere'))}</span>` : ''}`;
+          + `<span class="addr">${e(km)}${addr ? ` · ${e(addr)}` : ''}</span>${when ? `<span class="when">${e(when)}</span>` : ''}${cheap ? `<span class="when cheap" data-k="cheapestHere">${e(word('cheapestHere'))}</span>` : ''}`;
         return `<li class="st${cheap ? ' first' : ''}"><span class="rk" aria-hidden="true">${i + 1}</span>${page ? `<a class="who" href="${e(page.url)}">${who}</a>` : `<div class="who">${who}</div>`}`
           + `<span class="pp">${e(money(r.p, r.x.g.m))}</span>`
           + `<a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query=${s.lat},${s.lng}" rel="nofollow noopener" data-kl="directionsTo" aria-label="${e(word('directionsTo', { s: name }))}"><span class="i-pin"></span><span class="dw" data-k="directions">${e(word('directions'))}</span></a></li>`;
       })
       .join('');
+    moreWrap.hidden = shown.length >= sorted.length;
+    if (!moreWrap.hidden) say2(moreBtn, 'showAll', { n: sorted.length });
+    osm.hidden = !at.osm;
     all('button', fuelsEl).forEach((b) =>
       b.addEventListener('click', () => {
         picked = b.getAttribute('data-k2');
@@ -1274,6 +1358,63 @@ function siteMain(D) {
     );
     res.hidden = false;
   }
+  // Search the chosen area round a point. `p` names the centre: a place name, or { k: 'youWord' }.
+  function runAt(lat, lng, p, fromOsm, jump) {
+    at = { lat, lng, p, osm: !!fromOsm };
+    full = false;
+    const mine = ++run;
+    status('loading');
+    return (meta ? Promise.resolve(meta) : fetch(`${base}meta.json?t=${Math.floor(Date.now() / 6e4)}`).then((r) => r.json()).then((x) => (meta = x)))
+      .then(() => find(lat, lng, radius))
+      .then((rows) => {
+        if (mine !== run) return null;
+        if (!rows.length) {
+          found = null;
+          res.hidden = true;
+          status('noneIn', area());
+          return null;
+        }
+        found = rows;
+        // Without the place list the stations still show, only without links to their pages.
+        return index()
+          .catch(() => null)
+          .then((ix) => {
+            if (mine !== run) return;
+            status('');
+            draw(ix);
+            if (jump && res.getBoundingClientRect().top > innerHeight * 0.6) res.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          });
+      })
+      .catch(() => {
+        if (mine === run) status('loadFailed');
+      });
+  }
+  NEAR.at = (lat, lng, p, fromOsm) => runAt(lat, lng, p, fromOsm, true);
+  // An address that is not a town or postcode: one lookup with OpenStreetMap's Nominatim, only when the
+  // visitor presses Go, inside the countries the site covers.
+  let lastLookup = 0;
+  NEAR.addr = (text) => {
+    status('addrLooking');
+    const wait2 = Math.max(0, lastLookup + 1100 - Date.now());
+    lastLookup = Date.now() + wait2;
+    const mine = ++run;
+    return new Promise((ok) => setTimeout(ok, wait2))
+      .then(() => fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=${D.cc}&accept-language=${L}&q=${encodeURIComponent(text)}`))
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((a) => {
+        if (mine !== run) return null;
+        const x = a && a[0];
+        if (!x) {
+          res.hidden = true;
+          status('addrNone');
+          return null;
+        }
+        return runAt(Number(x.lat), Number(x.lon), x.name || String(x.display_name || text).split(',')[0], true, true);
+      })
+      .catch(() => {
+        if (mine === run) status('addrNone');
+      });
+  };
   onLanguage.push(() => {
     if (found && !res.hidden) draw(lastIx);
   });
@@ -1284,35 +1425,26 @@ function siteMain(D) {
       if (found) draw(lastIx);
     }),
   );
-  btn.addEventListener('click', () => {
+  radiusBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      radius = Number(b.getAttribute('data-r'));
+      store.set('pw-radius', String(radius));
+      radiusBtns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      if (at) runAt(at.lat, at.lng, at.p, at.osm, false);
+    }),
+  );
+  moreBtn.addEventListener('click', () => {
+    full = true;
+    if (found) draw(lastIx);
+  });
+  function locate(jump) {
     btn.disabled = true;
     status('finding');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        status('loading');
-        (meta ? Promise.resolve(meta) : fetch(`${base}meta.json?t=${Math.floor(Date.now() / 6e4)}`).then((r) => r.json()).then((x) => (meta = x)))
-          .then(() => find(lat, lng, 0))
-          .then((rows) => {
-            if (!rows.length) {
-              status('none');
-              res.hidden = true;
-              return null;
-            }
-            found = rows;
-            // Without the place list the stations still show, only without links to their pages.
-            return index()
-              .catch(() => null)
-              .then((ix) => {
-                status('');
-                draw(ix);
-              });
-          })
-          .catch(() => status('loadFailed'))
-          .then(() => {
-            btn.disabled = false;
-          });
+        runAt(pos.coords.latitude, pos.coords.longitude, { k: 'youWord' }, false, jump).then(() => {
+          btn.disabled = false;
+        });
       },
       (err) => {
         status(err && err.code === 1 ? 'denied' : 'failed');
@@ -1320,14 +1452,34 @@ function siteMain(D) {
       },
       { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
     );
-  });
+  }
+  btn.addEventListener('click', () => locate(true));
+  // A search sent from another page (?q=...), or, where the visitor already allowed location for this site,
+  // their own area straight away. Region pages keep to their region, so they never start on their own.
+  const main = document.querySelector('form.find:not([data-pop])');
+  const asked = new URLSearchParams(location.search).get('q');
+  if (asked && main && main.go) {
+    main.querySelector('input').value = asked;
+    main.go();
+  } else if (navigator.geolocation && navigator.permissions && !document.querySelector('form.find[data-region]')) {
+    navigator.permissions
+      .query({ name: 'geolocation' })
+      .then((p) => {
+        if (p.state === 'granted' && !at) locate(false);
+      })
+      .catch(() => null);
+  }
 }
+
+/** Each region's country, for the address lookup (ISO 3166 codes, lower case). */
+const COUNTRY = { wa: 'au', nsw: 'au', tas: 'au', es: 'es', fr: 'fr', mx: 'mx', pt: 'pt' };
 
 /** site.js as sent to the browser: siteMain's source, run with the texts and region facts it needs. */
 export function siteJs() {
   const R = {};
   for (const [id, cfg] of Object.entries(REGIONS)) R[id] = { m: cfg.money, f: cfg.fuels, l: cfg.labels, g: cfg.lang, tz: cfg.tz, fx: !!(cfg.fixedDaily || cfg.current) };
-  const data = JSON.stringify({ U, G: FUEL_WORDS, R, base: BASE }).replace(/</g, '\\u003c');
+  const cc = [...new Set(Object.keys(REGIONS).map((id) => COUNTRY[id] || id))].join(',');
+  const data = JSON.stringify({ U, G: FUEL_WORDS, R, base: BASE, site: SITE_BASE, cc, radii: NEAR_RADII, nr: NEAR_DEFAULT }).replace(/</g, '\\u003c');
   return `/* Pumpwise price pages: language, fuel choice, search and "Near me". The pages work without it. */\n(function(){var D=${data};D.tidy=(${makeTidy.toString()})();(${siteMain.toString()})(D);})();\n`;
 }
 
@@ -1903,6 +2055,13 @@ a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2
 .seg{display:inline-flex;margin:0 0 10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
 .seg button{min-height:44px;padding:0 16px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--amber);color:#101820}
+.radius{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:12px 0 0}
+.radius .seg{margin:0}
+.rlabel{font-size:14px;font-weight:700;letter-spacing:.02em}
+.rseg button{padding:0 12px}
+.morewrap{margin:12px 0 0}
+.nearmore{border:0;font:inherit;font-weight:700;cursor:pointer}
+.osm a{color:inherit}
 .when.cheap{color:var(--cheap);font-weight:700}
 .hero .nearstatus,.hero .note{color:#C9D1DB}
 .hero .nearres{background:var(--bg);color:var(--fg);border-radius:16px;padding:4px 12px 8px;margin:12px 0 0}

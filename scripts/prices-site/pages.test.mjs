@@ -190,6 +190,10 @@ test('home page: search first, real prices only, every region and the App Store 
   assert.match(html, /180\.0/, "Perth's cheapest real price is shown");
   assert.match(html, /<nav aria-label="Footer">/);
   assert.match(html, /"@type":"WebSite"/);
+  // Search area: four sizes, 10 km picked at first, results cheapest first.
+  assert.match(html, /class="seg rseg"/);
+  assert.match(html, /data-r="10" aria-pressed="true"/);
+  assert.match(html, /data-sort="p" aria-pressed="true"/);
 });
 
 test('fallback home page: no prices at all, but the App Store link and every region', () => {

@@ -35,6 +35,8 @@ To keep the website free, its pages show adverts from Google AdSense (the Tasman
 
 If you search for a place, the words you type are sent to Apple's map service to find it, as when you search in Apple Maps. UK postcodes are looked up with postcodes.io, a free public service built on Ordnance Survey and Office for National Statistics open data (https://postcodes.io/about). Nothing else is sent with a search.
 
+On the website, a town or postcode you type is matched inside your browser and is not sent anywhere. If what you type is not a town or postcode and you press Go, it is sent to OpenStreetMap's Nominatim service (https://nominatim.org) to find the address, under the OpenStreetMap Foundation's privacy policy (https://osmfoundation.org/wiki/Privacy_Policy). Nothing else is sent with it. The search area you pick is remembered in your browser only.
+
 ## Directions
 
 When you tap Directions, Pumpwise opens Apple Maps, Google Maps or Waze with the station's position. What happens next is covered by that app's own privacy policy.
