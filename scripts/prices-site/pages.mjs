@@ -17,7 +17,7 @@ export const SITE_BASE = 'https://pumpwiseapp.com';
 // Google AdSense publisher ID (ca-pub-...), empty until Tyler's AdSense account exists. When set, every page
 // except Tasmania's loads Google's ad script and the site root gets ads.txt. Tasmania stays ad free because its
 // government has published no reuse licence (data-licences.html), so its prices are never shown beside adverts.
-export const ADSENSE_CLIENT = '';
+export const ADSENSE_CLIENT = 'ca-pub-6653441997013817';
 const NO_ADS = new Set(['tas']);
 export const BASE = `${SITE_BASE}/prices`;
 const APP_STORE = 'https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153';

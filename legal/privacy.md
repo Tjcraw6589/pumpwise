@@ -1,15 +1,15 @@
 # Pumpwise Privacy Policy
 
-Last updated: 12 November 2026
+Last updated: 13 November 2026
 
 Pumpwise shows official fuel prices near you. It is built to need as little of your information as possible. This policy explains what the app does and does not do with data.
 
 ## The short version
 
-- Pumpwise has no accounts, no sign-in, no adverts, no analytics and no tracking.
+- The Pumpwise app has no accounts, no signing in, no adverts, no analytics and no tracking.
 - Your location is used on your iPhone to work out distances. It is never sent to us or stored by us.
 - Your settings (fuel, search area, fill-up size, fuel economy, recent places) stay on your iPhone.
-- The fuel price website has no cookies and no tracking, and its "Show stations near me" button uses your location only inside your browser.
+- The fuel price website has no accounts and no analytics. It shows adverts from Google, which may use cookies, with your consent first where the law requires it. Its "Show stations near me" button uses your location only inside your browser.
 
 ## Your location
 
@@ -21,11 +21,15 @@ Pumpwise never collects location in the background and never stores your locatio
 
 ## The fuel price website
 
-The fuel price pages at https://tjcraw6589.github.io/pumpwise/prices/ have no accounts, no cookies, no adverts, no analytics and no tracking.
+The fuel price pages at https://pumpwiseapp.com/prices/ have no accounts and no analytics, and Pumpwise itself sets no cookies.
 
 If you tap "Show stations near me", your browser first asks whether the page may use your location. If you allow it, the location is used only inside your browser to work out which stations are closest and how far away they are. The page then downloads the same public price files the app uses, each covering roughly 50 by 50 kilometres, so the request shows only which broad area you are in. Your location is never sent to us or stored, and the page forgets it when you leave. You can say no and search for a town instead.
 
 The search box downloads one public list of place names and searches it inside your browser; what you type is not sent anywhere. Directions links open Google Maps, which is covered by Google's own privacy policy.
+
+## Adverts on the website
+
+To keep the website free, its pages show adverts from Google AdSense (the Tasmania pages show none). Google and its partners may use cookies or similar technology to show adverts and to measure them, including adverts based on your visits to this and other websites. Visitors in the European Economic Area, the United Kingdom and Switzerland first see a consent message from Google and can change their choice at any time with the privacy settings button Google shows on the page. Anyone can turn off personalised adverts at https://adssettings.google.com. How Google uses information from sites that show its adverts is explained at https://policies.google.com/technologies/partner-sites. Pumpwise receives only totals from Google, such as how many adverts were shown and clicked and in which countries, never anything about you. The Pumpwise app shows no adverts.
 
 ## Place search
 
@@ -45,7 +49,7 @@ Pumpwise is not directed at children and collects no personal information from a
 
 ## Changes
 
-If this policy changes, the new version will be published at https://tjcraw6589.github.io/pumpwise/privacy.html with a new date.
+If this policy changes, the new version will be published at https://pumpwiseapp.com/privacy.html with a new date.
 
 ## Contact
 
