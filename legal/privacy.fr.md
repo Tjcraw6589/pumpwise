@@ -1,18 +1,19 @@
 # Politique de confidentialité de Pumpwise
 
-Last updated: 8 novembre 2026
+Last updated: 13 novembre 2026
 
 Pumpwise affiche les prix officiels des carburants près de vous. L’app est conçue pour avoir besoin du moins d’informations possible sur vous. Cette politique explique ce que l’app fait et ne fait pas de vos données, qui en est responsable et quels sont vos droits.
 
 ## Qui est responsable
 
-Pumpwise est créée et publiée par Tyler Crawford, développeur indépendant en Australie (« nous »). Pour toute question sur cette politique, écrivez à tyjcraw@gmail.com. Au sens du droit européen de la protection des données, Tyler Crawford est le « responsable du traitement » pour le peu de traitement décrit ici.
+Pumpwise est créée et publiée par un développeur indépendant en Australie (« Pumpwise », « nous »). Pour toute question sur cette politique, écrivez à tyjcraw@gmail.com. Au sens du droit européen de la protection des données, Pumpwise est le « responsable du traitement » pour le peu de traitement décrit ici.
 
 ## En bref
 
 - Pumpwise n’a ni compte, ni connexion, ni outil d’analyse d’audience. Une petite bannière publicitaire la garde gratuite. La publicité et la vérification des mises à jour sont les seuls moments où un tiers reçoit des informations sur votre appareil.
 - Votre position sert sur votre iPhone à calculer des distances. Elle ne nous est jamais envoyée et nous ne la conservons jamais.
 - Vos réglages (carburant, zone de recherche, plein habituel, consommation, lieux récents) restent sur votre iPhone.
+- Le site des prix des carburants n’utilise ni cookies ni suivi, et son bouton « Voir les stations près de moi » n’utilise votre position que dans votre navigateur.
 - Nous ne conservons aucune donnée personnelle vous concernant : il n’y a donc rien que nous puissions vendre, partager ou perdre.
 
 ## Votre position
@@ -22,6 +23,14 @@ Avec votre accord, Pumpwise lit votre position pendant que l’app est ouverte. 
 Pour obtenir les prix, l’app télécharge des fichiers publics depuis le service Pumpwise hébergé sur GitHub Pages. Chaque fichier couvre une zone d’environ 50 km sur 50, de sorte que la requête ne révèle que la zone large où vous êtes, de la même façon que toute requête web révèle une position approximative à partir de votre adresse internet. GitHub peut conserver des journaux de serveur ordinaires, comme le décrit sa déclaration de confidentialité : https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement. Pumpwise ne reçoit, ne conserve ni ne voit ces journaux. Ces téléchargements sont nécessaires pour fournir le service que vous demandez.
 
 Pumpwise ne relève jamais votre position en arrière-plan et ne conserve jamais l’historique de vos positions.
+
+## Le site des prix des carburants
+
+Les pages de prix sur https://tjcraw6589.github.io/pumpwise/prices/ n’ont ni compte, ni cookies, ni publicité, ni outil d’analyse, ni suivi.
+
+Si vous touchez « Voir les stations près de moi », votre navigateur vous demande d’abord si la page peut utiliser votre position. Si vous l’autorisez, la position sert uniquement dans votre navigateur à trouver les stations les plus proches et leur distance. La page télécharge ensuite les mêmes fichiers publics de prix que l’app, chacun couvrant environ 50 kilomètres sur 50 : la requête ne révèle donc que la grande zone où vous vous trouvez. Votre position ne nous est jamais envoyée ni conservée, et la page l’oublie quand vous la quittez. Vous pouvez refuser et chercher une commune.
+
+Le champ de recherche télécharge une liste publique de noms de lieux et cherche dans votre navigateur ; ce que vous tapez n’est envoyé nulle part. La langue et le carburant que vous choisissez sont mémorisés dans le stockage de votre navigateur, sur votre appareil, et ne nous sont jamais envoyés. Les liens « Itinéraire » ouvrent Google Maps, soumis à la politique de confidentialité de Google.
 
 ## Recherche de lieux
 
@@ -65,7 +74,7 @@ Vous avez aussi le droit d’adresser une réclamation à une autorité de prote
 
 ## Avis pour le Mexique
 
-Pour les personnes au Mexique, Tyler Crawford (contact : tyjcraw@gmail.com) est le responsable de cette app. Pumpwise ne collecte aucune donnée personnelle vous concernant. Les seules informations qui quittent votre téléphone sont les données techniques de publicité et de mise à jour décrites ci-dessus, reçues directement par Google et Expo pour afficher des publicités et tenir l’app à jour. Nous n’effectuons aucun transfert de données personnelles. Vous pouvez exercer vos droits d’accès, de rectification, d’annulation et d’opposition (droits ARCO), retirer votre consentement ou limiter l’usage de vos données en écrivant à tyjcraw@gmail.com. La version espagnole de cette politique est celle qui s’applique au Mexique.
+Pour les personnes au Mexique, Pumpwise (contact : tyjcraw@gmail.com) est le responsable de cette app. Pumpwise ne collecte aucune donnée personnelle vous concernant. Les seules informations qui quittent votre téléphone sont les données techniques de publicité et de mise à jour décrites ci-dessus, reçues directement par Google et Expo pour afficher des publicités et tenir l’app à jour. Nous n’effectuons aucun transfert de données personnelles. Vous pouvez exercer vos droits d’accès, de rectification, d’annulation et d’opposition (droits ARCO), retirer votre consentement ou limiter l’usage de vos données en écrivant à tyjcraw@gmail.com. La version espagnole de cette politique est celle qui s’applique au Mexique.
 
 ## Enfants
 

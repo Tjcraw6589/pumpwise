@@ -1,9 +1,11 @@
 // Mexico: the Energy Regulatory Commission's (CRE) open data on fuel prices. Two XML lists, one of
 // stations (name and position) and one of the prices each station reports, joined on the station
 // number. No key. The lists carry no addresses, opening hours or dates, so prices are shown as the
-// ones in force ("current") rather than with a report time.
+// ones in force ("current") rather than with a report time. The town and state come from the
+// station's position, looked up offline in INEGI's municipal boundaries (mx-municipios.ts).
 import { asNumber, type FeedStation, type FuelKind, inRegion, roundCoord, tidyName } from '../../../src/lib/feed.ts';
 import { politeRequester } from '../http.ts';
+import { mxMunicipio } from './mx-municipios.ts';
 
 export const MX_PLACES_URL = 'https://publicacionexterna.azurewebsites.net/publicaciones/places';
 export const MX_PRICES_URL = 'https://publicacionexterna.azurewebsites.net/publicaciones/prices';
@@ -72,13 +74,16 @@ export function buildMxStations(placesXml: string, pricesXml: string, now: Date)
     const lng = asNumber(/<x>([^<]*)<\/x>/.exec(body)?.[1]);
     const lat = asNumber(/<y>([^<]*)<\/y>/.exec(body)?.[1]);
     if (lat === null || lng === null || !inRegion('mx', lat, lng)) continue;
+    // No street address in the source: the town is the municipality the position falls in.
+    const place = mxMunicipio(lat, lng);
     stations.push({
       id: `mx-${id}`,
       region: 'mx',
       name: mxName(/<name>([\s\S]*?)<\/name>/.exec(body)?.[1] ?? '') || 'Gasolinera',
       brand: '',
       address: '',
-      town: '',
+      town: place?.municipio ?? '',
+      ...(place ? { state: place.estado } : {}),
       postcode: '',
       lat: roundCoord(lat),
       lng: roundCoord(lng),

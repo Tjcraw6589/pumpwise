@@ -94,7 +94,7 @@ test.describe('Pumpwise smoke', () => {
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByTestId('settings-privacy').click();
     await expect(page.getByTestId('legal-screen')).toBeVisible();
-    await expect(page.getByText('no accounts, no sign-in and no analytics', { exact: false })).toBeVisible();
+    await expect(page.getByText('no accounts, no sign-in and no analytics', { exact: false }).first()).toBeVisible();
     await page.getByTestId('header-dismiss').click();
     await page.getByTestId('settings-about').click();
     await expect(page.getByTestId('about-screen')).toBeVisible();
