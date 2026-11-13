@@ -53,4 +53,4 @@ If this policy changes, the new version will be published at https://pumpwiseapp
 
 ## Contact
 
-Questions about privacy: tyjcraw@gmail.com
+Questions about privacy: pumpwiseapp@gmail.com

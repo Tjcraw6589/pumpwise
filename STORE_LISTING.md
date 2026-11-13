@@ -20,7 +20,7 @@ Everything below fits Apple's field limits (counts given per field). Paste as-is
 | Privacy policy URL | https://tjcraw6589.github.io/pumpwise/privacy.html |
 | Support URL | https://tjcraw6589.github.io/pumpwise/ |
 | Marketing URL | https://tjcraw6589.github.io/pumpwise/ |
-| Support email | tyjcraw@gmail.com |
+| Support email | pumpwiseapp@gmail.com |
 
 "Pumpwise" was checked with the iTunes Search API in the Australian, UK and US App Stores on 28 October 2026: no app uses it.
 
@@ -105,7 +105,7 @@ Made by `node scripts/screenshots.mjs store` from the web build, showing live Fu
 | Field | Value |
 |-------|-------|
 | Sign-in required | No (untick) |
-| Contact email | tyjcraw@gmail.com |
+| Contact email | pumpwiseapp@gmail.com |
 | Review notes | See below |
 
 **Review notes**

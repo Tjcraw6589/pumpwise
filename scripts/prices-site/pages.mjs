@@ -21,7 +21,7 @@ export const ADSENSE_CLIENT = 'ca-pub-6653441997013817';
 const NO_ADS = new Set(['tas']);
 export const BASE = `${SITE_BASE}/prices`;
 // The support address shown on the home page and in its structured data. Change it here only.
-const SUPPORT_EMAIL = 'tyjcraw@gmail.com';
+const SUPPORT_EMAIL = 'pumpwiseapp@gmail.com';
 const APP_STORE = 'https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153';
 const STALE_DAYS = 10;
 const MIN_STATIONS = 3;
