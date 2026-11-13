@@ -20,6 +20,8 @@ export const SITE_BASE = 'https://pumpwiseapp.com';
 export const ADSENSE_CLIENT = 'ca-pub-6653441997013817';
 const NO_ADS = new Set(['tas']);
 export const BASE = `${SITE_BASE}/prices`;
+// The support address shown on the home page and in its structured data. Change it here only.
+const SUPPORT_EMAIL = 'tyjcraw@gmail.com';
 const APP_STORE = 'https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153';
 const STALE_DAYS = 10;
 const MIN_STATIONS = 3;
@@ -1675,7 +1677,7 @@ ${board}
 <div class="contact">
 ${w(L, 'supportH', null, 'h2', ' id="support-h"')}
 ${w(L, 'supportLead', null, 'p')}
-<a class="btn" href="mailto:tyjcraw@gmail.com?subject=Pumpwise">${ICON_MAIL}<span>tyjcraw@gmail.com</span></a>
+<a class="btn" href="mailto:${SUPPORT_EMAIL}?subject=Pumpwise">${ICON_MAIL}<span>${SUPPORT_EMAIL}</span></a>
 <p class="note">${w(L, 'independent')} <a href="${SITE_BASE}/data-licences.html">${w(L, 'sourcesLink')}</a></p>
 </div>
 <div class="faq">
@@ -1689,7 +1691,7 @@ ${q(4)}
 <section class="credit"><p>${updatedTag(L, now, null)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
   const data = [
     { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.rootDesc(cards.length), inLanguage: ['en', 'es', 'fr', 'pt'] },
-    { '@type': 'Organization', name: 'Pumpwise', url: `${SITE_BASE}/`, logo: `${BASE}/logo.png`, email: 'tyjcraw@gmail.com' },
+    { '@type': 'Organization', name: 'Pumpwise', url: `${SITE_BASE}/`, logo: `${BASE}/logo.png`, email: SUPPORT_EMAIL },
     { '@type': 'MobileApplication', name: 'Pumpwise: Fuel Prices Near Me', operatingSystem: 'iOS', applicationCategory: 'TravelApplication', url: APP_STORE, offers: { '@type': 'Offer', price: 0, priceCurrency: 'AUD' } },
   ];
   return layout({ lang: L, root: true, title: t.rootTitle, desc: t.rootDesc(cards.length), canonical: `${SITE_BASE}/`, crumbs: [{ name: 'Pumpwise', url: `${SITE_BASE}/` }], body, modified: now.toISOString(), data });
@@ -1753,7 +1755,7 @@ ${w(L, 'appWhere', { a: { k: 'appList' }, k }, 'p', ' class="note"')}
 <div class="contact">
 ${w(L, 'supportH', null, 'h2', ' id="support-h"')}
 ${w(L, 'supportLead', null, 'p')}
-<a class="btn" href="mailto:tyjcraw@gmail.com?subject=Pumpwise">${ICON_MAIL}<span>tyjcraw@gmail.com</span></a>
+<a class="btn" href="mailto:${SUPPORT_EMAIL}?subject=Pumpwise">${ICON_MAIL}<span>${SUPPORT_EMAIL}</span></a>
 <p class="note">${w(L, 'independent')} <a href="${SITE_BASE}/data-licences.html">${w(L, 'sourcesLink')}</a></p>
 </div>
 <div class="faq">
