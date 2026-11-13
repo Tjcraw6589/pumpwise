@@ -1192,12 +1192,15 @@ function langPicker(L) {
   return `<label class="langwrap" hidden><span class="sr" data-k="language">${esc(say(L, 'language'))}</span><select class="lang" hidden>${Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === L ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>`;
 }
 
-function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false }) {
+function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false, data = [] }) {
   const L = lang;
-  const ld = {
+  // Structured data for search and answer engines: the breadcrumb trail on every page, plus what the page
+  // itself lists (stations, places, the site), always mirroring what a visitor can see on the page.
+  const trailLd = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url })),
   };
+  const ld = data.length ? [trailLd, ...data.map((d) => ({ '@context': 'https://schema.org', ...d }))] : trailLd;
   const label = (c) => (c.k ? w(L, c.k) : esc(c.name));
   const trail = crumbs.length > 1
     ? `<nav class="crumbs" aria-label="Breadcrumb">${crumbs.map((c, i) => (i === crumbs.length - 1 ? `<span aria-current="page">${label(c)}</span>` : `<a href="${esc(c.url)}">${label(c)}</a>`)).join('<span class="sep" aria-hidden="true">›</span>')}</nav>`
@@ -1358,7 +1361,20 @@ ${credit(id, cfg, licence, now)}
 </aside>
 </div>`;
   const crumbs = [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }, { name: cfg.name, k: `rn_${id}`, url: regionUrl }, { name: place.name, url }];
-  return layout({ lang: L, title, desc, canonical: url, crumbs, body, modified: now.toISOString() });
+  const country = cfg.locale.split('-')[1];
+  const stationsLd = {
+    '@type': 'ItemList', name: `${main.label}: ${place.name}`, itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    numberOfItems: main.rows.length,
+    itemListElement: main.rows.slice(0, TOP).map((r, i) => ({
+      '@type': 'ListItem', position: i + 1,
+      item: {
+        '@type': 'GasStation', name: stationName(r.s),
+        address: { '@type': 'PostalAddress', streetAddress: tidyText(r.s.address) || undefined, addressLocality: tidyText(r.s.town) || place.name, postalCode: r.s.postcode || undefined, addressCountry: country },
+        geo: { '@type': 'GeoCoordinates', latitude: r.s.lat, longitude: r.s.lng },
+      },
+    })),
+  };
+  return layout({ lang: L, title, desc, canonical: url, crumbs, body, modified: now.toISOString(), data: [stationsLd] });
 }
 
 /** First letter for the A to Z index, without accents ("Ávila" goes under A). */
@@ -1405,7 +1421,12 @@ ${lists}
 </section>
 ${credit(id, cfg, licence, now)}`;
   const crumbs = [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }, { name: cfg.name, k: `rn_${id}`, url: regionUrl }];
-  return layout({ lang: L, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString() });
+  const placesLd = {
+    '@type': 'ItemList', name: t.regionTitle(cfg.name).replace(/ \| Pumpwise$/, ''), numberOfItems: places.length,
+    itemListElement: places.slice().sort((a, b) => b.stations.length - a.stations.length).slice(0, 30)
+      .map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name, url: `${regionUrl}${p.slug}/` })),
+  };
+  return layout({ data: [placesLd], lang: L, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString() });
 }
 
 function regionGrid(cards, L) {
@@ -1438,7 +1459,11 @@ ${regionGrid(cards, L)}
 </ul></section>
 <p class="app">${w(L, 'appHome')} <a href="${APP_STORE}">${w(L, 'appHomeLink')}</a>.</p>
 <section class="credit"><p>${updatedTag(L, now, null)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
-  return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString() });
+  const siteLd = [
+    { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.indexDesc(total), inLanguage: ['en', 'es', 'fr', 'pt'] },
+    { '@type': 'Organization', name: 'Pumpwise', url: `${SITE_BASE}/`, logo: `${BASE}/logo.png`, email: 'tyjcraw@gmail.com' },
+  ];
+  return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString(), data: siteLd });
 }
 
 /** The site's own "page not found" page (GitHub Pages serves /404.html for any missing page). */
@@ -1650,6 +1675,7 @@ export function buildSite(meta, byRegion) {
   const cutoff = now.getTime() - STALE_DAYS * 86400000;
   const files = new Map();
   const urls = [];
+  const maps = new Map();   // sitemap name to its URLs: one per region, so Search Console reports each country
   const cards = [];
   // The search index: regions, pages and the towns and postcodes without a page of their own.
   // p: [name, region, slug ("" when it is the name's own slug), stations, lat, lng]; t and c: [page,
@@ -1680,6 +1706,7 @@ export function buildSite(meta, byRegion) {
       const nearby = places.filter((q) => q !== p).map((q) => ({ q, d: km(p.lat, p.lng, q.lat, q.lng) })).sort((a, b) => a.d - b.d).slice(0, 8).map((x) => x.q);
       files.set(`${cfg.slug}/${p.slug}/index.html`, placePage(id, p, { ...ctx, nearby }));
       urls.push(`${regionUrl}${p.slug}/`);
+      maps.set(cfg.slug, [...(maps.get(cfg.slug) ?? []), `${regionUrl}${p.slug}/`]);
       idx.p.push([p.name, ri, p.slug === slugify(p.name) ? '' : p.slug, p.stations.length, Math.round(p.lat * 100) / 100, Math.round(p.lng * 100) / 100]);
       for (const s of p.stations) covered.add(s);
       for (const f of p.fuels) stats.doubts += f.rows.filter((r) => r.doubt).length;
@@ -1696,6 +1723,7 @@ export function buildSite(meta, byRegion) {
     stats.coverage[id] = { stations: stations.length, onPage: covered.size, places: places.length };
     files.set(`${cfg.slug}/index.html`, regionPage(id, places, stations.length, ctx));
     urls.push(regionUrl);
+    maps.set('main', [...(maps.get('main') ?? []), regionUrl]);
     const all = { name: cfg.name, stations, fuels: [] };
     all.fuels = summarise(all, cfg, cutoff);
     const top = places.slice().sort((a, b) => b.stations.length - a.stations.length).slice(0, 2).map((p) => ({ name: p.name, slug: p.slug, stations: p.stations.length }));
@@ -1709,12 +1737,16 @@ export function buildSite(meta, byRegion) {
   files.set('index.html', homePage(cards, total, now, dataBase));
   urls.unshift(`${BASE}/`);
   const lastmod = now.toISOString().slice(0, 10);
-  files.set('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`);
+  maps.set('main', [`${BASE}/`, ...(maps.get('main') ?? [])]);
+  const urlset = (list) => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${list.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`;
+  for (const [name, list] of maps) files.set(`sitemaps/${name}.xml`, urlset(list));
+  // prices/sitemap.xml (the address Search Console knows) is the index of them all.
+  files.set('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...maps.keys()].map((n) => `<sitemap><loc>${BASE}/sitemaps/${n}.xml</loc><lastmod>${lastmod}</lastmod></sitemap>`).join('\n')}\n</sitemapindex>\n`);
   files.set('places.json', JSON.stringify(idx));
   files.set('style.css', STYLE);
   files.set('site.js', siteJs());
   // robots.txt works now that the site has its own domain: it points search engines at the sitemap.
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`;
   const rootFiles = new Map([['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
-  return { files, rootFiles, stats: { ...stats, pages: urls.length } };
+  return { files, rootFiles, urls, stats: { ...stats, pages: urls.length } };
 }
