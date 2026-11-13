@@ -14,6 +14,11 @@
 // The site's own domain since 13 November 2026 (GitHub Pages sends the old tjcraw6589.github.io/pumpwise/
 // addresses here with a permanent redirect, so old links, the app's feed address and Search Console keep working).
 export const SITE_BASE = 'https://pumpwiseapp.com';
+// Google AdSense publisher ID (ca-pub-...), empty until Tyler's AdSense account exists. When set, every page
+// except Tasmania's loads Google's ad script and the site root gets ads.txt. Tasmania stays ad free because its
+// government has published no reuse licence (data-licences.html), so its prices are never shown beside adverts.
+export const ADSENSE_CLIENT = '';
+const NO_ADS = new Set(['tas']);
 export const BASE = `${SITE_BASE}/prices`;
 const APP_STORE = 'https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153';
 const STALE_DAYS = 10;
@@ -1192,7 +1197,7 @@ function langPicker(L) {
   return `<label class="langwrap" hidden><span class="sr" data-k="language">${esc(say(L, 'language'))}</span><select class="lang" hidden>${Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === L ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>`;
 }
 
-function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false, data = [] }) {
+function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false, data = [], ads = true }) {
   const L = lang;
   // Structured data for search and answer engines: the breadcrumb trail on every page, plus what the page
   // itself lists (stations, places, the site), always mirroring what a visitor can see on the page.
@@ -1231,7 +1236,7 @@ ${noindex ? '' : `<meta property="og:url" content="${esc(canonical)}">\n`}<meta 
 <link rel="stylesheet" href="${BASE}/style.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 <script src="${BASE}/site.js" defer></script>
-</head>
+${ADSENSE_CLIENT && ads ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>\n` : ''}</head>
 <body>
 ${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
 <header class="top"><div class="bar">
@@ -1369,12 +1374,12 @@ ${credit(id, cfg, licence, now)}
       '@type': 'ListItem', position: i + 1,
       item: {
         '@type': 'GasStation', name: stationName(r.s),
-        address: { '@type': 'PostalAddress', streetAddress: tidyText(r.s.address) || undefined, addressLocality: tidyText(r.s.town) || place.name, postalCode: r.s.postcode || undefined, addressCountry: country },
+        address: { '@type': 'PostalAddress', streetAddress: tidyText(r.s.address).replace(/[\s,;.]+$/, '') || undefined, addressLocality: tidyText(r.s.town) || place.name, postalCode: r.s.postcode || undefined, addressCountry: country },
         geo: { '@type': 'GeoCoordinates', latitude: r.s.lat, longitude: r.s.lng },
       },
     })),
   };
-  return layout({ lang: L, title, desc, canonical: url, crumbs, body, modified: now.toISOString(), data: [stationsLd] });
+  return layout({ lang: L, title, desc, canonical: url, crumbs, body, modified: now.toISOString(), data: [stationsLd], ads: !NO_ADS.has(id) });
 }
 
 /** First letter for the A to Z index, without accents ("Ávila" goes under A). */
@@ -1426,7 +1431,7 @@ ${credit(id, cfg, licence, now)}`;
     itemListElement: places.slice().sort((a, b) => b.stations.length - a.stations.length).slice(0, 30)
       .map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name, url: `${regionUrl}${p.slug}/` })),
   };
-  return layout({ data: [placesLd], lang: L, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString() });
+  return layout({ data: [placesLd], ads: !NO_ADS.has(id), lang: L, title: t.regionTitle(cfg.name), desc: t.regionDesc(cfg.name, total.toLocaleString(cfg.locale), places.length.toLocaleString(cfg.locale)), canonical: regionUrl, crumbs, body, modified: now.toISOString() });
 }
 
 function regionGrid(cards, L) {
@@ -1748,5 +1753,7 @@ export function buildSite(meta, byRegion) {
   // robots.txt works now that the site has its own domain: it points search engines at the sitemap.
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`;
   const rootFiles = new Map([['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
+  // ads.txt names Google as the only seller of the site's ad space (AdSense asks for it).
+  if (ADSENSE_CLIENT) rootFiles.set('ads.txt', `google.com, ${ADSENSE_CLIENT.replace(/^ca-/, '')}, DIRECT, f08c47fec0942fa0\n`);
   return { files, rootFiles, urls, stats: { ...stats, pages: urls.length } };
 }
