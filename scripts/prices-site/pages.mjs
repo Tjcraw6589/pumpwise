@@ -11,7 +11,9 @@
 // - Prices are shown exactly as reported; anything older than STALE_DAYS is left out.
 // - Pages are written in the language people search in: English, Spanish, French or Portuguese.
 
-export const SITE_BASE = 'https://tjcraw6589.github.io/pumpwise';
+// The site's own domain since 13 November 2026 (GitHub Pages sends the old tjcraw6589.github.io/pumpwise/
+// addresses here with a permanent redirect, so old links, the app's feed address and Search Console keep working).
+export const SITE_BASE = 'https://pumpwiseapp.com';
 export const BASE = `${SITE_BASE}/prices`;
 const APP_STORE = 'https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153';
 const STALE_DAYS = 10;
@@ -1439,7 +1441,7 @@ ${regionGrid(cards, L)}
   return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString() });
 }
 
-/** The site's own "page not found" page (GitHub Pages serves /pumpwise/404.html for any missing page). */
+/** The site's own "page not found" page (GitHub Pages serves /404.html for any missing page). */
 function notFoundPage(cards, now) {
   const L = 'en';
   const body = `<div class="head">
@@ -1711,6 +1713,8 @@ export function buildSite(meta, byRegion) {
   files.set('places.json', JSON.stringify(idx));
   files.set('style.css', STYLE);
   files.set('site.js', siteJs());
-  const rootFiles = new Map([['404.html', notFoundPage(cards, now)]]);
+  // robots.txt works now that the site has its own domain: it points search engines at the sitemap.
+  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`;
+  const rootFiles = new Map([['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
   return { files, rootFiles, stats: { ...stats, pages: urls.length } };
 }

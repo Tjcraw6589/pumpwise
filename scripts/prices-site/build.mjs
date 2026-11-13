@@ -49,7 +49,8 @@ const og = resolve(here, 'og.png');
 if (existsSync(og)) copyFileSync(og, join(staging, 'og.png'));
 rmSync(target, { recursive: true, force: true });
 renameSync(staging, target);
-// Pages at the site root: 404.html, which GitHub Pages shows for any address that does not exist.
+// Pages at the site root: 404.html, which GitHub Pages shows for any address that does not exist, and
+// robots.txt.
 for (const [path, text] of rootFiles) writeFileSync(join(site, path), text);
 console.log(
   `Price pages: ${stats.pages} pages (${stats.places} places in ${stats.regions} regions, ${stats.stations} stations), ` +
