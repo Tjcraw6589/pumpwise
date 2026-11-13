@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { aliasesFor, buildSite, countVars, FUEL_WORDS, markDoubts, median, placesFor, REGIONS, say, siteJs, stationAddress, stationName, tidyText, U } from './pages.mjs';
+import { aliasesFor, buildSite, countVars, fallbackRoot, FUEL_WORDS, markDoubts, median, placesFor, REGIONS, say, siteJs, stationAddress, stationName, tidyText, U } from './pages.mjs';
 
 const NOW = '2026-11-12T21:51:32.263Z';
 let n = 0;
@@ -170,6 +170,35 @@ test('place pages: fuel chips, one list per fuel, cheapest first and a labelled 
   assert.ok(rootFiles.get('404.html').includes('Page not found'));
   // The explanatory sentence comes after the lists.
   assert.ok(html.indexOf('class="lead"') > html.indexOf('id="f-diesel"'));
+});
+
+test('home page: search first, real prices only, every region and the App Store link', () => {
+  const wa = [];
+  for (let i = 0; i < 4; i++) wa.push(st('wa', 'Perth', -31.95 + i / 1000, 115.86, { regular: 180 + i }, { tomorrow: { regular: 175 + i } }));
+  const es = [];
+  for (let i = 0; i < 4; i++) es.push(st('es', 'Madrid', 40.41 + i / 1000, -3.7, { regular: 1.5 + i / 100 }));
+  const { rootFiles } = buildSite(meta(['wa', 'es']), { wa, es });
+  const html = rootFiles.get('index.html');
+  assert.ok(html, 'the site root gets a home page');
+  assert.match(html, /<a class="brand" href="[^"]*\/" aria-current="page">/);
+  // The search box comes before anything else in the main content, so it is on a phone's first screen.
+  assert.ok(html.indexOf('id="q"') < html.indexOf('id="app"'));
+  assert.match(html, /apps\.apple\.com\/au\/app\/pumpwise/);
+  assert.match(html, /href="mailto:/);
+  for (const r of ['wa', 'es']) assert.ok(html.includes(`/prices/${REGIONS[r].slug}/`), `links to ${r}`);
+  assert.ok(!/185\.9|199\.9/.test(html), 'no made up prices');
+  assert.match(html, /180\.0/, "Perth's cheapest real price is shown");
+  assert.match(html, /<nav aria-label="Footer">/);
+  assert.match(html, /"@type":"WebSite"/);
+});
+
+test('fallback home page: no prices at all, but the App Store link and every region', () => {
+  const html = fallbackRoot();
+  const text = html.replace(/<style>[\s\S]*?<\/style>|<svg[\s\S]*?<\/svg>|<[^>]+>/g, ' ');
+  assert.ok(!/\d+\.\d/.test(text), 'no prices');
+  assert.match(html, /apps\.apple\.com\/au\/app\/pumpwise/);
+  for (const cfg of Object.values(REGIONS)) assert.ok(html.includes(`/prices/${cfg.slug}/`), `links to ${cfg.slug}`);
+  assert.match(html, /google-adsense-account/);
 });
 
 test('site.js is valid script', () => {
