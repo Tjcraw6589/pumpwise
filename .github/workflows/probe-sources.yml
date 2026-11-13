@@ -1,0 +1,44 @@
+# Temporary: checks from GitHub's servers which candidate fuel price sources answer and in what format.
+# Run by hand (workflow_dispatch); removed once the new sources are written.
+name: Probe sources
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe
+        run: |
+          UA="Pumpwise/1.0 (+https://pumpwiseapp.com)"
+          probe() {
+            echo "================ $1"
+            curl -sSL -A "$UA" --max-time 60 -o body -D headers -w "HTTP %{http_code} %{content_type} %{size_download} bytes\n" "$1" || echo "curl failed"
+            grep -i -E "^(content-type|content-disposition|last-modified):" headers || true
+            head -c ${2:-1500} body | tr -d '\r'; echo
+            echo "lines: $(wc -l < body)"
+          }
+          probe "https://www.mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv" 1200
+          probe "https://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv" 800
+          probe "https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti" 300
+          grep -o -i -E ".{0,200}(licenza|IODL|creative commons).{0,200}" body | head -5 || true
+          probe "https://mzoe-gor.hr/data.json" 1500
+          probe "https://mzoe-gor.hr/" 2500
+          grep -o -E "(href|src)=\"[^\"]*\"" body | head -40 || true
+          probe "https://goriva.si/api/v1/search/?format=json" 1500
+          probe "https://goriva.si/api/v1/franchise/?format=json" 600
+          probe "https://goriva.si/" 300
+          grep -o -i -E ".{0,200}(ponovn|licenc|uporab).{0,200}" body | head -5 || true
+          probe "http://datos.energia.gob.ar/api/3/action/package_show?id=precios-en-surtidor" 200
+          python3 - <<'PY'
+          import json
+          try:
+              d = json.load(open('body'))['result']
+              print('license:', d.get('license_title'), d.get('license_id'))
+              print('updated:', d.get('metadata_modified'))
+              for r in d.get('resources', []):
+                  print('-', r.get('name'), r.get('format'), r.get('last_modified') or r.get('created'), r.get('url'))
+          except Exception as e:
+              print('no json', e)
+          PY
