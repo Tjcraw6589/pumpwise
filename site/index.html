@@ -1,88 +1,305 @@
 <!doctype html>
-<html lang="en-AU">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pumpwise: cheapest fuel prices near you, from official prices</title>
-<meta name="description" content="Find the cheapest fuel near you with official government prices: petrol and diesel by town and city in Australia, Spain, France, Portugal and Mexico, plus the Pumpwise iPhone app.">
+<title>Pumpwise: cheapest fuel near you, from official prices</title>
+<meta name="description" content="Today's cheapest petrol and diesel near you, from official government prices in 7 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
 <link rel="canonical" href="https://pumpwiseapp.com/">
+<meta property="og:title" content="Pumpwise: cheapest fuel near you, from official prices">
+<meta property="og:description" content="Today's cheapest petrol and diesel near you, from official government prices in 7 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
+<meta property="og:url" content="https://pumpwiseapp.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pumpwise">
+<meta name="theme-color" content="#101820">
+<link rel="icon" type="image/png" href="https://pumpwiseapp.com/favicon.png">
 <meta name="google-adsense-account" content="ca-pub-6653441997013817">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6653441997013817" crossorigin="anonymous"></script>
-<meta property="og:title" content="Pumpwise: cheapest fuel prices near you">
-<meta property="og:description" content="Official petrol and diesel prices by town and city, updated through the day.">
-<meta property="og:url" content="https://pumpwiseapp.com/">
-<meta property="og:image" content="https://pumpwiseapp.com/prices/og.png">
-<link rel="icon" type="image/png" href="prices/favicon.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pumpwise","url":"https://pumpwiseapp.com/","description":"Official fuel prices by town and city, and the cheapest station near you."}</script>
 <style>
-  :root { color-scheme: light dark; --bg:#F4F1EA; --fg:#121B26; --muted:#5A6372; --card:#FFFFFF; --border:#E0D9CB; --link:#9A5B00; --sign:#101820; --amber:#FFB000; --green:#3BE38C; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#0A0F15; --fg:#F3F0E8; --muted:#A4ACB7; --card:#131B24; --border:#24303C; --link:#FFC54D; --sign:#05090D; } }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; }
-  .hero { display:flex; align-items:center; gap:16px; }
-  .hero svg { width:64px; height:64px; flex:none; }
-  h1 { font-size: 40px; line-height: 1.05; letter-spacing: -0.5px; margin: 0; }
-  .tag { color: var(--muted); margin: 4px 0 0; }
-  .signs { display:flex; gap:12px; margin: 28px 0; flex-wrap: wrap; }
-  .sign { background: var(--sign); border-radius: 14px; padding: 10px 18px; font: 700 40px/1 "Arial Narrow", "Roboto Condensed", sans-serif; color: var(--amber); letter-spacing: 1px; }
-  .sign.cheap { color: var(--green); }
-  .sign small { display:block; font-size: 11px; letter-spacing: 1.4px; color: #8C97A4; margin-top: 4px; }
-  section { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 20px 24px; margin-top: 16px; }
-  h2 { font-size: 20px; margin: 0 0 8px; }
-  a { color: var(--link); }
-  ul { padding-left: 20px; margin: 8px 0 0; }
-  footer { color: var(--muted); font-size: 13px; margin-top: 28px; text-align: center; }
+:root{color-scheme:light dark;--bg:#F4F1EA;--fg:#121B26;--muted:#5A6372;--card:#FFFFFF;--card2:#EBE6DA;--border:#E0D9CB;--link:#9A5B00;--sign:#101820;--amber:#FFB000;--green:#3BE38C;--cheap:#087A43;--cheapbg:#E3F5EA;--shadow:0 1px 2px rgba(18,27,38,.06),0 4px 14px rgba(18,27,38,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#0A0F15;--fg:#F3F0E8;--muted:#A4ACB7;--card:#131B24;--card2:#1A2430;--border:#24303C;--link:#FFC54D;--sign:#05090D;--cheap:#3BE38C;--cheapbg:#11281D;--shadow:none}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;left:8px;top:-80px;z-index:10;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:10px;background:var(--amber);color:#101820;font-weight:700;text-decoration:none}
+.skip:focus{top:8px}
+main:focus{outline:none}
+.langwrap{display:inline-flex;align-items:center}
+select.lang{min-height:44px;padding:0 28px 0 10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:#101820 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23F3F0E8' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") right 8px center/14px no-repeat;color:#F3F0E8;font:inherit;font-size:15px;font-weight:600;-webkit-appearance:none;appearance:none;cursor:pointer}
+select.lang:hover{background-color:#1A2430}
+@media (max-width:380px){.brand span{display:none}}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--link)}
+.bar,main{max-width:1120px;margin:0 auto;padding:0 16px}
+main{padding-top:4px;padding-bottom:48px}
+.top{background:#101820;color:#F3F0E8;position:sticky;top:0;z-index:5;border-bottom:3px solid var(--amber)}
+.top .bar{display:flex;align-items:center;justify-content:space-between;min-height:56px;gap:12px}
+.brand{display:inline-flex;align-items:center;gap:10px;color:#F3F0E8;text-decoration:none;font-weight:800;font-size:19px;letter-spacing:-.2px;min-height:44px;min-width:44px}
+.mark{flex:none;border-radius:8px}
+.menu{display:flex;align-items:center;gap:4px}
+.menu a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:10px;color:#F3F0E8;text-decoration:none;font-weight:600;font-size:15px}
+.menu a:hover{background:rgba(255,255,255,.08)}
+.menu .findlink{background:var(--amber);color:#101820}
+.menu .findlink:hover{background:#FFC54D}
+@media (max-width:560px){.menu a:not(.findlink){display:none}.menu .findlink span{display:none}.menu .findlink{width:44px;justify-content:center;padding:0}}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted);margin:2px 0 0}
+.crumbs a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 2px;font-weight:600;text-decoration:none}
+.crumbs a:hover{text-decoration:underline}
+.crumbs .sep{padding:0 6px}
+h1{font-size:clamp(26px,6vw,44px);line-height:1.1;letter-spacing:-.6px;margin:2px 0 6px;font-weight:800}
+h2{font-size:21px;line-height:1.25;margin:32px 0 12px;font-weight:800;letter-spacing:-.2px}
+h2 .unit{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px}
+h3{font-size:15px;margin:20px 0 8px;color:var(--muted);letter-spacing:.5px}
+.lead{font-size:18px;line-height:1.5;margin:8px 0}
+.meta,.note,small{color:var(--muted);font-size:14px}
+.meta{margin:2px 0 0;line-height:1.4}
+.head{margin:2px 0 12px}
+.tag{display:inline-block;margin-left:8px;padding:1px 8px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap;vertical-align:2px}
+.tag.warn{color:var(--link);border-color:currentColor}
+/* Fuel chips: one compact row that scrolls sideways when it must; the price keeps the roadside sign look */
+.fuels{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 4px;padding:2px 16px 6px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.fchip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 6px 4px 12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--fg);text-decoration:none;font:inherit;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer}
+.fchip b{background:var(--sign);color:var(--green);border-radius:8px;padding:3px 8px;font:700 17px/1.2 "Arial Narrow","Roboto Condensed","Helvetica Neue",sans-serif;font-variant-numeric:tabular-nums}
+.fchip[aria-current=true],.fchip[aria-pressed=true]{border:2px solid var(--amber);background:var(--card2)}
+.nearfuels .fchip{padding:4px 14px}
+.fchip:hover{border-color:var(--amber)}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;background:var(--amber);color:#101820;font-weight:700;text-decoration:none}
+.btn:hover{background:#FFC54D}
+.btn.ghost{background:transparent;color:var(--link);border:1px solid var(--border);margin-top:14px}
+.btn.ghost:hover{background:var(--card)}
+/* Station lists: a fixed price column; the cheapest row carries a labelled Directions button */
+.fuel h2{margin:16px 0 8px}
+.list{list-style:none;margin:0;padding:0;color:var(--fg);background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.st{display:grid;grid-template-columns:26px minmax(0,1fr) 5.6em auto;gap:4px 10px;align-items:center;padding:10px 8px 10px 12px;border-bottom:1px solid var(--border)}
+.st:last-child{border-bottom:0}
+.st .rk{width:26px;height:26px;border-radius:50%;background:var(--card2);color:var(--muted);font-size:13px;font-weight:700;display:grid;place-items:center}
+.st.first{background:var(--cheapbg)}
+.st.first .rk{background:var(--cheap);color:var(--card)}
+.who{min-width:0;color:inherit;text-decoration:none}
+a.who{display:block;min-height:44px}
+a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2px}
+.who strong{font-size:16px;line-height:1.3}
+.who .addr,.who .when{display:block;color:var(--muted);font-size:13.5px;line-height:1.35}
+.kick{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--cheap)}
+.pp{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.st.first .pp{color:var(--cheap);font-size:19px}
+.dir{min-width:44px;height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;color:var(--link);border:1px solid var(--border);text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap}
+.dir:hover{background:var(--card2)}
+.st.first .dir{background:var(--amber);color:#101820;border-color:transparent}
+@media (max-width:399px){.dir{padding:0}.dir .dw{display:none}.st.first .dir{grid-column:2/-1;justify-self:start;padding:0 14px}.st.first .dir .dw{display:inline}}
+.i-pin{flex:none;width:20px;height:20px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5c-3.9 0-7 3-7 6.9 0 5 6 10.1 6.3 10.4.4.3.9.3 1.3 0 .3-.3 6.4-5.4 6.4-10.4 0-3.9-3.1-6.9-7-6.9z' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='9.5' r='2.4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5c-3.9 0-7 3-7 6.9 0 5 6 10.1 6.3 10.4.4.3.9.3 1.3 0 .3-.3 6.4-5.4 6.4-10.4 0-3.9-3.1-6.9-7-6.9z' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='9.5' r='2.4'/%3E%3C/svg%3E") center/contain no-repeat}
+.more{margin-top:10px}
+.more summary{cursor:pointer;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);font-weight:700;color:var(--link);list-style:none}
+.more summary::-webkit-details-marker{display:none}
+.more summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-4px 0 0 10px}
+.more[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.more .list{margin-top:10px}
+/* Place pages: lists, then the summary; two columns on wide screens */
+.side .sum .lead{font-size:16px;margin:0}
+.sum{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-top:24px}
+.sum .note{margin:8px 0 0}
+@media (min-width:1024px){.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}.side{position:sticky;top:72px;max-height:calc(100vh - 84px);overflow-y:auto;padding-bottom:8px}.side .sum{margin-top:16px}.side .credit{margin-top:20px}.side h2{font-size:18px;margin-top:20px}}
+/* Search */
+.find{margin:14px 0 8px;position:relative}
+.find.pop{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.find label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.field{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--border);border-radius:14px;padding:0 6px 0 12px;color:var(--muted)}
+.field:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px rgba(255,176,0,.25)}
+.field input{flex:1;min-width:0;height:54px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:17px;outline:none}
+.field button{height:44px;padding:0 16px;border:0;border-radius:10px;background:var(--amber);color:#101820;font:inherit;font-weight:700;cursor:pointer}
+.hits{list-style:none;margin:6px 0 0;padding:0;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.hits:empty{display:none}
+.hits a{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:8px 14px;border:1px solid var(--border);border-top:0;text-decoration:none;color:var(--fg);font-weight:600}
+.hits li:first-child a{border-top:1px solid var(--border);border-radius:14px 14px 0 0}
+.hits li:last-child a{border-radius:0 0 14px 14px}
+.hits li:only-child a{border-radius:14px}
+.hits a:hover,.hits a:focus{background:var(--card2)}
+.hits small{flex:none;text-align:right}
+.none{color:var(--muted)}
+.near{margin:12px 0 4px}
+.nearbtn{border:0;font:inherit;font-weight:700;cursor:pointer}
+.nearbtn:disabled{opacity:.7;cursor:progress}
+.nearstatus{margin:8px 0 0;color:var(--muted);font-size:15px}
+.nearstatus:empty{display:none}
+.nearres h2{margin:18px 0 8px}
+.nearres .fuels{margin-bottom:8px}
+.seg{display:inline-flex;margin:0 0 10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{min-height:44px;padding:0 16px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--amber);color:#101820}
+.when.cheap{color:var(--cheap);font-weight:700}
+.hero .nearstatus,.hero .note{color:#C9D1DB}
+.hero .nearres{background:var(--bg);color:var(--fg);border-radius:16px;padding:4px 12px 8px;margin:12px 0 0}
+.hero .nearres .note{color:var(--muted)}
+/* Home */
+.hero{background:#101820;color:#F3F0E8;margin:0 -16px;padding:28px 16px 22px;border-radius:0 0 22px 22px}
+.hero h1{color:#FFFFFF;max-width:16ch}
+.hero .lead{color:#C9D1DB;max-width:56ch}
+.hero .find label{color:#F3F0E8}
+.hero .field{border-color:#24303C;background:#FFFFFF;color:#5A6372}
+.hero .field input{color:#121B26}
+.hero .hits a{color:#121B26;background:#FFFFFF;border-color:#E0D9CB}
+.hero .hits a:hover,.hero .hits a:focus{background:#F4F1EA}
+.hero .hits small{color:#5A6372}
+.hero .none{color:#C9D1DB}
+.poplabel{margin:14px 0 6px;font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#A4ACB7}
+.hero .chip{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:#F3F0E8}
+.hero .chip:hover{background:rgba(255,255,255,.16)}
+@media (min-width:1152px){.hero{margin:0;border-radius:22px;padding:36px 32px 28px;margin-top:16px}}
+.trust{list-style:none;display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;margin:16px 0 0;color:var(--muted);font-size:14px;font-weight:600}
+.trust li::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cheap);margin-right:8px;vertical-align:1px}
+.regions{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.region{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"code name go" "board board board";gap:10px 12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg);box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+.region:hover{transform:translateY(-2px);border-color:var(--amber)}
+.region .code{grid-area:code;min-width:44px;height:44px;padding:0 8px;border-radius:12px;background:var(--amber);color:#101820;font-weight:800;font-size:15px;display:grid;place-items:center}
+.region .rname{grid-area:name;font-weight:800;font-size:18px;line-height:1.2}
+.region .rname small{display:block;font-weight:500;margin-top:2px}
+.region .go{grid-area:go;color:var(--muted)}
+.region .board{grid-area:board;background:var(--sign);border-radius:12px;padding:8px 12px;display:grid;gap:2px}
+.region .line{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.region .line .fuel{color:#C9D1DB;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.region .digits{color:var(--green);font:700 20px/1.2 "Arial Narrow","Roboto Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* Chips, ranks and A to Z */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--fg);text-decoration:none;font-weight:600;font-size:15px}
+.chip:hover{border-color:var(--amber)}
+.rank{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.rank a{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--fg)}
+.rank a:hover,.rows a:hover{border-color:var(--amber)}
+.rank .rk{flex:none;width:28px;height:28px;border-radius:50%;background:var(--sign);color:var(--green);font-weight:800;font-size:14px;display:grid;place-items:center}
+.nm{flex:1;min-width:0;font-weight:700;line-height:1.25}
+.nm small{display:block;font-weight:500;font-size:13px}
+.rank .pp{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:16px}
+.rank .pp small{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.az{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 4px;position:sticky;top:59px;z-index:2;background:var(--bg);padding:6px 0}
+.az a{min-width:44px;height:44px;display:grid;place-items:center;border-radius:10px;background:var(--card);border:1px solid var(--border);text-decoration:none;font-weight:700;color:var(--fg)}
+.az a:hover{border-color:var(--amber)}
+.letter{scroll-margin-top:120px}
+.rows{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+@media (min-width:1024px){.rows{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rows a{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--fg);font-weight:700;line-height:1.25}
+.rows i{font-style:normal;font-weight:500;font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.rows b{min-width:4.8em;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rows small{font-weight:500}
+.fuel{scroll-margin-top:72px}
+.panel,.app{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;margin-top:24px}
+.panel h2{margin-top:4px}
+.nearby{margin-top:8px}
+.credit{margin-top:36px;padding:14px 16px;border-radius:14px;background:var(--card2);color:var(--muted);font-size:14px}
+.credit p{margin:4px 0}
+.credit a{color:inherit;text-decoration:underline}
+.credit a,.app a{display:inline-block;padding:12px 0;margin:-12px 0}
+footer.site{background:#101820;color:#C9D1DB;margin-top:24px}
+footer.site .bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;padding-top:10px;padding-bottom:10px}
+footer.site nav{display:flex;flex-wrap:wrap;gap:4px}
+footer.site nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:#FFC54D;text-decoration:none;font-weight:600}
+footer.site nav a:hover{text-decoration:underline}
+a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+@media (max-width:420px){.st{grid-template-columns:24px minmax(0,1fr) 5.2em auto;gap:4px 8px;padding-left:10px}.pp{font-size:16px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.region{transition:none}}
+.today{display:none}
+@media (min-width:1024px){
+.hero.home{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:0 48px;align-items:start}
+.hero.home .today{display:block}
+}
+.region{grid-template-columns:auto minmax(0,1fr) auto}
+.region .board{min-width:0;grid-template-columns:minmax(0,1fr)}
+.region .line .fuel{min-width:0}
+.today{background:#070C12;border:1px solid #24303C;border-radius:16px;padding:14px 16px 12px;margin-top:4px}
+.today h2{margin:0 0 4px;font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#A4ACB7}
+.today ol{list-style:none;margin:0;padding:0}
+.today a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:6px 0;border-top:1px solid #1C2733;color:#F3F0E8;text-decoration:none}
+.today li:first-child a{border-top:0}
+.today a:hover b{text-decoration:underline}
+.today .where{min-width:0}
+.today .where b{display:block;font-size:16px;line-height:1.25}
+.today .where small{display:block;color:#A4ACB7;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.today .digits{color:#3BE38C;font:700 24px/1.1 "Arial Narrow","Roboto Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.today .tnote{margin:8px 0 0;font-size:13px;color:#A4ACB7}
+.appcard{margin-top:36px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 16px;box-shadow:var(--shadow);display:grid;gap:20px;scroll-margin-top:72px}
+@media (min-width:768px){.appcard{grid-template-columns:minmax(0,1fr) 320px;padding:28px 28px 24px;gap:36px;align-items:center}}
+.appcard h2{margin:0 0 6px}
+.appcard .lead{font-size:17px;margin:0 0 14px;max-width:52ch}
+.ticks{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
+.ticks li{position:relative;padding-left:32px;line-height:1.45}
+.ticks li::before{content:"";position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--cheap)}
+.ticks li::after{content:"";position:absolute;left:8px;top:5px;width:5px;height:10px;border:solid var(--card);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.appcard .note{margin:10px 0 0}
+.appboard{background:var(--sign);border-radius:16px;padding:16px;color:#F3F0E8}
+.appboard .bh{margin:0 0 10px;font-size:14px;font-weight:700;color:#C9D1DB}
+.signs2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sign2{background:#070C12;border:1px solid #24303C;border-radius:12px;padding:12px 12px 10px}
+.sign2 b{display:block;color:#3BE38C;font:700 36px/1 "Arial Narrow","Roboto Condensed",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.sign2.tmr b{color:#FFB000}
+.sign2 span{display:block;margin-top:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A4ACB7}
+.appboard .cap{margin:10px 0 0;font-size:13px;line-height:1.45;color:#A4ACB7}
+.appboard .see{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-top:8px;padding:0 12px;border-radius:10px;border:1px solid #24303C;color:#FFC54D;font-weight:700;text-decoration:none}
+.appboard .see:hover{background:#1A2430}
+.support{margin-top:40px;display:grid;gap:16px;scroll-margin-top:72px}
+@media (min-width:1024px){.support{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:start}}
+.contact{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 16px;box-shadow:var(--shadow)}
+@media (min-width:768px){.contact{padding:24px}}
+.contact h2{margin:0 0 8px}
+.contact p{margin:0 0 14px}
+.contact .btn{max-width:100%}
+.contact .note{margin:16px 0 0}
+.faq h3{font-size:18px;color:var(--fg);letter-spacing:0;margin:4px 0 4px}
+.faq details{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:8px}
+.faq summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 16px;font-weight:700;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-top:-4px}
+.faq details[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.faq details p{margin:0;padding:0 16px 14px}
+.faq details p + p{margin-top:-4px}
+.faq details a,.contact .note a{display:inline-block;padding:12px 0;margin:-12px 0}
+.brand[aria-current=page]{cursor:default}
+
 </style>
 </head>
 <body>
-<main>
-  <div class="hero">
-    <svg viewBox="120 100 760 820" aria-hidden="true">
-      <defs><linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC93D"/><stop offset="1" stop-color="#F29A00"/></linearGradient></defs>
-      <path d="M500 118 C 322 118 186 254 186 430 C 186 612 404 806 500 892 C 596 806 814 612 814 430 C 814 254 678 118 500 118 Z" fill="url(#p)"/>
-      <path d="M500 252 C 462 318 382 404 382 478 C 382 548 434 598 500 598 C 566 598 618 548 618 478 C 618 404 538 318 500 252 Z" fill="#101820"/>
-      <path d="M444 452 L500 508 L556 452" fill="none" stroke="#FFB000" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div>
-      <h1>Pumpwise</h1>
-      <p class="tag">Cheap fuel, close by. Official prices by town for Australia, Spain, France, Portugal and Mexico: <a href="prices/">find the cheapest fuel near you</a>.</p>
-    </div>
-  </div>
-
-  <div class="signs" aria-hidden="true">
-    <div class="sign cheap">185.9<small>CHEAPEST</small></div>
-    <div class="sign">199.9<small>NEAREST</small></div>
-  </div>
-
-  <section>
-    <h2>What it does</h2>
-    <ul>
-      <li>Shows the nearest station and the cheapest one inside the area you choose, with directions in one tap.</li>
-      <li>Counts the fuel you'd burn getting there, so you can see whether the cheaper station is worth the drive.</li>
-      <li>In Western Australia, see tomorrow's prices after 2:30pm, so you know whether to fill up today or wait.</li>
-      <li>Free, with no account to make. The app has no adverts.</li>
-    </ul>
-  </section>
-
-  <section id="support">
-    <h2>Support</h2>
-    <p>Questions, ideas or a problem with the app? Email <a href="mailto:tyjcraw@gmail.com?subject=Pumpwise">tyjcraw@gmail.com</a>.</p>
-    <p>If a Western Australian station isn't selling at its published price, contact <a href="https://www.fuelwatch.wa.gov.au/contact">FuelWatch</a>.</p>
-  </section>
-
-  <section>
-    <h2>Where the prices come from</h2>
-    <p>Western Australia: prices from <a href="https://www.fuelwatch.wa.gov.au">FuelWatch</a>, Government of Western Australia. Every station's price is fixed for 24 hours from 6am, and tomorrow's prices are published by 2:30pm.</p>
-    <p>Pumpwise adds a new place whenever a government publishes its station prices for free. It is not affiliated with any government, station or fuel brand.</p>
-  </section>
-
-  <section>
-    <h2>Fuel prices by town</h2>
-    <p>See today's cheapest stations without the app: <a href="prices/">fuel prices by town and city</a>, from the same official sources.</p>
-  </section>
-
-  <footer><a href="prices/">Fuel prices by town</a> · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a> · <a href="data-licences.html">Data licences</a></footer>
+<a class="skip" href="#main" data-k="skip">Skip to content</a>
+<header class="top"><div class="bar">
+<a class="brand" href="https://pumpwiseapp.com/" aria-current="page"><svg class="mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#101820"/><path d="M16 4.5c-5.2 0-9.3 4-9.3 9.1 0 6.7 7.9 13.3 8.4 13.7.5.4 1.3.4 1.8 0 .5-.4 8.4-7 8.4-13.7 0-5.1-4.1-9.1-9.3-9.1z" fill="#FFB000"/><path d="M16 8.4c-.2 0-.4.1-.5.3-1.2 1.6-3.6 5-3.6 6.9a4.1 4.1 0 0 0 8.2 0c0-1.9-2.4-5.3-3.6-6.9-.1-.2-.3-.3-.5-.3z" fill="#101820"/><path d="M14.3 15.3l1.3 1.3 2.2-2.4" fill="none" stroke="#FFB000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pumpwise</span></a>
+<nav class="menu"><a class="home" href="https://pumpwiseapp.com/prices/"><span data-k="home">Fuel prices</span></a></nav>
+</div></header>
+<main id="main" tabindex="-1">
+<section class="hero">
+<h1 data-k="rootH1">Find the cheapest fuel near you</h1>
+<p class="lead">Official prices from tens of thousands of stations in 7 countries and states, updated through the day.</p>
+<p><a class="btn" href="https://pumpwiseapp.com/prices/">See fuel prices by town<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p>
+<p class="poplabel" data-k="regions">Countries and states</p>
+<nav class="chips" aria-label="Countries and states"><a class="chip" href="https://pumpwiseapp.com/prices/western-australia/"><span data-k="rn_wa">Western Australia</span></a><a class="chip" href="https://pumpwiseapp.com/prices/new-south-wales/"><span data-k="rn_nsw">New South Wales and the ACT</span></a><a class="chip" href="https://pumpwiseapp.com/prices/tasmania/"><span data-k="rn_tas">Tasmania</span></a><a class="chip" href="https://pumpwiseapp.com/prices/spain/"><span data-k="rn_es">Spain</span></a><a class="chip" href="https://pumpwiseapp.com/prices/france/"><span data-k="rn_fr">France</span></a><a class="chip" href="https://pumpwiseapp.com/prices/mexico/"><span data-k="rn_mx">Mexico</span></a><a class="chip" href="https://pumpwiseapp.com/prices/portugal/"><span data-k="rn_pt">Portugal</span></a></nav>
+</section>
+<ul class="trust"><li data-k="trust1">Official government prices</li><li data-k="trust2">Updated through the day</li><li data-k="trust3">Free to use, no sign up</li></ul>
+<section class="appcard" id="app" aria-labelledby="app-h">
+<div class="apptext">
+<h2 id="app-h" data-k="appH">Pumpwise for iPhone</h2>
+<p class="lead" data-k="appLead">Open the app and see the nearest station and the cheapest one around you. Directions take one tap.</p>
+<ul class="ticks"><li data-k="appB1">Tomorrow's prices from 2:30pm, so you know whether to fill up today or wait.</li><li data-k="appB2">Shows if a cheaper station is worth the drive, counting the fuel you use to get there.</li><li data-k="appB3">Free. The app has no account and no adverts.</li></ul>
+<a class="btn" href="https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153"><span data-k="appLink">Get Pumpwise on the App Store</span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+<p class="note" data-k="appWhere" data-v="{&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;},&quot;k&quot;:7}">The app covers Western Australia for now. This website covers all 7 countries and states.</p>
+</div>
+</section>
+<section class="support" id="support" aria-labelledby="support-h">
+<div class="contact">
+<h2 id="support-h" data-k="supportH">Help and support</h2>
+<p data-k="supportLead">Questions, ideas or a problem with the app or this website? Send an email.</p>
+<a class="btn" href="mailto:tyjcraw@gmail.com?subject=Pumpwise"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 7.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>tyjcraw@gmail.com</span></a>
+<p class="note"><span data-k="independent">Pumpwise is independent. It is not linked to any government, station or fuel brand.</span> <a href="https://pumpwiseapp.com/data-licences.html"><span data-k="sourcesLink">Where the prices come from</span></a></p>
+</div>
+<div class="faq">
+<h3 data-k="faqH">Common questions</h3>
+<details open><summary><span data-k="faq1q">Where does Pumpwise work?</span></summary><p data-k="faq1a" data-v="{&quot;r&quot;:{&quot;k&quot;:&quot;regionList&quot;},&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;}}">The website covers Western Australia, New South Wales and the ACT, Tasmania, Spain, France, Mexico and Portugal. The iPhone app covers Western Australia for now.</p></details>
+<details><summary><span data-k="faq2q">A price looks wrong. What can I do?</span></summary><p data-k="faq2a">Prices are the ones stations report to each official service, so always check the price at the pump. If a station in Western Australia is not selling at its published price, FuelWatch can help.</p><p><a href="https://www.fuelwatch.wa.gov.au/contact"><span data-k="faq2link">Contact FuelWatch</span></a></p></details>
+<details><summary><span data-k="faq3q">Does Pumpwise track me?</span></summary><p data-k="faq3a">Pumpwise has no accounts, and your location stays on your phone or in your browser. The website shows Google adverts, which may use cookies; visitors in Europe and the UK are asked first. The app has no adverts.</p><p><a href="https://pumpwiseapp.com/privacy.html"><span data-k="faq3link">Read the privacy policy</span></a></p></details>
+<details><summary><span data-k="faq4q">Why is my country or state missing?</span></summary><p data-k="faq4a">Pumpwise adds a place when its government publishes station prices that anyone may use for free. If you know of one, send an email.</p></details>
+</div>
+</section>
+<section class="credit"><p data-k="disclaimer">Prices are the ones stations report to the official service. The price at the pump is what you pay.</p></section>
 </main>
+<footer class="site"><div class="bar">
+<a class="brand" href="https://pumpwiseapp.com/"><svg class="mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#101820"/><path d="M16 4.5c-5.2 0-9.3 4-9.3 9.1 0 6.7 7.9 13.3 8.4 13.7.5.4 1.3.4 1.8 0 .5-.4 8.4-7 8.4-13.7 0-5.1-4.1-9.1-9.3-9.1z" fill="#FFB000"/><path d="M16 8.4c-.2 0-.4.1-.5.3-1.2 1.6-3.6 5-3.6 6.9a4.1 4.1 0 0 0 8.2 0c0-1.9-2.4-5.3-3.6-6.9-.1-.2-.3-.3-.5-.3z" fill="#101820"/><path d="M14.3 15.3l1.3 1.3 2.2-2.4" fill="none" stroke="#FFB000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pumpwise</span></a>
+<nav aria-label="Footer"><a href="https://pumpwiseapp.com/prices/"><span data-k="home">Fuel prices</span></a><a href="https://pumpwiseapp.com/#app"><span data-k="appShort">iPhone app</span></a><a href="https://pumpwiseapp.com/#support"><span data-k="support">Support</span></a><a href="https://pumpwiseapp.com/privacy.html"><span data-k="privacy">Privacy</span></a><a href="https://pumpwiseapp.com/terms.html"><span data-k="terms">Terms</span></a><a href="https://pumpwiseapp.com/data-licences.html"><span data-k="licences">Data licences</span></a></nav>
+</div></footer>
 </body>
 </html>

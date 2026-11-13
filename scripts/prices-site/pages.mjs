@@ -111,6 +111,8 @@ const T = {
     regionDesc: (r, n, k) => `Official fuel prices from ${n} stations in ${r}: today's cheapest petrol and diesel in ${k} towns and cities.`,
     indexTitle: 'Fuel prices today by town and city: official prices | Pumpwise',
     indexDesc: (n) => `Today's cheapest petrol and diesel from ${n} stations, using each government's official prices. Pick a country and a town.`,
+    rootTitle: 'Pumpwise: cheapest fuel near you, from official prices',
+    rootDesc: (k) => `Today's cheapest petrol and diesel near you, from official government prices in ${k} countries and states. Free, no sign up. Plus the Pumpwise iPhone app.`,
   },
   es: {
     title: (p) => `Precio de la gasolina hoy en ${p}: gasolineras más baratas | Pumpwise`,
@@ -184,6 +186,38 @@ export const U = {
     nearPrivacy: 'Your location stays in your browser. It is only used to pick which prices to load.', cheapestHere: 'Cheapest of these',
     sortBy: 'Sort by', sortNear: 'Nearest', sortCheap: 'Cheapest',
     notFoundH: 'Page not found', notFoundLead: 'This page does not exist or has moved. Search for a town, or pick a country or state.',
+    // Home page at the domain root (13 Nov 2026)
+    rootH1: "Find the cheapest fuel near you",
+    bestNowNote: "Lowest price per litre in each city. Tap one to see every station.",
+    appH: "Pumpwise for iPhone",
+    appLead: "Open the app and see the nearest station and the cheapest one around you. Directions take one tap.",
+    appB1: "Tomorrow's prices from 2:30pm, so you know whether to fill up today or wait.",
+    appB2: "Shows if a cheaper station is worth the drive, counting the fuel you use to get there.",
+    appB3: "Free. The app has no account and no adverts.",
+    appWhere: "The app covers {a} for now. This website covers all {k} countries and states.",
+    appBoardH: "Cheapest {f} in {p}",
+    today: "Today",
+    tomorrow: "Tomorrow",
+    appBoardNote: "Western Australian stations fix their price for 24 hours from 6am and publish tomorrow's price by 2:30pm.",
+    seeAll: "See every station in {p}",
+    supportH: "Help and support",
+    supportLead: "Questions, ideas or a problem with the app or this website? Send an email.",
+    independent: "Pumpwise is independent. It is not linked to any government, station or fuel brand.",
+    sourcesLink: "Where the prices come from",
+    faqH: "Common questions",
+    faq1q: "Where does Pumpwise work?",
+    faq1a: "The website covers {r}. The iPhone app covers {a} for now.",
+    faq2q: "A price looks wrong. What can I do?",
+    faq2a: "Prices are the ones stations report to each official service, so always check the price at the pump. If a station in Western Australia is not selling at its published price, FuelWatch can help.",
+    faq2link: "Contact FuelWatch",
+    faq3q: "Does Pumpwise track me?",
+    faq3a: "Pumpwise has no accounts, and your location stays on your phone or in your browser. The website shows Google adverts, which may use cookies; visitors in Europe and the UK are asked first. The app has no adverts.",
+    faq3link: "Read the privacy policy",
+    faq4q: "Why is my country or state missing?",
+    faq4a: "Pumpwise adds a place when its government publishes station prices that anyone may use for free. If you know of one, send an email.",
+    appShort: "iPhone app",
+    support: "Support",
+    terms: "Terms",
   },
   es: {
     searchFailed: 'No se pudo cargar la lista de lugares. Comprueba la conexión y vuelve a intentarlo.',
@@ -228,6 +262,38 @@ export const U = {
     nearPrivacy: 'Tu ubicación no sale de tu navegador. Solo se usa para elegir qué precios cargar.', cheapestHere: 'La más barata de estas',
     sortBy: 'Ordenar por', sortNear: 'Más cerca', sortCheap: 'Más barato',
     notFoundH: 'Página no encontrada', notFoundLead: 'Esta página no existe o ha cambiado de dirección. Busca un lugar o elige un país o estado.',
+    // Home page at the domain root (13 Nov 2026)
+    rootH1: "Encuentra el combustible más barato cerca de ti",
+    bestNowNote: "Precio más bajo por litro en cada ciudad. Toca una para ver todas sus gasolineras.",
+    appH: "Pumpwise para iPhone",
+    appLead: "Abre la app y verás la gasolinera más cercana y la más barata a tu alrededor. Cómo llegar, con un toque.",
+    appB1: "Los precios de mañana desde las 14:30, para saber si repostar hoy o esperar.",
+    appB2: "Te dice si merece la pena ir a una gasolinera más barata, contando el combustible del trayecto.",
+    appB3: "Gratis. La app no pide cuenta ni tiene anuncios.",
+    appWhere: "Por ahora la app cubre {a}. Esta web cubre los {k} países y estados.",
+    appBoardH: "Precio más bajo de {f} en {p}",
+    today: "Hoy",
+    tomorrow: "Mañana",
+    appBoardNote: "En Australia Occidental cada gasolinera fija su precio durante 24 horas desde las 6 de la mañana y publica el de mañana antes de las 14:30.",
+    seeAll: "Ver todas las gasolineras de {p}",
+    supportH: "Ayuda y soporte",
+    supportLead: "¿Preguntas, ideas o un problema con la app o con esta web? Escribe un correo.",
+    independent: "Pumpwise es independiente. No tiene relación con ningún gobierno, gasolinera ni marca de combustible.",
+    sourcesLink: "De dónde salen los precios",
+    faqH: "Preguntas frecuentes",
+    faq1q: "¿Dónde funciona Pumpwise?",
+    faq1a: "La web cubre {r}. Por ahora, la app para iPhone cubre {a}.",
+    faq2q: "Un precio parece incorrecto. ¿Qué hago?",
+    faq2a: "Los precios son los que cada gasolinera comunica al servicio oficial, así que comprueba siempre el precio en el surtidor. Si una gasolinera de Australia Occidental no vende al precio publicado, FuelWatch puede ayudarte.",
+    faq2link: "Contactar con FuelWatch",
+    faq3q: "¿Pumpwise me rastrea?",
+    faq3a: "Pumpwise no tiene cuentas y tu ubicación se queda en tu teléfono o en tu navegador. La web muestra anuncios de Google, que pueden usar cookies; en Europa y el Reino Unido se te pide permiso antes. La app no tiene anuncios.",
+    faq3link: "Leer la política de privacidad",
+    faq4q: "¿Por qué no está mi país o estado?",
+    faq4a: "Pumpwise añade un lugar cuando su gobierno publica los precios de las gasolineras para que cualquiera los use gratis. Si conoces alguno, escribe un correo.",
+    appShort: "App para iPhone",
+    support: "Ayuda",
+    terms: "Condiciones",
   },
   fr: {
     searchFailed: 'La liste des communes n’a pas pu être chargée. Vérifiez votre connexion et réessayez.',
@@ -272,6 +338,38 @@ export const U = {
     nearPrivacy: 'Votre position reste dans votre navigateur. Elle sert seulement à choisir les prix à charger.', cheapestHere: 'La moins chère de celles-ci',
     sortBy: 'Trier par', sortNear: 'La plus proche', sortCheap: 'La moins chère',
     notFoundH: 'Page introuvable', notFoundLead: 'Cette page n’existe pas ou a été déplacée. Cherchez une commune ou choisissez un pays ou un État.',
+    // Home page at the domain root (13 Nov 2026)
+    rootH1: "Trouvez le carburant le moins cher près de chez vous",
+    bestNowNote: "Prix le plus bas au litre dans chaque ville. Touchez une ville pour voir toutes ses stations.",
+    appH: "Pumpwise pour iPhone",
+    appLead: "Ouvrez l’app : la station la plus proche et la moins chère autour de vous s’affichent. L’itinéraire en un geste.",
+    appB1: "Les prix de demain dès 14 h 30, pour savoir s’il vaut mieux faire le plein aujourd’hui ou attendre.",
+    appB2: "Indique si une station moins chère vaut le détour, en comptant le carburant du trajet.",
+    appB3: "Gratuit. L’app ne demande aucun compte et n’a pas de publicité.",
+    appWhere: "Pour l’instant, l’app couvre {a}. Ce site couvre les {k} pays et États.",
+    appBoardH: "Prix le plus bas à {p} : {f}",
+    today: "Aujourd’hui",
+    tomorrow: "Demain",
+    appBoardNote: "En Australie-Occidentale, chaque station fixe son prix pour 24 heures dès 6 h et publie celui du lendemain avant 14 h 30.",
+    seeAll: "Voir toutes les stations : {p}",
+    supportH: "Aide et assistance",
+    supportLead: "Une question, une idée ou un problème avec l’app ou ce site ? Envoyez un courriel.",
+    independent: "Pumpwise est indépendant. Il n’est lié à aucun gouvernement, aucune station ni aucune marque de carburant.",
+    sourcesLink: "D’où viennent les prix",
+    faqH: "Questions fréquentes",
+    faq1q: "Où fonctionne Pumpwise ?",
+    faq1a: "Le site couvre {r}. Pour l’instant, l’app iPhone couvre {a}.",
+    faq2q: "Un prix semble faux. Que faire ?",
+    faq2a: "Les prix sont ceux que les stations déclarent au service officiel : vérifiez toujours le prix à la pompe. Si une station d’Australie-Occidentale ne vend pas au prix publié, FuelWatch peut vous aider.",
+    faq2link: "Contacter FuelWatch",
+    faq3q: "Pumpwise me suit-il ?",
+    faq3a: "Pumpwise n’a pas de compte et votre position reste sur votre téléphone ou dans votre navigateur. Le site affiche des publicités Google, qui peuvent utiliser des cookies ; en Europe et au Royaume-Uni, votre accord est demandé avant. L’app n’a pas de publicité.",
+    faq3link: "Lire la politique de confidentialité",
+    faq4q: "Pourquoi mon pays ou mon État n’y est pas ?",
+    faq4a: "Pumpwise ajoute un lieu quand son gouvernement publie les prix des stations en accès libre et gratuit. Si vous en connaissez un, envoyez un courriel.",
+    appShort: "App iPhone",
+    support: "Aide",
+    terms: "Conditions",
   },
   pt: {
     searchFailed: 'Não foi possível carregar a lista de locais. Verifique a ligação e tente novamente.',
@@ -316,6 +414,38 @@ export const U = {
     nearPrivacy: 'A sua localização fica no seu navegador. Só é usada para escolher que preços carregar.', cheapestHere: 'O mais barato destes',
     sortBy: 'Ordenar por', sortNear: 'Mais perto', sortCheap: 'Mais barato',
     notFoundH: 'Página não encontrada', notFoundLead: 'Esta página não existe ou mudou de endereço. Procure um local ou escolha um país ou estado.',
+    // Home page at the domain root (13 Nov 2026)
+    rootH1: "Encontre o combustível mais barato perto de si",
+    bestNowNote: "Preço mais baixo por litro em cada cidade. Toque numa para ver todos os postos.",
+    appH: "Pumpwise para iPhone",
+    appLead: "Abra a app e veja o posto mais próximo e o mais barato à sua volta. Direções com um toque.",
+    appB1: "Os preços de amanhã a partir das 14h30, para saber se abastece hoje ou espera.",
+    appB2: "Mostra se um posto mais barato compensa a viagem, contando o combustível gasto até lá.",
+    appB3: "Grátis. A app não pede conta nem tem anúncios.",
+    appWhere: "Para já, a app cobre {a}. Este site cobre os {k} países e estados.",
+    appBoardH: "Preço mais baixo de {f} em {p}",
+    today: "Hoje",
+    tomorrow: "Amanhã",
+    appBoardNote: "Na Austrália Ocidental cada posto fixa o preço durante 24 horas a partir das 6h e publica o de amanhã até às 14h30.",
+    seeAll: "Ver todos os postos em {p}",
+    supportH: "Ajuda e apoio",
+    supportLead: "Dúvidas, ideias ou um problema com a app ou este site? Envie um email.",
+    independent: "O Pumpwise é independente. Não tem ligação a nenhum governo, posto ou marca de combustível.",
+    sourcesLink: "De onde vêm os preços",
+    faqH: "Perguntas frequentes",
+    faq1q: "Onde funciona o Pumpwise?",
+    faq1a: "O site cobre {r}. Para já, a app para iPhone cobre {a}.",
+    faq2q: "Um preço parece errado. O que posso fazer?",
+    faq2a: "Os preços são os que os postos comunicam ao serviço oficial, por isso confirme sempre o preço na bomba. Se um posto da Austrália Ocidental não vender ao preço publicado, a FuelWatch pode ajudar.",
+    faq2link: "Contactar a FuelWatch",
+    faq3q: "O Pumpwise segue-me?",
+    faq3a: "O Pumpwise não tem contas e a sua localização fica no seu telemóvel ou no seu navegador. O site mostra anúncios da Google, que podem usar cookies; na Europa e no Reino Unido o seu consentimento é pedido antes. A app não tem anúncios.",
+    faq3link: "Ler a política de privacidade",
+    faq4q: "Porque é que o meu país ou estado não aparece?",
+    faq4a: "O Pumpwise acrescenta um local quando o seu governo publica os preços dos postos para uso livre e gratuito. Se conhecer algum, envie um email.",
+    appShort: "App para iPhone",
+    support: "Ajuda",
+    terms: "Termos",
   },
 };
 
@@ -465,6 +595,12 @@ function when(iso, cfg, now) {
 
 /** Locales site.js and the pages use to write dates in each language. */
 const LOCALES = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT' };
+// "Western Australia, New South Wales and the ACT, Tasmania, ... and Portugal" in each language (home page).
+for (const l of Object.keys(U)) {
+  const list = (ids) => new Intl.ListFormat(LOCALES[l], { type: 'conjunction' }).format(ids.map((id) => U[l][`rn_${id}`] ?? U.en[`rn_${id}`]));
+  U[l].regionList = list(Object.keys(REGIONS));
+  U[l].appList = list(Object.keys(REGIONS).filter((id) => REGIONS[id].app));
+}
 
 /**
  * "Updated 13 November at 2:51 am, Perth time" in the page's language. site.js rewrites it in the
@@ -655,6 +791,7 @@ export function aliasesFor(id, stations, places) {
 const MARK = '<svg class="mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#101820"/><path d="M16 4.5c-5.2 0-9.3 4-9.3 9.1 0 6.7 7.9 13.3 8.4 13.7.5.4 1.3.4 1.8 0 .5-.4 8.4-7 8.4-13.7 0-5.1-4.1-9.1-9.3-9.1z" fill="#FFB000"/><path d="M16 8.4c-.2 0-.4.1-.5.3-1.2 1.6-3.6 5-3.6 6.9a4.1 4.1 0 0 0 8.2 0c0-1.9-2.4-5.3-3.6-6.9-.1-.2-.3-.3-.5-.3z" fill="#101820"/><path d="M14.3 15.3l1.3 1.3 2.2-2.4" fill="none" stroke="#FFB000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICON_SEARCH = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const ICON_PIN = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 2.5c-3.9 0-7 3-7 6.9 0 5 6 10.1 6.3 10.4.4.3.9.3 1.3 0 .3-.3 6.4-5.4 6.4-10.4 0-3.9-3.1-6.9-7-6.9z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.4" fill="currentColor"/></svg>';
+const ICON_MAIL = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 7.5l8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICON_ARROW = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function mapsUrl(s) {
@@ -1197,7 +1334,7 @@ function langPicker(L) {
   return `<label class="langwrap" hidden><span class="sr" data-k="language">${esc(say(L, 'language'))}</span><select class="lang" hidden>${Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === L ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>`;
 }
 
-function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false, data = [], ads = true }) {
+function layout({ lang, title, desc, canonical, crumbs, body, modified, noindex = false, data = [], ads = true, root = false }) {
   const L = lang;
   // Structured data for search and answer engines: the breadcrumb trail on every page, plus what the page
   // itself lists (stations, places, the site), always mirroring what a visitor can see on the page.
@@ -1240,7 +1377,7 @@ ${ADSENSE_CLIENT && ads ? `<script async src="https://pagead2.googlesyndication.
 <body>
 ${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
 <header class="top"><div class="bar">
-<a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
+<a class="brand" href="${SITE_BASE}/"${root ? ' aria-current="page"' : ''}>${MARK}<span>Pumpwise</span></a>
 <nav class="menu">${langPicker(L)}<a class="home" href="${BASE}/">${w(L, 'home')}</a><a class="findlink" href="${BASE}/#find" aria-label="${esc(say(L, 'find'))}" data-kl="find">${ICON_SEARCH}${w(L, 'find')}</a></nav>
 </div></header>
 <main id="main" tabindex="-1">
@@ -1249,7 +1386,7 @@ ${body}
 </main>
 <footer class="site"><div class="bar">
 <a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
-<nav><a href="${BASE}/">${w(L, 'home')}</a><a href="${SITE_BASE}/data-licences.html">${w(L, 'licences')}</a><a href="${SITE_BASE}/privacy.html">${w(L, 'privacy')}</a></nav>
+<nav aria-label="Footer"><a href="${BASE}/">${w(L, 'home')}</a><a href="${SITE_BASE}/#app">${w(L, 'appShort')}</a><a href="${SITE_BASE}/#support">${w(L, 'support')}</a><a href="${SITE_BASE}/privacy.html">${w(L, 'privacy')}</a><a href="${SITE_BASE}/terms.html">${w(L, 'terms')}</a><a href="${SITE_BASE}/data-licences.html">${w(L, 'licences')}</a></nav>
 </div></footer>
 </body>
 </html>
@@ -1443,12 +1580,17 @@ function regionGrid(cards, L) {
 </a></li>`).join('\n');
 }
 
+/** The two biggest places of each region, biggest first: the "Popular places" chips. */
+function popularChips(cards) {
+  return cards.flatMap((c) => c.top.map((p) => ({ ...p, url: `${c.regionUrl}${p.slug}/` })))
+    .sort((a, b) => b.stations - a.stations).slice(0, 12)
+    .map((p) => `<a class="chip" href="${p.url}">${esc(p.name)}</a>`).join('');
+}
+
 function homePage(cards, total, now, dataBase) {
   const L = 'en';
   const t = T.en;
-  const popular = cards.flatMap((c) => c.top.map((p) => ({ ...p, url: `${c.regionUrl}${p.slug}/` })))
-    .sort((a, b) => b.stations - a.stations).slice(0, 12)
-    .map((p) => `<a class="chip" href="${p.url}">${esc(p.name)}</a>`).join('');
+  const popular = popularChips(cards);
   const body = `<section class="hero">
 ${w(L, 'indexH1', null, 'h1')}
 ${w(L, 'indexLead', { n: total, k: cards.length }, 'p', ' class="lead"')}
@@ -1464,11 +1606,173 @@ ${regionGrid(cards, L)}
 </ul></section>
 <p class="app">${w(L, 'appHome')} <a href="${APP_STORE}">${w(L, 'appHomeLink')}</a>.</p>
 <section class="credit"><p>${updatedTag(L, now, null)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
-  const siteLd = [
-    { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.indexDesc(total), inLanguage: ['en', 'es', 'fr', 'pt'] },
+  return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString() });
+}
+
+/**
+ * The site's front door at the domain root (Tyler, 13 Nov 2026: the old app support page "makes it feel like
+ * the site is unfinished"). Same header, footer, style and site.js as the price pages: search, "Show stations
+ * near me", popular places, the cheapest price right now in each region's biggest city, every region with live
+ * averages, the iPhone app with Perth's real price today and tomorrow, and help and support (the app's App
+ * Store Support URL points here, #support). site/index.html is only the fallback for a run without prices.
+ */
+function rootPage(cards, total, now, dataBase, appPlace) {
+  const L = 'en';
+  const t = T.en;
+  const best = cards.filter((c) => c.top[0] && c.top[0].p > 0).map((c) => ({ c, p: c.top[0] }));
+  const rows = (best.length > 6 ? best.filter((x) => x.c.id !== 'tas') : best).slice(0, 6);
+  const today = rows.length >= 4 ? `<aside class="today" aria-labelledby="today-h">
+${w(L, 'bestNow', null, 'h2', ' id="today-h"')}
+<ol>
+${rows.map(({ c, p }) => `<li><a href="${c.regionUrl}${p.slug}/"><span class="where"><b>${esc(p.name)}</b><small data-fuel="${p.kind}" data-lang="${c.cfg.lang}">${esc(p.label)}</small></span><span class="digits">${esc(money(p.p, c.cfg.money))}</span></a></li>`).join('\n')}
+</ol>
+${w(L, 'bestNowNote', null, 'p', ' class="tnote"')}
+</aside>` : '';
+  let board = '';
+  if (appPlace) {
+    const a = appPlace;
+    const second = a.tomorrow > 0
+      ? `<div class="sign2 tmr"><b>${esc(money(a.tomorrow, a.money).replace(/c$/, ''))}</b>${w(L, 'tomorrow')}</div>`
+      : `<div class="sign2 tmr"><b>${esc(money(a.avg, a.money).replace(/c$/, ''))}</b>${w(L, 'average')}</div>`;
+    board = `<div class="appboard">
+${w(L, 'appBoardH', { f: a.label, p: a.name }, 'p', ' class="bh"')}
+<div class="signs2">
+<div class="sign2"><b>${esc(money(a.today, a.money).replace(/c$/, ''))}</b>${w(L, 'today')}</div>
+${second}
+</div>
+${w(L, 'appBoardNote', null, 'p', ' class="cap"')}
+<a class="see" href="${a.url}">${w(L, 'seeAll', { p: a.name })}${ICON_ARROW}</a>
+</div>`;
+  }
+  const q = (n, link) => `<details${n === 1 ? ' open' : ''}><summary>${w(L, `faq${n}q`)}</summary>${w(L, `faq${n}a`, n === 1 ? { r: { k: 'regionList' }, a: { k: 'appList' } } : null, 'p')}${link ? `<p><a href="${link[1]}">${w(L, link[0])}</a></p>` : ''}</details>`;
+  const body = `<section class="hero home">
+<div class="intro">
+${w(L, 'rootH1', null, 'h1')}
+${w(L, 'indexLead', { n: total, k: cards.length }, 'p', ' class="lead"')}
+${searchBox(L, '')}
+${nearBox(L, dataBase)}
+${w(L, 'popular', null, 'p', ' class="poplabel"')}
+<nav class="chips" aria-label="${esc(say(L, 'popular'))}" data-kl="popular">${popularChips(cards)}</nav>
+</div>
+${today}
+</section>
+<ul class="trust">${w(L, 'trust1', null, 'li')}${w(L, 'trust2', null, 'li')}${w(L, 'trust3', null, 'li')}</ul>
+<section><h2>${w(L, 'regions')} ${w(L, 'perLitreAvg', null, 'span', ' class="unit"')}</h2>
+<ul class="regions">
+${regionGrid(cards, L)}
+</ul></section>
+<section class="appcard" id="app" aria-labelledby="app-h">
+<div class="apptext">
+${w(L, 'appH', null, 'h2', ' id="app-h"')}
+${w(L, 'appLead', null, 'p', ' class="lead"')}
+<ul class="ticks">${w(L, 'appB1', null, 'li')}${w(L, 'appB2', null, 'li')}${w(L, 'appB3', null, 'li')}</ul>
+<a class="btn" href="${APP_STORE}">${w(L, 'appLink')}${ICON_ARROW}</a>
+${w(L, 'appWhere', { a: { k: 'appList' }, k: cards.length }, 'p', ' class="note"')}
+</div>
+${board}
+</section>
+<section class="support" id="support" aria-labelledby="support-h">
+<div class="contact">
+${w(L, 'supportH', null, 'h2', ' id="support-h"')}
+${w(L, 'supportLead', null, 'p')}
+<a class="btn" href="mailto:tyjcraw@gmail.com?subject=Pumpwise">${ICON_MAIL}<span>tyjcraw@gmail.com</span></a>
+<p class="note">${w(L, 'independent')} <a href="${SITE_BASE}/data-licences.html">${w(L, 'sourcesLink')}</a></p>
+</div>
+<div class="faq">
+${w(L, 'faqH', null, 'h3')}
+${q(1)}
+${q(2, ['faq2link', 'https://www.fuelwatch.wa.gov.au/contact'])}
+${q(3, ['faq3link', `${SITE_BASE}/privacy.html`])}
+${q(4)}
+</div>
+</section>
+<section class="credit"><p>${updatedTag(L, now, null)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
+  const data = [
+    { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.rootDesc(cards.length), inLanguage: ['en', 'es', 'fr', 'pt'] },
     { '@type': 'Organization', name: 'Pumpwise', url: `${SITE_BASE}/`, logo: `${BASE}/logo.png`, email: 'tyjcraw@gmail.com' },
+    { '@type': 'MobileApplication', name: 'Pumpwise: Fuel Prices Near Me', operatingSystem: 'iOS', applicationCategory: 'TravelApplication', url: APP_STORE, offers: { '@type': 'Offer', price: 0, priceCurrency: 'AUD' } },
   ];
-  return layout({ lang: L, title: t.indexTitle, desc: t.indexDesc(total), canonical: `${BASE}/`, crumbs: [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }], body, modified: now.toISOString(), data: siteLd });
+  return layout({ lang: L, root: true, title: t.rootTitle, desc: t.rootDesc(cards.length), canonical: `${SITE_BASE}/`, crumbs: [{ name: 'Pumpwise', url: `${SITE_BASE}/` }], body, modified: now.toISOString(), data });
+}
+
+/**
+ * site/index.html: the root page for a run where the price step fails (then /prices/ is not built, but the
+ * App Store Support URL must still work). Static, CSS inline, no numbers, no script but Google's ad tag.
+ * Regenerate after changing texts or styles: node scripts/prices-site/fallback.mjs
+ */
+export function fallbackRoot() {
+  const L = 'en';
+  const t = T.en;
+  const k = Object.keys(REGIONS).length;
+  const chips = Object.values(REGIONS).map((cfg, i) => `<a class="chip" href="${BASE}/${cfg.slug}/">${w(L, `rn_${Object.keys(REGIONS)[i]}`)}</a>`).join('');
+  const q = (n, link) => `<details${n === 1 ? ' open' : ''}><summary>${w(L, `faq${n}q`)}</summary>${w(L, `faq${n}a`, n === 1 ? { r: { k: 'regionList' }, a: { k: 'appList' } } : null, 'p')}${link ? `<p><a href="${link[1]}">${w(L, link[0])}</a></p>` : ''}</details>`;
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(t.rootTitle)}</title>
+<meta name="description" content="${esc(t.rootDesc(k))}">
+<link rel="canonical" href="${SITE_BASE}/">
+<meta property="og:title" content="${esc(t.rootTitle)}">
+<meta property="og:description" content="${esc(t.rootDesc(k))}">
+<meta property="og:url" content="${SITE_BASE}/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pumpwise">
+<meta name="theme-color" content="#101820">
+<link rel="icon" type="image/png" href="${SITE_BASE}/favicon.png">
+${ADSENSE_CLIENT ? `<meta name="google-adsense-account" content="${ADSENSE_CLIENT}">\n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>\n` : ''}<style>
+${STYLE}
+</style>
+</head>
+<body>
+${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
+<header class="top"><div class="bar">
+<a class="brand" href="${SITE_BASE}/" aria-current="page">${MARK}<span>Pumpwise</span></a>
+<nav class="menu"><a class="home" href="${BASE}/">${w(L, 'home')}</a></nav>
+</div></header>
+<main id="main" tabindex="-1">
+<section class="hero">
+${w(L, 'rootH1', null, 'h1')}
+<p class="lead">Official prices from tens of thousands of stations in ${k} countries and states, updated through the day.</p>
+<p><a class="btn" href="${BASE}/">See fuel prices by town${ICON_ARROW}</a></p>
+${w(L, 'regions', null, 'p', ' class="poplabel"')}
+<nav class="chips" aria-label="${esc(say(L, 'regions'))}">${chips}</nav>
+</section>
+<ul class="trust">${w(L, 'trust1', null, 'li')}${w(L, 'trust2', null, 'li')}${w(L, 'trust3', null, 'li')}</ul>
+<section class="appcard" id="app" aria-labelledby="app-h">
+<div class="apptext">
+${w(L, 'appH', null, 'h2', ' id="app-h"')}
+${w(L, 'appLead', null, 'p', ' class="lead"')}
+<ul class="ticks">${w(L, 'appB1', null, 'li')}${w(L, 'appB2', null, 'li')}${w(L, 'appB3', null, 'li')}</ul>
+<a class="btn" href="${APP_STORE}">${w(L, 'appLink')}${ICON_ARROW}</a>
+${w(L, 'appWhere', { a: { k: 'appList' }, k }, 'p', ' class="note"')}
+</div>
+</section>
+<section class="support" id="support" aria-labelledby="support-h">
+<div class="contact">
+${w(L, 'supportH', null, 'h2', ' id="support-h"')}
+${w(L, 'supportLead', null, 'p')}
+<a class="btn" href="mailto:tyjcraw@gmail.com?subject=Pumpwise">${ICON_MAIL}<span>tyjcraw@gmail.com</span></a>
+<p class="note">${w(L, 'independent')} <a href="${SITE_BASE}/data-licences.html">${w(L, 'sourcesLink')}</a></p>
+</div>
+<div class="faq">
+${w(L, 'faqH', null, 'h3')}
+${q(1)}
+${q(2, ['faq2link', 'https://www.fuelwatch.wa.gov.au/contact'])}
+${q(3, ['faq3link', `${SITE_BASE}/privacy.html`])}
+${q(4)}
+</div>
+</section>
+<section class="credit">${w(L, 'disclaimer', null, 'p')}</section>
+</main>
+<footer class="site"><div class="bar">
+<a class="brand" href="${SITE_BASE}/">${MARK}<span>Pumpwise</span></a>
+<nav aria-label="Footer"><a href="${BASE}/">${w(L, 'home')}</a><a href="${SITE_BASE}/#app">${w(L, 'appShort')}</a><a href="${SITE_BASE}/#support">${w(L, 'support')}</a><a href="${SITE_BASE}/privacy.html">${w(L, 'privacy')}</a><a href="${SITE_BASE}/terms.html">${w(L, 'terms')}</a><a href="${SITE_BASE}/data-licences.html">${w(L, 'licences')}</a></nav>
+</div></footer>
+</body>
+</html>
+`;
 }
 
 /** The site's own "page not found" page (GitHub Pages serves /404.html for any missing page). */
@@ -1667,6 +1971,62 @@ footer.site nav a:hover{text-decoration:underline}
 a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 @media (max-width:420px){.st{grid-template-columns:24px minmax(0,1fr) 5.2em auto;gap:4px 8px;padding-left:10px}.pp{font-size:16px}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.region{transition:none}}
+.today{display:none}
+@media (min-width:1024px){
+.hero.home{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:0 48px;align-items:start}
+.hero.home .today{display:block}
+}
+.region{grid-template-columns:auto minmax(0,1fr) auto}
+.region .board{min-width:0;grid-template-columns:minmax(0,1fr)}
+.region .line .fuel{min-width:0}
+.today{background:#070C12;border:1px solid #24303C;border-radius:16px;padding:14px 16px 12px;margin-top:4px}
+.today h2{margin:0 0 4px;font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#A4ACB7}
+.today ol{list-style:none;margin:0;padding:0}
+.today a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:6px 0;border-top:1px solid #1C2733;color:#F3F0E8;text-decoration:none}
+.today li:first-child a{border-top:0}
+.today a:hover b{text-decoration:underline}
+.today .where{min-width:0}
+.today .where b{display:block;font-size:16px;line-height:1.25}
+.today .where small{display:block;color:#A4ACB7;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.today .digits{color:#3BE38C;font:700 24px/1.1 "Arial Narrow","Roboto Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.today .tnote{margin:8px 0 0;font-size:13px;color:#A4ACB7}
+.appcard{margin-top:36px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 16px;box-shadow:var(--shadow);display:grid;gap:20px;scroll-margin-top:72px}
+@media (min-width:768px){.appcard{grid-template-columns:minmax(0,1fr) 320px;padding:28px 28px 24px;gap:36px;align-items:center}}
+.appcard h2{margin:0 0 6px}
+.appcard .lead{font-size:17px;margin:0 0 14px;max-width:52ch}
+.ticks{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}
+.ticks li{position:relative;padding-left:32px;line-height:1.45}
+.ticks li::before{content:"";position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--cheap)}
+.ticks li::after{content:"";position:absolute;left:8px;top:5px;width:5px;height:10px;border:solid var(--card);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.appcard .note{margin:10px 0 0}
+.appboard{background:var(--sign);border-radius:16px;padding:16px;color:#F3F0E8}
+.appboard .bh{margin:0 0 10px;font-size:14px;font-weight:700;color:#C9D1DB}
+.signs2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sign2{background:#070C12;border:1px solid #24303C;border-radius:12px;padding:12px 12px 10px}
+.sign2 b{display:block;color:#3BE38C;font:700 36px/1 "Arial Narrow","Roboto Condensed",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.sign2.tmr b{color:#FFB000}
+.sign2 span{display:block;margin-top:6px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A4ACB7}
+.appboard .cap{margin:10px 0 0;font-size:13px;line-height:1.45;color:#A4ACB7}
+.appboard .see{display:flex;align-items:center;justify-content:space-between;min-height:44px;margin-top:8px;padding:0 12px;border-radius:10px;border:1px solid #24303C;color:#FFC54D;font-weight:700;text-decoration:none}
+.appboard .see:hover{background:#1A2430}
+.support{margin-top:40px;display:grid;gap:16px;scroll-margin-top:72px}
+@media (min-width:1024px){.support{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:start}}
+.contact{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 16px;box-shadow:var(--shadow)}
+@media (min-width:768px){.contact{padding:24px}}
+.contact h2{margin:0 0 8px}
+.contact p{margin:0 0 14px}
+.contact .btn{max-width:100%}
+.contact .note{margin:16px 0 0}
+.faq h3{font-size:18px;color:var(--fg);letter-spacing:0;margin:4px 0 4px}
+.faq details{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-top:8px}
+.faq summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 16px;font-weight:700;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-top:-4px}
+.faq details[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.faq details p{margin:0;padding:0 16px 14px}
+.faq details p + p{margin-top:-4px}
+.faq details a,.contact .note a{display:inline-block;padding:12px 0;margin:-12px 0}
+.brand[aria-current=page]{cursor:default}
 `;
 
 /**
@@ -1682,6 +2042,7 @@ export function buildSite(meta, byRegion) {
   const urls = [];
   const maps = new Map();   // sitemap name to its URLs: one per region, so Search Console reports each country
   const cards = [];
+  let appPlace = null;
   // The search index: regions, pages and the towns and postcodes without a page of their own.
   // p: [name, region, slug ("" when it is the name's own slug), stations, lat, lng]; t and c: [page,
   // "Town|Town"] and [page, "postcode postcode"], each pointing at its nearest page. Kept small on purpose.
@@ -1731,7 +2092,15 @@ export function buildSite(meta, byRegion) {
     maps.set('main', [...(maps.get('main') ?? []), regionUrl]);
     const all = { name: cfg.name, stations, fuels: [] };
     all.fuels = summarise(all, cfg, cutoff);
-    const top = places.slice().sort((a, b) => b.stations.length - a.stations.length).slice(0, 2).map((p) => ({ name: p.name, slug: p.slug, stations: p.stations.length }));
+    const big = places.slice().sort((a, b) => b.stations.length - a.stations.length);
+    const top = big.slice(0, 2).map((p) => ({ name: p.name, slug: p.slug, stations: p.stations.length, kind: p.fuels[0].kind, label: p.fuels[0].label, p: p.fuels[0].min.p }));
+    if (cfg.app && !appPlace && big[0]) {
+      // The app card's board: the app region's biggest city, today's cheapest main fuel and tomorrow's, as on its page.
+      const f = big[0].fuels[0];
+      const both = f.good.filter((r) => r.s.tomorrow && r.s.tomorrow[f.kind] > 0);
+      appPlace = { name: big[0].name, url: `${regionUrl}${big[0].slug}/`, label: f.label, money: cfg.money, today: f.min.p, avg: f.avg,
+        tomorrow: both.length >= 2 ? Math.min(...both.map((r) => r.s.tomorrow[f.kind])) : 0 };
+    }
     cards.push({ id, cfg, t, regionUrl, places: places.length, stations: stations.length, fuels: all.fuels, top });
     stats.regions += 1;
     stats.places += places.length;
@@ -1742,7 +2111,7 @@ export function buildSite(meta, byRegion) {
   files.set('index.html', homePage(cards, total, now, dataBase));
   urls.unshift(`${BASE}/`);
   const lastmod = now.toISOString().slice(0, 10);
-  maps.set('main', [`${BASE}/`, ...(maps.get('main') ?? [])]);
+  maps.set('main', [`${SITE_BASE}/`, `${BASE}/`, ...(maps.get('main') ?? [])]);
   const urlset = (list) => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${list.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`;
   for (const [name, list] of maps) files.set(`sitemaps/${name}.xml`, urlset(list));
   // prices/sitemap.xml (the address Search Console knows) is the index of them all.
@@ -1752,7 +2121,7 @@ export function buildSite(meta, byRegion) {
   files.set('site.js', siteJs());
   // robots.txt works now that the site has its own domain: it points search engines at the sitemap.
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`;
-  const rootFiles = new Map([['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
+  const rootFiles = new Map([['index.html', rootPage(cards, total, now, dataBase, appPlace)], ['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
   // ads.txt names Google as the only seller of the site's ad space (AdSense asks for it).
   if (ADSENSE_CLIENT) rootFiles.set('ads.txt', `google.com, ${ADSENSE_CLIENT.replace(/^ca-/, '')}, DIRECT, f08c47fec0942fa0\n`);
   return { files, rootFiles, urls, stats: { ...stats, pages: urls.length } };
