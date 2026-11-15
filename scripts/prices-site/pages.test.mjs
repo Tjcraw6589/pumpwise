@@ -196,6 +196,20 @@ test('home page: search first, real prices only, every region and the App Store 
   assert.match(html, /data-sort="p" aria-pressed="true"/);
 });
 
+test('tomorrow page: cheapest tomorrow first, with today beside it, linked from the region page', () => {
+  const wa = [];
+  for (let i = 0; i < 6; i++) wa.push(st('wa', 'Perth', -31.95 + i / 1000, 115.86, { regular: 180 + i }, { tomorrow: { regular: 190 - i } }));
+  const { files } = buildSite(meta(['wa']), { wa });
+  const html = files.get('western-australia/tomorrow/index.html');
+  assert.ok(html, 'Western Australia gets a tomorrow page');
+  assert.match(html, /<title>Fuel prices tomorrow in Perth and Western Australia/);
+  assert.match(html, /data-k="tmrLead"/);
+  const first = html.indexOf('185.0c');
+  assert.ok(first > 0 && first < html.indexOf('190.0c'), 'the cheapest tomorrow price comes first');
+  assert.match(html, /today 185\.0c/);
+  assert.match(files.get('western-australia/index.html'), /href="tomorrow\/"/);
+});
+
 test('fallback home page: no prices at all, but the App Store link and every region', () => {
   const html = fallbackRoot();
   const text = html.replace(/<style>[\s\S]*?<\/style>|<svg[\s\S]*?<\/svg>|<[^>]+>/g, ' ');

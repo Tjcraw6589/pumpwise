@@ -114,6 +114,8 @@ const T = {
     indexTitle: 'Fuel prices today by town and city: official prices | Pumpwise',
     indexDesc: (n) => `Today's cheapest petrol and diesel from ${n} stations, using each government's official prices. Pick a country and a town.`,
     rootTitle: 'Pumpwise: cheapest fuel near you, from official prices',
+    tmrTitle: (city, r) => `Fuel prices tomorrow in ${city} and ${r}: cheapest stations | Pumpwise`,
+    tmrDesc: (city, r, n) => `Tomorrow's fixed fuel prices for ${n} stations in ${r}, from FuelWatch at 2:30pm: the cheapest unleaded and diesel in ${city} and every suburb.`,
     rootDesc: (k) => `Today's cheapest petrol and diesel near you, from official government prices in ${k} countries and states. Free, no sign up. Plus the Pumpwise iPhone app.`,
   },
   es: {
@@ -175,6 +177,7 @@ export const U = {
     tomorrowUp: '{f}: average {avg} tomorrow, up {d} on today. Cheapest tomorrow: {min} at {s}.',
     tomorrowDown: '{f}: average {avg} tomorrow, down {d} on today. Cheapest tomorrow: {min} at {s}.',
     tomorrowSame: '{f}: average {avg} tomorrow, the same as today. Cheapest tomorrow: {min} at {s}.',
+    tmrH1: "Fuel prices tomorrow in {r}", tmrLead: "Prices for {d}. Stations tell FuelWatch by 2pm and must sell at that price for 24 hours from 6am, so these are the prices you will pay tomorrow.", tmrNotYet: "Tomorrow's prices come out at 2:30pm Perth time. Until then, this page shows today's prices.", tmrPlaces: "Cheapest places tomorrow", tmrLink: "Tomorrow's prices in {r}", tmrToday: "today {v}",
     searchLabel: 'Search for a town, postcode or address', searchPh: 'Town, postcode or address', noMatch: 'No town or postcode with that name. Press Go to look it up as an address.', go: 'Go',
     nearPlace: '{a}, near {p}',
     bestNow: 'Cheapest right now', directions: 'Directions', directionsTo: 'Directions to {s}',
@@ -254,6 +257,7 @@ export const U = {
     tomorrowUp: '{f}: media de {avg} mañana, {d} más que hoy. Lo más barato mañana: {min} en {s}.',
     tomorrowDown: '{f}: media de {avg} mañana, {d} menos que hoy. Lo más barato mañana: {min} en {s}.',
     tomorrowSame: '{f}: media de {avg} mañana, igual que hoy. Lo más barato mañana: {min} en {s}.',
+    tmrH1: "Precios del combustible mañana en {r}", tmrLead: "Precios para el {d}. Las gasolineras los comunican a FuelWatch antes de las 14:00 y deben mantenerlos 24 horas desde las 6:00, así que son los precios que pagarás mañana.", tmrNotYet: "Los precios de mañana se publican a las 14:30, hora de Perth. Hasta entonces, esta página muestra los de hoy.", tmrPlaces: "Los lugares más baratos mañana", tmrLink: "Precios de mañana en {r}", tmrToday: "hoy {v}",
     searchLabel: 'Buscar un municipio, código postal o dirección', searchPh: 'Lugar, código postal o dirección', noMatch: 'Ningún lugar ni código postal con ese nombre. Pulsa Ir para buscarlo como dirección.', go: 'Ir',
     nearPlace: '{a}, cerca de {p}',
     bestNow: 'Lo más barato ahora', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}',
@@ -333,6 +337,7 @@ export const U = {
     tomorrowUp: '{f} : moyenne de {avg} demain, en hausse de {d}. Le moins cher demain : {min} chez {s}.',
     tomorrowDown: '{f} : moyenne de {avg} demain, en baisse de {d}. Le moins cher demain : {min} chez {s}.',
     tomorrowSame: '{f} : moyenne de {avg} demain, sans changement. Le moins cher demain : {min} chez {s}.',
+    tmrH1: "Prix des carburants demain : {r}", tmrLead: "Prix pour le {d}. Les stations les déclarent à FuelWatch avant 14 h et doivent les appliquer 24 heures à partir de 6 h : ce sont les prix que vous paierez demain.", tmrNotYet: "Les prix de demain sont publiés à 14 h 30, heure de Perth. En attendant, cette page montre ceux du jour.", tmrPlaces: "Les endroits les moins chers demain", tmrLink: "Les prix de demain : {r}", tmrToday: "aujourd'hui {v}",
     searchLabel: 'Rechercher une commune, un code postal ou une adresse', searchPh: 'Commune, code postal ou adresse', noMatch: 'Aucune commune ni code postal de ce nom. Appuyez sur OK pour la chercher comme adresse.', go: 'OK',
     nearPlace: '{a}, près de {p}',
     bestNow: 'Le moins cher maintenant', directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}',
@@ -412,6 +417,7 @@ export const U = {
     tomorrowUp: '{f}: média de {avg} amanhã, mais {d} do que hoje. O mais barato amanhã: {min} em {s}.',
     tomorrowDown: '{f}: média de {avg} amanhã, menos {d} do que hoje. O mais barato amanhã: {min} em {s}.',
     tomorrowSame: '{f}: média de {avg} amanhã, igual a hoje. O mais barato amanhã: {min} em {s}.',
+    tmrH1: "Preços dos combustíveis amanhã: {r}", tmrLead: "Preços para {d}. Os postos comunicam-nos à FuelWatch até às 14h e têm de os manter 24 horas a partir das 6h, por isso são os preços que vai pagar amanhã.", tmrNotYet: "Os preços de amanhã saem às 14h30, hora de Perth. Até lá, esta página mostra os de hoje.", tmrPlaces: "Os locais mais baratos amanhã", tmrLink: "Preços de amanhã: {r}", tmrToday: "hoje {v}",
     searchLabel: 'Procurar uma localidade, código postal ou morada', searchPh: 'Local, código postal ou morada', noMatch: 'Nenhum local ou código postal com esse nome. Carregue em Ir para o procurar como morada.', go: 'Ir',
     nearPlace: '{a}, perto de {p}',
     bestNow: 'O mais barato agora', directions: 'Direções', directionsTo: 'Direções para {s}',
@@ -1632,7 +1638,7 @@ ${more}
       const key = Math.abs(d) < 0.05 ? 'tomorrowSame' : d > 0 ? 'tomorrowUp' : 'tomorrowDown';
       lines.push(w(L, key, { f: f.label, avg: money(avgT, cfg.money), d: `${Math.abs(d).toFixed(1)}c`, min: money(bestT.s.tomorrow[f.kind], cfg.money), s: stationName(bestT.s) }, 'li'));
     }
-    if (lines.length) tomorrow = `<section class="panel">${w(L, 'tomorrowH', { p: place.name }, 'h2')}<ul>${lines.join('')}</ul></section>`;
+    if (lines.length) tomorrow = `<section class="panel">${w(L, 'tomorrowH', { p: place.name }, 'h2')}<ul>${lines.join('')}</ul><p><a href="../tomorrow/">${w(L, 'tmrLink', { r: { k: `rn_${id}` } })}</a></p></section>`;
   }
   const near = `<section class="nearby">${nearby.length ? `${w(L, 'nearby', null, 'h2')}<nav class="chips">${nearby.map((n) => `<a class="chip" href="../${n.slug}/">${esc(n.name)}</a>`).join('')}</nav>` : ''}<a class="btn ghost" href="../">${w(L, 'allIn', { r: { k: `rn_${id}` } })}${ICON_ARROW}</a></section>`;
   const app = cfg.app ? `<p class="app">${w(L, 'app')} <a href="${APP_STORE}">${w(L, 'appLink')}</a>.</p>` : '';
@@ -1679,6 +1685,78 @@ function letterOf(name) {
   return /[A-Z]/.test(c) ? c : '#';
 }
 
+/**
+ * "Fuel prices tomorrow in Western Australia": for regions whose stations fix tomorrow's price in advance
+ * (cfg.fixedDaily). Lists the cheapest stations tomorrow for the first three fuels and the cheapest places,
+ * with today's price beside each. Before the prices come out (2:30pm Perth time) it shows today's prices with
+ * a note, so the address always answers.
+ */
+function tomorrowPage(id, places, all, ctx) {
+  const { cfg, t, licence, now, regionUrl } = ctx;
+  const L = cfg.lang;
+  const url = `${regionUrl}tomorrow/`;
+  const city = places.slice().sort((a, b) => b.stations.length - a.stations.length)[0];
+  const next = new Date(now.getTime() + 86400000);
+  const day = new Intl.DateTimeFormat(cfg.locale, { timeZone: cfg.tz, weekday: 'long', day: 'numeric', month: 'long' }).format(next);
+  const fuels = all.fuels.slice(0, 3).map((f) => {
+    const rows = f.good.filter((r) => r.s.tomorrow && r.s.tomorrow[f.kind] > 0)
+      .map((r) => ({ s: r.s, p: r.s.tomorrow[f.kind], today: r.p }))
+      .sort((a, b) => a.p - b.p);
+    return { ...f, trows: rows };
+  });
+  const ready = fuels.length && fuels[0].trows.length >= 2;
+  const lists = fuels.map((f) => {
+    const rows = (ready ? f.trows : f.good.map((r) => ({ s: r.s, p: r.p }))).slice(0, MAX_ROWS);
+    if (rows.length < 2) return '';
+    const row = (r, i) => stationRow(r, i + 1, cfg, now, !ready && i === 0).replace('</div><span class="pp">',
+      r.today ? `${w(L, 'tmrToday', { v: money(r.today, cfg.money) }, 'span', ' class="when"')}</div><span class="pp">` : '</div><span class="pp">');
+    const top = rows.slice(0, TOP).map(row).join('\n');
+    const rest = rows.slice(TOP);
+    const all2 = ready ? f.trows.length : f.good.length;
+    const more = rest.length ? `<details class="more"><summary>${w(L, 'showAll', { n: all2.toLocaleString(cfg.locale) })}</summary><ol class="list">${rest.map((r, i) => row(r, TOP + i)).join('\n')}</ol></details>` : '';
+    return `<section class="fuel" id="f-${f.kind}"><h2>${fuelLabel(f)} ${w(L, 'perLitre', null, 'span', ' class="unit"')}</h2><ol class="list">\n${top}\n</ol>${more}</section>`;
+  }).join('\n');
+  // The average move and the cheapest station tomorrow, for each fuel (the same lines as on a place page).
+  const lines = !ready ? [] : fuels.filter((f) => f.trows.length >= 2).map((f) => {
+    const avgT = mean(f.trows);
+    const d = avgT - mean(f.trows.map((r) => ({ p: r.today })));
+    const key = Math.abs(d) < 0.05 ? 'tomorrowSame' : d > 0 ? 'tomorrowUp' : 'tomorrowDown';
+    return w(L, key, { f: f.label, avg: money(avgT, cfg.money), d: `${Math.abs(d).toFixed(1)}c`, min: money(f.trows[0].p, cfg.money), s: stationName(f.trows[0].s) }, 'li');
+  });
+  const mainKind = fuels[0] ? fuels[0].kind : cfg.fuels[0];
+  const ranked2 = !ready ? [] : places.map((p) => {
+    const f = p.fuels.find((x) => x.kind === mainKind);
+    const ps = f ? f.good.filter((r) => r.s.tomorrow && r.s.tomorrow[mainKind] > 0).map((r) => r.s.tomorrow[mainKind]) : [];
+    return ps.length >= 2 ? { p, min: Math.min(...ps) } : null;
+  }).filter(Boolean).sort((a, b) => a.min - b.min).slice(0, 12);
+  const placesHtml = ranked2.length >= 5 ? `<section><h2>${w(L, 'tmrPlaces')} <span class="unit">${fuelLabel(fuels[0])}</span></h2>
+<ol class="rank">${ranked2.map((x, i) => `<li><a href="../${x.p.slug}/"><span class="rk" aria-hidden="true">${i + 1}</span><span class="nm">${esc(x.p.name)}</span><span class="pp">${w(L, 'from', null, 'small')}${esc(money(x.min, cfg.money))}</span></a></li>`).join('')}</ol></section>` : '';
+  const body = `<div class="head">
+${w(L, 'tmrH1', { r: { k: `rn_${id}` } }, 'h1')}
+${ready ? w(L, 'tmrLead', { d: day }, 'p', ' class="lead"') : w(L, 'tmrNotYet', null, 'p', ' class="lead"')}
+<p class="meta">${updatedTag(L, now, cfg)}</p>
+</div>
+<div class="cols">
+<div class="lists">
+${lists}
+</div>
+<aside class="side">
+${lines.length ? `<section class="panel">${w(L, 'tomorrowH', { p: { k: `rn_${id}` } }, 'h2')}<ul>${lines.join('')}</ul></section>` : ''}
+${placesHtml}
+<section class="nearby"><a class="btn ghost" href="../">${w(L, 'allIn', { r: { k: `rn_${id}` } })}${ICON_ARROW}</a></section>
+${credit(id, cfg, licence, now)}
+</aside>
+</div>`;
+  const crumbs = [{ name: say(L, 'home'), k: 'home', url: `${BASE}/` }, { name: cfg.name, k: `rn_${id}`, url: regionUrl }, { name: say(L, 'tmrLink', { r: cfg.name }), url }];
+  const first = fuels[0];
+  const listLd = ready && first ? {
+    '@type': 'ItemList', name: `${first.label}: ${t.tmrTitle(city.name, cfg.name).replace(/ \| Pumpwise$/, '')}`, itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    numberOfItems: first.trows.length,
+    itemListElement: first.trows.slice(0, TOP).map((r, i) => ({ '@type': 'ListItem', position: i + 1, item: { '@type': 'GasStation', name: stationName(r.s), geo: { '@type': 'GeoCoordinates', latitude: r.s.lat, longitude: r.s.lng } } })),
+  } : null;
+  return layout({ lang: L, title: t.tmrTitle(city.name, cfg.name), desc: t.tmrDesc(city.name, cfg.name, all.stations.length.toLocaleString(cfg.locale)), canonical: url, crumbs, body, modified: now.toISOString(), data: listLd ? [listLd] : [], ads: !NO_ADS.has(id) });
+}
+
 function regionPage(id, places, total, ctx) {
   const { cfg, t, licence, now, regionUrl, dataBase } = ctx;
   const L = cfg.lang;
@@ -1706,6 +1784,7 @@ function regionPage(id, places, total, ctx) {
 ${w(L, 'regionH1', { r: { k: `rn_${id}` } }, 'h1')}
 ${w(L, 'regionLead', { n: total.toLocaleString(cfg.locale), k: places.length.toLocaleString(cfg.locale) }, 'p', ' class="lead"')}
 <p class="meta">${updatedTag(L, now, cfg)}</p>
+${cfg.fixedDaily ? `<p><a class="btn ghost" href="tomorrow/">${w(L, 'tmrLink', { r: { k: `rn_${id}` } })}${ICON_ARROW}</a></p>` : ''}
 </div>
 ${searchBox(L, id)}
 ${nearBox(L, dataBase)}
@@ -2253,6 +2332,11 @@ export function buildSite(meta, byRegion) {
     maps.set('main', [...(maps.get('main') ?? []), regionUrl]);
     const all = { name: cfg.name, stations, fuels: [] };
     all.fuels = summarise(all, cfg, cutoff);
+    if (cfg.fixedDaily && all.fuels.length) {
+      files.set(`${cfg.slug}/tomorrow/index.html`, tomorrowPage(id, places, all, ctx));
+      urls.push(`${regionUrl}tomorrow/`);
+      maps.set('main', [...maps.get('main'), `${regionUrl}tomorrow/`]);
+    }
     const big = places.slice().sort((a, b) => b.stations.length - a.stations.length);
     const top = big.slice(0, 2).map((p) => ({ name: p.name, slug: p.slug, stations: p.stations.length, kind: p.fuels[0].kind, label: p.fuels[0].label, p: p.fuels[0].min.p }));
     if (cfg.app && !appPlace && big[0]) {
