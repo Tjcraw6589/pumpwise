@@ -13,6 +13,7 @@ interface RegionText {
   nameInSentence?: string;
   about: string;
   credit: string;
+  placesCredit?: string;
   reportLabel: string;
   reportNote: string;
 }
@@ -79,8 +80,9 @@ const ES: Record<RegionId, RegionText> = {
   mx: {
     name: 'México',
     about:
-      'En México las gasolineras reportan sus precios a la Comisión Nacional de Energía (CNE, antes CRE), que los publica como datos abiertos. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales.',
+      'En México las gasolineras reportan sus precios a la Comisión Nacional de Energía (CNE, antes CRE), que los publica como datos abiertos. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales. La lista no trae direcciones, por eso Pumpwise indica el municipio de cada gasolinera con los límites del Marco Geoestadístico 2024 del INEGI.',
     credit: 'Precios comunicados a la Comisión Nacional de Energía (CNE, antes CRE), Gobierno de México (CC BY 4.0)',
+    placesCredit: 'Nombres de municipios: INEGI, Marco Geoestadístico 2024',
     reportLabel: 'Denunciarlo ante PROFECO',
     reportNote: 'Las gasolineras reportan sus precios a la CNE; PROFECO atiende las quejas en la bomba.',
   },
@@ -163,8 +165,9 @@ const FR: Record<RegionId, RegionText> = {
     name: 'Mexique',
     nameInSentence: 'le Mexique',
     about:
-      'Au Mexique, les stations déclarent leurs prix à la Comisión Nacional de Energía (CNE, anciennement CRE), qui les publie en données ouvertes. La liste donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels, avec la date de leur relevé.',
+      'Au Mexique, les stations déclarent leurs prix à la Comisión Nacional de Energía (CNE, anciennement CRE), qui les publie en données ouvertes. La liste donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels, avec la date de leur relevé. La liste ne donne pas d’adresse : Pumpwise indique donc la municipalité de chaque station d’après les limites du Marco Geoestadístico 2024 de l’INEGI.',
     credit: 'Prix déclarés à la Comisión Nacional de Energía (CNE, anciennement CRE), gouvernement du Mexique (CC BY 4.0)',
+    placesCredit: 'Noms des municipalités : INEGI, Marco Geoestadístico 2024',
     reportLabel: 'Le signaler à la PROFECO',
     reportNote: 'Les stations déclarent leurs prix à la CNE ; la PROFECO traite les réclamations à la pompe.',
   },
@@ -245,8 +248,9 @@ const PT: Record<RegionId, RegionText> = {
     name: 'México',
     nameInSentence: 'o México',
     about:
-      'No México os postos comunicam os seus preços à Comisión Nacional de Energía (CNE, antes CRE), que os publica como dados abertos. A lista dá os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais, com a data da recolha.',
+      'No México os postos comunicam os seus preços à Comisión Nacional de Energía (CNE, antes CRE), que os publica como dados abertos. A lista dá os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais, com a data da recolha. A lista não traz moradas, por isso o Pumpwise indica o município de cada posto com os limites do Marco Geoestadístico 2024 do INEGI.',
     credit: 'Preços comunicados à Comisión Nacional de Energía (CNE, antes CRE), Governo do México (CC BY 4.0)',
+    placesCredit: 'Nomes dos municípios: INEGI, Marco Geoestadístico 2024',
     reportLabel: 'Denunciar à PROFECO',
     reportNote: 'Os postos comunicam os seus preços à CNE; a PROFECO trata das queixas na bomba.',
   },
@@ -372,7 +376,7 @@ export function localizeRegion(info: RegionInfo): RegionInfo {
     name: text.name,
     nameInSentence: text.nameInSentence,
     about: text.about,
-    source: { ...info.source, credit: text.credit },
+    source: { ...info.source, credit: text.credit, placesCredit: text.placesCredit ?? info.source.placesCredit },
     report: { ...info.report, label: text.reportLabel, note: text.reportNote },
     fuels: info.fuels.map((f) => ({ ...f, description: descriptions[f.description] ?? f.description })),
     cities: info.cities.map((c) => ({ ...c, detail: c.detail === info.name ? text.name : (details[c.detail] ?? c.detail) })),

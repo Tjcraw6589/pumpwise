@@ -1,6 +1,6 @@
 # Pumpwise Terms of Use
 
-Last updated: 8 November 2026
+Last updated: 15 November 2026
 
 These terms cover your use of the Pumpwise app. By using it you agree to them. Apple's standard Licensed Application End User License Agreement also applies.
 
@@ -8,7 +8,7 @@ These terms cover your use of the Pumpwise app. By using it you agree to them. A
 
 Pumpwise shows fuel prices that stations report to official government price schemes in Australia, Spain, France, Portugal and Mexico. It is free, has no accounts and is not affiliated with any government, station or fuel brand.
 
-The prices are there for your own driving. Each government lets its prices be reused on its own terms, listed under "Data sources" below and at https://tjcraw6589.github.io/pumpwise/data-licences.html. One exception: Queensland's licence does not allow its prices to be published again, so please do not copy or redistribute Queensland prices.
+The prices are there for your own driving. Each government lets its prices be reused on its own terms, listed under "Data sources" below and at https://pumpwiseapp.com/data-licences.html. One exception: Queensland's licence does not allow its prices to be published again, so please do not copy or redistribute Queensland prices.
 
 ## Prices can be wrong
 
@@ -38,8 +38,8 @@ Pumpwise is provided as it is, without warranties of any kind. As far as the law
 
 ## Changes
 
-These terms may be updated. The current version is always at https://tjcraw6589.github.io/pumpwise/terms.html.
+These terms may be updated. The current version is always at https://pumpwiseapp.com/terms.html.
 
 ## Contact
 
-tyjcraw@gmail.com
+pumpwiseapp@gmail.com

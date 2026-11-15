@@ -217,7 +217,7 @@ export default function SettingsScreen() {
         <Pressable
           accessibilityRole="button"
           onPress={() => confirmReset(resetSettings)}
-          hitSlop={12}
+          hitSlop={14}
           style={{ marginTop: spacing.xl, alignSelf: 'center' }}
           testID="settings-reset"
         >

@@ -266,13 +266,18 @@ export default function StationScreen() {
         </View>
         <Ionicons name="open-outline" size={16} color={colors.textFaint} />
       </Pressable>
-      <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.source.url)} style={{ marginTop: spacing.lg, marginBottom: spacing.xl }} testID="station-source">
+      <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.source.url)} hitSlop={{ top: 13, bottom: 13 }} style={{ marginTop: spacing.lg, marginBottom: spacing.xl }} testID="station-source">
         <AppText variant="caption" tone="faint">
           {region.source.credit}:{' '}
           <AppText variant="caption" tone="accent">
             {region.source.url.replace(/^https:\/\//, '')}
           </AppText>
         </AppText>
+        {region.source.placesCredit ? (
+          <AppText variant="caption" tone="faint" style={{ marginTop: 2 }}>
+            {region.source.placesCredit}.
+          </AppText>
+        ) : null}
       </Pressable>
     </Screen>
   );

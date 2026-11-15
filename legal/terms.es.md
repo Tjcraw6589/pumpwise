@@ -1,14 +1,14 @@
 # Condiciones de uso de Pumpwise
 
-Last updated: 8 de noviembre de 2026
+Last updated: 15 de noviembre de 2026
 
-Estas condiciones regulan el uso de la app Pumpwise. Al usarla, las aceptas. También se aplica el Contrato de licencia de aplicación con licencia para usuario final estándar de Apple. En caso de duda prevalece la versión en inglés, disponible en https://tjcraw6589.github.io/pumpwise/terms.html.
+Estas condiciones regulan el uso de la app Pumpwise. Al usarla, las aceptas. También se aplica el Contrato de licencia de aplicación con licencia para usuario final estándar de Apple. En caso de duda prevalece la versión en inglés, disponible en https://pumpwiseapp.com/terms.html.
 
 ## Qué es Pumpwise
 
 Pumpwise muestra los precios del combustible que las gasolineras comunican a los sistemas oficiales de precios de los gobiernos de Australia, España, Francia, Portugal y México. Es gratis, no tiene cuentas y no está vinculada a ningún gobierno, gasolinera ni marca de combustible.
 
-Los precios están ahí para tu propia conducción. Cada gobierno permite reutilizar sus precios en sus propias condiciones, indicadas en «Fuentes de datos» más abajo y en https://tjcraw6589.github.io/pumpwise/data-licences.html. Una excepción: la licencia de Queensland no permite volver a publicar sus precios, así que no copies ni redistribuyas los precios de Queensland.
+Los precios están ahí para tu propia conducción. Cada gobierno permite reutilizar sus precios en sus propias condiciones, indicadas en «Fuentes de datos» más abajo y en https://pumpwiseapp.com/data-licences.html. Una excepción: la licencia de Queensland no permite volver a publicar sus precios, así que no copies ni redistribuyas los precios de Queensland.
 
 ## Los precios pueden ser incorrectos
 
@@ -38,8 +38,8 @@ Pumpwise se ofrece tal cual, sin garantías de ningún tipo. En la medida en que
 
 ## Cambios
 
-Estas condiciones pueden actualizarse. La versión vigente está siempre en https://tjcraw6589.github.io/pumpwise/terms.es.html.
+Estas condiciones pueden actualizarse. La versión vigente está siempre en https://pumpwiseapp.com/terms.es.html.
 
 ## Contacto
 
-tyjcraw@gmail.com
+pumpwiseapp@gmail.com

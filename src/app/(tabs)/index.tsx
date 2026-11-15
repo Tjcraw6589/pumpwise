@@ -143,9 +143,9 @@ export default function NearbyScreen() {
         accessibilityRole="button"
         accessibilityLabel={t('nearby.searching', areaLabel)}
         onPress={() => router.push('/place')}
-        hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
+        hitSlop={{ left: 8, right: 8 }}
         testID="place-chip"
-        style={[styles.placeRow, { marginTop: 2, marginBottom: spacing.md }]}
+        style={[styles.placeRow, { marginBottom: spacing.xs }]}
       >
         <Ionicons name={settings.locationMode === 'gps' ? 'navigate' : 'map'} size={14} color={colors.accentText} />
         <AppText variant="bodyBold" numberOfLines={1} style={{ marginLeft: 6, flexShrink: 1 }}>
@@ -236,10 +236,15 @@ export default function NearbyScreen() {
             {region.source.url.replace(/^https:\/\//, '')}
           </AppText>
         </Pressable>
+        {region.source.placesCredit ? (
+          <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.sm }} testID="places-credit">
+            {region.source.placesCredit}.
+          </AppText>
+        ) : null}
         <AppText variant="caption" tone="faint" align="center" style={{ marginTop: spacing.sm }}>
           {t('nearby.straightLine')}
         </AppText>
-        <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.report.url)} hitSlop={8} testID="report-link">
+        <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(region.report.url)} hitSlop={10} testID="report-link">
           <AppText variant="small" tone="accent" align="center" style={{ marginTop: spacing.sm }}>
             {t('report.priceWrong')} {region.report.label}
           </AppText>
@@ -273,5 +278,5 @@ const styles = StyleSheet.create({
   iconButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: StyleSheet.hairlineWidth },
   listHeader: { flexDirection: 'row', alignItems: 'baseline' },
   bestValue: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, gap: 12 },
-  placeRow: { flexDirection: 'row', alignItems: 'center' },
+  placeRow: { flexDirection: 'row', alignItems: 'center', minHeight: 44 },
 });

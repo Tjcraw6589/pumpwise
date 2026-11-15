@@ -16,6 +16,10 @@ interface ChipProps {
   testID?: string;
 }
 
+/** Chips are 36 points tall; 4 points of slop on every side make the tap area 44, Apple's minimum. */
+export const CHIP_HEIGHT = 36;
+export const CHIP_SLOP = 4;
+
 export function Chip({ label, selected = false, onPress, picker = false, icon, testID }: ChipProps) {
   const { colors, radius, spacing } = useTheme();
   const fg = selected ? colors.onPrimary : colors.text;
@@ -25,7 +29,7 @@ export function Chip({ label, selected = false, onPress, picker = false, icon, t
       accessibilityState={{ selected }}
       accessibilityLabel={label}
       testID={testID}
-      hitSlop={4}
+      hitSlop={CHIP_SLOP}
       onPress={() => {
         selectionHaptic();
         onPress?.();
@@ -51,7 +55,7 @@ export function Chip({ label, selected = false, onPress, picker = false, icon, t
 }
 
 const styles = StyleSheet.create({
-  chip: { borderWidth: 1, height: 36, flexDirection: 'row', alignItems: 'center' },
+  chip: { borderWidth: 1, height: CHIP_HEIGHT, flexDirection: 'row', alignItems: 'center' },
   icon: { marginRight: 6 },
   chevron: { marginLeft: 4 },
 });

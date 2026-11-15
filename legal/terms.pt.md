@@ -1,14 +1,14 @@
 # Condições de utilização do Pumpwise
 
-Last updated: 8 de novembro de 2026
+Last updated: 15 de novembro de 2026
 
-Estas condições regem a sua utilização da app Pumpwise. Ao usá-la, aceita-as. Aplica-se também o Contrato de Licença de Aplicação Licenciada para Utilizador Final padrão da Apple. Em caso de dúvida prevalece a versão em inglês, em https://tjcraw6589.github.io/pumpwise/terms.html.
+Estas condições regem a sua utilização da app Pumpwise. Ao usá-la, aceita-as. Aplica-se também o Contrato de Licença de Aplicação Licenciada para Utilizador Final padrão da Apple. Em caso de dúvida prevalece a versão em inglês, em https://pumpwiseapp.com/terms.html.
 
 ## O que é o Pumpwise
 
 O Pumpwise mostra os preços dos combustíveis que os postos comunicam aos sistemas oficiais de preços dos governos de Austrália, Espanha, França, Portugal e México. É gratuito, não tem contas e não está ligado a nenhum governo, posto ou marca de combustível.
 
-Os preços estão lá para a sua própria condução. Cada governo permite reutilizar os seus preços nas suas próprias condições, indicadas em «Fontes dos dados» abaixo e em https://tjcraw6589.github.io/pumpwise/data-licences.html. Uma exceção: a licença do Queensland não permite voltar a publicar os seus preços, por isso não copie nem redistribua os preços do Queensland.
+Os preços estão lá para a sua própria condução. Cada governo permite reutilizar os seus preços nas suas próprias condições, indicadas em «Fontes dos dados» abaixo e em https://pumpwiseapp.com/data-licences.html. Uma exceção: a licença do Queensland não permite voltar a publicar os seus preços, por isso não copie nem redistribua os preços do Queensland.
 
 ## Os preços podem estar errados
 
@@ -38,8 +38,8 @@ O Pumpwise é fornecido tal como está, sem garantias de qualquer tipo. Na medid
 
 ## Alterações
 
-Estas condições podem ser atualizadas. A versão em vigor está sempre em https://tjcraw6589.github.io/pumpwise/terms.pt.html.
+Estas condições podem ser atualizadas. A versão em vigor está sempre em https://pumpwiseapp.com/terms.pt.html.
 
 ## Contacto
 
-tyjcraw@gmail.com
+pumpwiseapp@gmail.com

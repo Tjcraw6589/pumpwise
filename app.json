@@ -169,12 +169,12 @@
       "typedRoutes": true
     },
     "extra": {
-      "feedUrl": "https://tjcraw6589.github.io/pumpwise/data/v4",
+      "feedUrl": "https://pumpwiseapp.com/data/v4",
       "support": {
-        "email": "tyjcraw@gmail.com",
-        "siteUrl": "https://tjcraw6589.github.io/pumpwise/",
-        "privacyUrl": "https://tjcraw6589.github.io/pumpwise/privacy.html",
-        "termsUrl": "https://tjcraw6589.github.io/pumpwise/terms.html"
+        "email": "pumpwiseapp@gmail.com",
+        "siteUrl": "https://pumpwiseapp.com/",
+        "privacyUrl": "https://pumpwiseapp.com/privacy.html",
+        "termsUrl": "https://pumpwiseapp.com/terms.html"
       },
       "router": {
         "asyncRoutes": {

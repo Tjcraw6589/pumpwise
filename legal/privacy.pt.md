@@ -1,12 +1,12 @@
 # Política de privacidade do Pumpwise
 
-Last updated: 13 de novembro de 2026
+Last updated: 15 de novembro de 2026
 
-O Pumpwise mostra os preços oficiais dos combustíveis perto de si. Foi feito para precisar do mínimo de informação possível sobre si. Esta política explica o que a app faz e não faz com os dados, quem é o responsável e quais são os seus direitos. Em caso de dúvida prevalece a versão em inglês, em https://tjcraw6589.github.io/pumpwise/privacy.html.
+O Pumpwise mostra os preços oficiais dos combustíveis perto de si. Foi feito para precisar do mínimo de informação possível sobre si. Esta política explica o que a app faz e não faz com os dados, quem é o responsável e quais são os seus direitos. Em caso de dúvida prevalece a versão em inglês, em https://pumpwiseapp.com/privacy.html.
 
 ## Quem é o responsável
 
-O Pumpwise é criado e publicado por um programador independente na Austrália («Pumpwise», «nós»). Para qualquer questão sobre esta política, escreva para tyjcraw@gmail.com. Nos termos do direito europeu da proteção de dados, o Pumpwise é o «responsável pelo tratamento» do pouco tratamento aqui descrito.
+O Pumpwise é criado e publicado por um programador independente na Austrália («Pumpwise», «nós»). Para qualquer questão sobre esta política, escreva para pumpwiseapp@gmail.com. Nos termos do direito europeu da proteção de dados, o Pumpwise é o «responsável pelo tratamento» do pouco tratamento aqui descrito.
 
 ## A versão curta
 
@@ -26,7 +26,7 @@ O Pumpwise nunca recolhe a localização em segundo plano nem guarda o seu hist�
 
 ## O site de preços dos combustíveis
 
-As páginas de preços em https://tjcraw6589.github.io/pumpwise/prices/ não têm contas, cookies, anúncios, ferramentas de análise nem rastreio.
+As páginas de preços em https://pumpwiseapp.com/prices/ não têm contas, cookies, anúncios, ferramentas de análise nem rastreio.
 
 Se tocar em «Ver postos perto de mim», o navegador pergunta primeiro se a página pode usar a sua localização. Se autorizar, a localização é usada apenas dentro do navegador para saber que postos estão mais perto e a que distância. A página descarrega depois os mesmos ficheiros públicos de preços que a app usa, cada um com cerca de 50 por 50 quilómetros, por isso o pedido mostra apenas a zona alargada onde está. A sua localização nunca nos é enviada nem guardada, e a página esquece-a quando sai. Pode recusar e procurar um local.
 
@@ -68,13 +68,13 @@ Não guardamos nada. As suas definições ficam no seu telemóvel até apagar a 
 
 ## Os seus direitos
 
-Se estiver na União Europeia, no Reino Unido, na Suíça ou noutro lugar com regras semelhantes, tem o direito de pedir acesso aos seus dados pessoais, a sua retificação ou apagamento, a limitação do tratamento ou de se lhe opor, de os receber num formato portável e de retirar o seu consentimento a qualquer momento sem afetar o que foi feito antes. Como não temos nenhum dado pessoal sobre si, a maioria destes pedidos terá a mesma resposta: não há nada para encontrar. Os pedidos sobre dados de publicidade dirigem-se à Google; pode também mudar o seu consentimento nas Definições, em «Privacidade dos anúncios», e nas definições de privacidade do iPhone. Escreva para tyjcraw@gmail.com e responderemos no prazo de um mês.
+Se estiver na União Europeia, no Reino Unido, na Suíça ou noutro lugar com regras semelhantes, tem o direito de pedir acesso aos seus dados pessoais, a sua retificação ou apagamento, a limitação do tratamento ou de se lhe opor, de os receber num formato portável e de retirar o seu consentimento a qualquer momento sem afetar o que foi feito antes. Como não temos nenhum dado pessoal sobre si, a maioria destes pedidos terá a mesma resposta: não há nada para encontrar. Os pedidos sobre dados de publicidade dirigem-se à Google; pode também mudar o seu consentimento nas Definições, em «Privacidade dos anúncios», e nas definições de privacidade do iPhone. Escreva para pumpwiseapp@gmail.com e responderemos no prazo de um mês.
 
 Tem também o direito de apresentar reclamação a uma autoridade de proteção de dados: em Portugal, a Comissão Nacional de Proteção de Dados (www.cnpd.pt); em Espanha, a Agencia Española de Protección de Datos (www.aepd.es); em França, a Commission nationale de l'informatique et des libertés (www.cnil.fr); no Reino Unido, o Information Commissioner's Office (ico.org.uk); na Austrália, o Office of the Australian Information Commissioner (www.oaic.gov.au); ou a autoridade do seu próprio país.
 
 ## Aviso para o México
 
-Para as pessoas no México, o Pumpwise (contacto: tyjcraw@gmail.com) é o responsável por esta app. O Pumpwise não recolhe dados pessoais seus. A única informação que sai do seu telemóvel são os dados técnicos de publicidade e de atualização descritos acima, recebidos diretamente pela Google e pela Expo para mostrar anúncios e manter a app atualizada. Não fazemos transferências de dados pessoais. Pode exercer os seus direitos de acesso, retificação, cancelamento e oposição (direitos ARCO), retirar o consentimento ou limitar o uso dos seus dados escrevendo para tyjcraw@gmail.com. A versão espanhola desta política é a que se aplica no México.
+Para as pessoas no México, o Pumpwise (contacto: pumpwiseapp@gmail.com) é o responsável por esta app. O Pumpwise não recolhe dados pessoais seus. A única informação que sai do seu telemóvel são os dados técnicos de publicidade e de atualização descritos acima, recebidos diretamente pela Google e pela Expo para mostrar anúncios e manter a app atualizada. Não fazemos transferências de dados pessoais. Pode exercer os seus direitos de acesso, retificação, cancelamento e oposição (direitos ARCO), retirar o consentimento ou limitar o uso dos seus dados escrevendo para pumpwiseapp@gmail.com. A versão espanhola desta política é a que se aplica no México.
 
 ## Crianças
 
@@ -82,8 +82,8 @@ O Pumpwise não se destina a crianças e não recolhe informação pessoal de ni
 
 ## Alterações
 
-Se esta política mudar, a nova versão será publicada em https://tjcraw6589.github.io/pumpwise/privacy.pt.html com uma nova data.
+Se esta política mudar, a nova versão será publicada em https://pumpwiseapp.com/privacy.pt.html com uma nova data.
 
 ## Contacto
 
-Questões sobre privacidade: tyjcraw@gmail.com
+Questões sobre privacidade: pumpwiseapp@gmail.com
