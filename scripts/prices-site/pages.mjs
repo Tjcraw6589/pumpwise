@@ -96,6 +96,12 @@ export const REGIONS = {
       ['Nuevo Laredo', 27.4779, -99.5496, 12], ['Los Mochis', 25.7904, -108.9859, 12], ['Playa del Carmen', 20.6296, -87.0739, 12],
     ],
   },
+  it: {
+    slug: 'italy', name: 'Italia', lang: 'it', locale: 'it-IT', tz: 'Europe/Rome', zone: 'rome', money: 'euro', app: false,
+    fuels: ['regular', 'diesel', 'lpg', 'premium', 'premium-diesel', 'hvo'],
+    labels: { regular: 'Benzina (self)', diesel: 'Gasolio (self)', premium: 'Benzina speciale', 'premium-diesel': 'Gasolio speciale', lpg: 'GPL', hvo: 'HVO' },
+    cities: [],
+  },
   pt: {
     slug: 'portugal', name: 'Portugal', lang: 'pt', locale: 'pt-PT', tz: 'Europe/Lisbon', zone: 'lisbon', money: 'euro', app: false, pc: 1,
     fuels: ['regular', 'diesel', 'premium-diesel', 'super', 'premium', 'lpg'],
@@ -128,6 +134,12 @@ const T = {
     regionTitle: (r) => `Prix des carburants aujourd'hui en ${r} par commune | Pumpwise`,
     regionDesc: (r, n, k) => `Prix officiels de ${n} stations en ${r} : l'essence et le gazole les moins chers aujourd'hui dans ${k} communes.`,
   },
+  it: {
+    title: (p) => `Prezzi carburanti oggi a ${p}: i distributori più economici | Pumpwise`,
+    desc: (f, price, p, s, n) => `${f} da ${price} oggi a ${p} (${s}). Confronta ${n} distributori con i prezzi ufficiali, aggiornati durante il giorno.`,
+    regionTitle: (r) => `Prezzi carburanti oggi in ${r} per comune | Pumpwise`,
+    regionDesc: (r, n, k) => `Prezzi ufficiali di ${n} distributori in ${r}: la benzina e il gasolio più economici oggi in ${k} comuni e città.`,
+  },
   pt: {
     title: (p) => `Preços dos combustíveis em ${p} hoje: postos mais baratos | Pumpwise`,
     desc: (f, price, p, s, n) => `${f} desde ${price} hoje em ${p} (${s}). Compare ${n} postos com preços oficiais, atualizados ao longo do dia.`,
@@ -143,7 +155,7 @@ const T = {
  * who only reads English must be able to use the Lisbon page). {name} marks a value filled in per page;
  * a value written { k: key } is itself one of these texts (a region name, a time zone), so it switches too.
  */
-export const LANGS = { en: 'English', es: 'Español', fr: 'Français', pt: 'Português' };
+export const LANGS = { en: 'English', es: 'Español', fr: 'Français', it: 'Italiano', pt: 'Português' };
 export const U = {
   en: {
     searchFailed: 'The list of places could not be loaded. Check your connection and try again.',
@@ -161,8 +173,8 @@ export const U = {
     updated: 'Updated', source: 'Source', licence: 'Licence',
     updatedAt: 'Updated {d} at {t}, {z} time', updatedToday: 'Updated today at {t}, {z} time',
     updatedLocal: 'Updated {d} at {t}, your time', updatedLocalToday: 'Updated today at {t}, your time', updatedUtc: 'Updated {d} at {t} UTC',
-    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisbon', z_mexico: 'Mexico City',
-    rn_wa: 'Western Australia', rn_nsw: 'New South Wales and the ACT', rn_tas: 'Tasmania', rn_es: 'Spain', rn_fr: 'France', rn_mx: 'Mexico', rn_pt: 'Portugal',
+    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisbon', z_mexico: 'Mexico City', z_rome: 'Rome',
+    rn_wa: 'Western Australia', rn_nsw: 'New South Wales and the ACT', rn_tas: 'Tasmania', rn_es: 'Spain', rn_fr: 'France', rn_mx: 'Mexico', rn_pt: 'Portugal', rn_it: 'Italy',
     disclaimer: 'Prices are the ones stations report to the official service. The price at the pump is what you pay.',
     reuse: 'The price tables on this page may be reused under the same licence.',
     regionH1: 'Fuel prices in {r} today', regionLead: '{n} stations, {k} towns and cities. Pick a place to see its cheapest stations.',
@@ -240,8 +252,8 @@ export const U = {
     updated: 'Actualizado', source: 'Fuente', licence: 'Licencia',
     updatedAt: 'Actualizado el {d} a las {t}, hora de {z}', updatedToday: 'Actualizado hoy a las {t}, hora de {z}',
     updatedLocal: 'Actualizado el {d} a las {t}, hora local', updatedLocalToday: 'Actualizado hoy a las {t}, hora local', updatedUtc: 'Actualizado el {d} a las {t} UTC',
-    z_perth: 'Perth', z_sydney: 'Sídney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'París', z_lisbon: 'Lisboa', z_mexico: 'Ciudad de México',
-    rn_wa: 'Australia Occidental', rn_nsw: 'Nueva Gales del Sur y el ACT', rn_tas: 'Tasmania', rn_es: 'España', rn_fr: 'Francia', rn_mx: 'México', rn_pt: 'Portugal',
+    z_perth: 'Perth', z_sydney: 'Sídney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'París', z_lisbon: 'Lisboa', z_mexico: 'Ciudad de México', z_rome: 'Roma',
+    rn_wa: 'Australia Occidental', rn_nsw: 'Nueva Gales del Sur y el ACT', rn_tas: 'Tasmania', rn_es: 'España', rn_fr: 'Francia', rn_mx: 'México', rn_pt: 'Portugal', rn_it: 'Italia',
     disclaimer: 'Los precios son los que las estaciones comunican al servicio oficial. El precio válido es el del surtidor.',
     reuse: 'Las tablas de precios de esta página pueden reutilizarse con la misma licencia.',
     regionH1: 'Precio de la gasolina y el diésel hoy en {r}', regionLead: '{n} gasolineras, {k} municipios y ciudades. Elige un lugar para ver sus gasolineras más baratas.',
@@ -319,8 +331,8 @@ export const U = {
     updated: 'Mis à jour', source: 'Source', licence: 'Licence',
     updatedAt: 'Mis à jour le {d} à {t}, heure de {z}', updatedToday: 'Mis à jour aujourd’hui à {t}, heure de {z}',
     updatedLocal: 'Mis à jour le {d} à {t}, heure locale', updatedLocalToday: 'Mis à jour aujourd’hui à {t}, heure locale', updatedUtc: 'Mis à jour le {d} à {t} UTC',
-    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisbonne', z_mexico: 'Mexico',
-    rn_wa: 'Australie-Occidentale', rn_nsw: 'Nouvelle-Galles du Sud et ACT', rn_tas: 'Tasmanie', rn_es: 'Espagne', rn_fr: 'France', rn_mx: 'Mexique', rn_pt: 'Portugal',
+    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisbonne', z_mexico: 'Mexico', z_rome: 'Rome',
+    rn_wa: 'Australie-Occidentale', rn_nsw: 'Nouvelle-Galles du Sud et ACT', rn_tas: 'Tasmanie', rn_es: 'Espagne', rn_fr: 'France', rn_mx: 'Mexique', rn_pt: 'Portugal', rn_it: 'Italie',
     disclaimer: 'Les prix sont ceux déclarés par les stations au service officiel. Le prix affiché à la pompe fait foi.',
     reuse: 'Les tableaux de prix de cette page peuvent être réutilisés sous la même licence.',
     regionH1: "Prix des carburants aujourd'hui : {r}", regionLead: '{n} stations, {k} communes. Choisissez une commune pour voir ses stations les moins chères.',
@@ -398,8 +410,8 @@ export const U = {
     updated: 'Atualizado', source: 'Fonte', licence: 'Licença',
     updatedAt: 'Atualizado a {d} às {t}, hora de {z}', updatedToday: 'Atualizado hoje às {t}, hora de {z}',
     updatedLocal: 'Atualizado a {d} às {t}, hora local', updatedLocalToday: 'Atualizado hoje às {t}, hora local', updatedUtc: 'Atualizado a {d} às {t} UTC',
-    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisboa', z_mexico: 'Cidade do México',
-    rn_wa: 'Austrália Ocidental', rn_nsw: 'Nova Gales do Sul e ACT', rn_tas: 'Tasmânia', rn_es: 'Espanha', rn_fr: 'França', rn_mx: 'México', rn_pt: 'Portugal',
+    z_perth: 'Perth', z_sydney: 'Sydney', z_hobart: 'Hobart', z_madrid: 'Madrid', z_paris: 'Paris', z_lisbon: 'Lisboa', z_mexico: 'Cidade do México', z_rome: 'Roma',
+    rn_wa: 'Austrália Ocidental', rn_nsw: 'Nova Gales do Sul e ACT', rn_tas: 'Tasmânia', rn_es: 'Espanha', rn_fr: 'França', rn_mx: 'México', rn_pt: 'Portugal', rn_it: 'Itália',
     disclaimer: 'Os preços são os comunicados pelos postos ao serviço oficial. O preço válido é o da bomba.',
     reuse: 'As tabelas de preços desta página podem ser reutilizadas com a mesma licença.',
     regionH1: 'Preços dos combustíveis hoje em {r}', regionLead: '{n} postos, {k} localidades. Escolha um local para ver os postos mais baratos.',
@@ -461,6 +473,149 @@ export const U = {
     support: "Ajuda",
     terms: "Termos",
   },
+  it: {
+    searchFailed: "Non è stato possibile caricare l'elenco dei luoghi. Controlla la connessione e riprova.",
+    loadFailed: "Non è stato possibile caricare i prezzi. Controlla la connessione e riprova.",
+    mxPlaces: "Nomi e confini dei comuni: INEGI, Marco Geoestadístico 2024, semplificati da Pumpwise.",
+    home: "Prezzi carburanti",
+    find: "Cerca un comune",
+    language: "Lingua",
+    stations: "distributori",
+    nStations: "{n} distributori",
+    skip: "Vai al contenuto",
+    h1: "Prezzi dei carburanti a {p} oggi",
+    lead: "Oggi a {p} il prezzo più basso per {f} è {price}, da {s}.",
+    countSell: "{n} distributori, {k} vendono {f}",
+    saving: "La media di {n} distributori è {avg}: il più economico fa risparmiare circa {save} su un pieno da 50 litri.",
+    leftOut: "I distributori riservati ai soci e i prezzi che sembrano errati sono esclusi dal prezzo più basso e dalla media.",
+    cheapest: "Il più economico",
+    average: "Media",
+    avgIs: "Media {v}",
+    reported: "Comunicato",
+    perLitre: "al litro",
+    membersOnly: "Solo soci",
+    permitNeeded: "Serve un permesso d'accesso",
+    checkPrice: "Verifica il prezzo",
+    nearby: "Luoghi vicini",
+    allIn: "Tutti i luoghi: {r}",
+    updated: "Aggiornato",
+    source: "Fonte",
+    licence: "Licenza",
+    updatedAt: "Aggiornato il {d} alle {t}, ora di {z}",
+    updatedToday: "Aggiornato oggi alle {t}, ora di {z}",
+    updatedLocal: "Aggiornato il {d} alle {t}, ora del tuo fuso",
+    updatedLocalToday: "Aggiornato oggi alle {t}, ora del tuo fuso",
+    updatedUtc: "Aggiornato il {d} alle {t} UTC",
+    z_perth: "Perth",
+    z_sydney: "Sydney",
+    z_hobart: "Hobart",
+    z_madrid: "Madrid",
+    z_paris: "Parigi",
+    z_lisbon: "Lisbona",
+    z_mexico: "Città del Messico",
+    z_rome: "Roma",
+    rn_wa: "Australia Occidentale",
+    rn_nsw: "Nuovo Galles del Sud e ACT",
+    rn_tas: "Tasmania",
+    rn_es: "Spagna",
+    rn_fr: "Francia",
+    rn_mx: "Messico",
+    rn_pt: "Portogallo",
+    rn_it: "Italia",
+    disclaimer: "I prezzi sono quelli comunicati dai distributori al servizio ufficiale. Il prezzo alla pompa è quello che paghi.",
+    reuse: "Le tabelle dei prezzi di questa pagina possono essere riutilizzate con la stessa licenza.",
+    regionH1: "Prezzi dei carburanti oggi: {r}",
+    regionLead: "{n} distributori, {k} comuni e città. Scegli un luogo per vedere i distributori più economici.",
+    cheapPlaces: "I luoghi più economici oggi",
+    from: "da",
+    legend: "Per ogni luogo: il numero di distributori, poi il prezzo più basso.",
+    indexH1: "Trova il carburante più economico oggi",
+    indexLead: "Prezzi ufficiali di {n} distributori in {k} paesi e stati, aggiornati durante il giorno.",
+    app: "Pumpwise per iPhone mostra il distributore più economico vicino a te e se vale la pena il tragitto.",
+    appLink: "Scarica Pumpwise dall'App Store",
+    appHome: "Pumpwise per iPhone è disponibile sull'App Store australiano. Altri paesi in arrivo.",
+    appHomeLink: "Vedi Pumpwise sull'App Store",
+    fixed: "In Australia Occidentale ogni distributore fissa il prezzo per 24 ore dalle 6 del mattino.",
+    tomorrowH: "Domani a {p}",
+    tomorrowUp: "{f}: media {avg} domani, {d} in più di oggi. Il più economico domani: {min} da {s}.",
+    tomorrowDown: "{f}: media {avg} domani, {d} in meno di oggi. Il più economico domani: {min} da {s}.",
+    tomorrowSame: "{f}: media {avg} domani, come oggi. Il più economico domani: {min} da {s}.",
+    searchLabel: "Cerca un comune, un CAP o un indirizzo",
+    searchPh: "Comune, CAP o indirizzo",
+    noMatch: "Nessun comune o CAP con questo nome. Premi Vai per cercarlo come indirizzo.",
+    go: "Vai",
+    nearPlace: "{a}, vicino a {p}",
+    bestNow: "I più economici adesso",
+    directions: "Indicazioni",
+    directionsTo: "Indicazioni per {s}",
+    cheapestFuel: "Prezzo più basso di ogni carburante",
+    fuelPick: "Carburante",
+    showAll: "Mostra tutti i {n} distributori",
+    capped: "Sono mostrati i {k} più economici.",
+    aToZ: "Tutti i luoghi dalla A alla Z",
+    jump: "Vai a una lettera",
+    licences: "Licenze dei dati",
+    privacy: "Privacy",
+    popular: "Luoghi popolari",
+    regions: "Paesi e stati",
+    perLitreAvg: "media, al litro",
+    placesCount: "{k} luoghi",
+    trust1: "Prezzi ufficiali dei governi",
+    trust2: "Aggiornati durante il giorno",
+    trust3: "Gratis, senza registrazione",
+    nearBtn: "Mostra i distributori vicino a me",
+    nearH: "I distributori più vicini",
+    finding: "Ricerca della tua posizione",
+    loading: "Caricamento dei prezzi vicino a te",
+    denied: "La posizione è disattivata per questa pagina. Attivala nelle impostazioni del browser, oppure cerca un comune.",
+    failed: "Non è stato possibile trovare la tua posizione. Cerca un comune.",
+    none: "Nessun distributore con prezzi entro 120 km da te.",
+    nearPrivacy: "La tua posizione resta nel tuo browser. Serve solo a scegliere quali prezzi caricare.",
+    cheapestHere: "Il più economico di questi",
+    sortBy: "Ordina per",
+    sortNear: "Più vicino",
+    sortCheap: "Più economico",
+    radiusH: "Zona di ricerca",
+    withinOf: "Entro {d} da {p}",
+    youWord: "te",
+    noneIn: "Nessun distributore con prezzi entro {d} da {p}. Prova una zona più ampia.",
+    addrLooking: "Ricerca dell'indirizzo",
+    addrNone: "Indirizzo non trovato. Prova con un comune o un CAP.",
+    osmCredit: "Ricerca degli indirizzi di OpenStreetMap",
+    notFoundH: "Pagina non trovata",
+    notFoundLead: "Questa pagina non esiste o è stata spostata. Cerca un comune, oppure scegli un paese o uno stato.",
+    rootH1: "Trova il carburante più economico vicino a te",
+    bestNowNote: "Il prezzo al litro più basso in ogni città. Toccane una per vedere tutti i distributori.",
+    appH: "Pumpwise per iPhone",
+    appLead: "Apri l'app e vedi il distributore più vicino e il più economico intorno a te. Le indicazioni sono a un tocco.",
+    appB1: "I prezzi di domani dalle 14:30, così sai se fare il pieno oggi o aspettare.",
+    appB2: "Ti dice se un distributore più economico vale il tragitto, contando il carburante per arrivarci.",
+    appB3: "Gratis. L'app non ha account né pubblicità.",
+    appWhere: "Per ora l'app copre {a}. Questo sito copre tutti i {k} paesi e stati.",
+    appBoardH: "Prezzo più basso per {f} a {p}",
+    today: "Oggi",
+    tomorrow: "Domani",
+    appBoardNote: "In Australia Occidentale i distributori fissano il prezzo per 24 ore dalle 6 del mattino e pubblicano quello di domani entro le 14:30.",
+    seeAll: "Vedi tutti i distributori di {p}",
+    supportH: "Aiuto e assistenza",
+    supportLead: "Domande, idee o un problema con l'app o con questo sito? Scrivi un'email.",
+    independent: "Pumpwise è indipendente. Non è legato a nessun governo, distributore o marchio di carburante.",
+    sourcesLink: "Da dove vengono i prezzi",
+    faqH: "Domande frequenti",
+    faq1q: "Dove funziona Pumpwise?",
+    faq1a: "Il sito copre {r}. Per ora l'app per iPhone copre {a}.",
+    faq2q: "Un prezzo sembra sbagliato. Cosa posso fare?",
+    faq2a: "I prezzi sono quelli comunicati dai distributori a ciascun servizio ufficiale, quindi controlla sempre il prezzo alla pompa. Se un distributore dell'Australia Occidentale non vende al prezzo pubblicato, FuelWatch può aiutarti.",
+    faq2link: "Contatta FuelWatch",
+    faq3q: "Pumpwise mi traccia?",
+    faq3a: "Pumpwise non ha account e la tua posizione resta sul tuo telefono o nel tuo browser. Il sito mostra pubblicità di Google, che può usare cookie; in Europa e nel Regno Unito il consenso viene chiesto prima. L'app non ha pubblicità.",
+    faq3link: "Leggi l'informativa sulla privacy",
+    faq4q: "Perché il mio paese o stato non c'è?",
+    faq4a: "Pumpwise aggiunge un luogo quando il suo governo pubblica i prezzi dei distributori per un uso libero e gratuito. Se ne conosci uno, scrivi un'email.",
+    appShort: "App per iPhone",
+    support: "Assistenza",
+    terms: "Termini",
+  },
 };
 
 /** Plain names of each fuel, added after a pump's own label when the visitor reads another language. */
@@ -468,6 +623,7 @@ export const FUEL_WORDS = {
   en: { regular: 'unleaded', e10: 'E10 unleaded', premium: 'premium unleaded', super: 'premium unleaded 98', diesel: 'diesel', 'premium-diesel': 'premium diesel', lpg: 'LPG', e85: 'E85', b20: 'B20 diesel', hvo: 'renewable diesel' },
   es: { regular: 'gasolina sin plomo', e10: 'gasolina E10', premium: 'gasolina premium', super: 'gasolina 98', diesel: 'diésel', 'premium-diesel': 'diésel premium', lpg: 'GLP', e85: 'E85', b20: 'diésel B20', hvo: 'diésel renovable' },
   fr: { regular: 'sans plomb', e10: 'sans plomb E10', premium: 'sans plomb premium', super: 'sans plomb 98', diesel: 'gazole', 'premium-diesel': 'gazole premium', lpg: 'GPL', e85: 'E85', b20: 'gazole B20', hvo: 'gazole renouvelable' },
+  it: { regular: 'benzina', e10: 'benzina E10', premium: 'benzina speciale', super: 'benzina 98', diesel: 'gasolio', 'premium-diesel': 'gasolio speciale', lpg: 'GPL', e85: 'E85', b20: 'gasolio B20', hvo: 'gasolio rinnovabile (HVO)' },
   pt: { regular: 'gasolina sem chumbo', e10: 'gasolina E10', premium: 'gasolina premium', super: 'gasolina 98', diesel: 'gasóleo', 'premium-diesel': 'gasóleo premium', lpg: 'GPL', e85: 'E85', b20: 'gasóleo B20', hvo: 'gasóleo renovável' },
 };
 
@@ -495,7 +651,7 @@ function fuelLabel(f) {
   return `<span data-fuel="${f.kind}">${esc(f.label)}</span>`;
 }
 
-const CODES = { wa: 'WA', nsw: 'NSW', tas: 'TAS', es: 'ES', fr: 'FR', mx: 'MX', pt: 'PT' };
+const CODES = { wa: 'WA', nsw: 'NSW', tas: 'TAS', es: 'ES', fr: 'FR', mx: 'MX', pt: 'PT', it: 'IT' };
 /** How many stations are listed under a fuel at most (the first TOP show, the rest open with "Show all"). */
 const MAX_ROWS = 50;
 /**
@@ -608,7 +764,7 @@ function when(iso, cfg, now) {
 }
 
 /** Locales site.js and the pages use to write dates in each language. */
-const LOCALES = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT' };
+const LOCALES = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT', it: 'it-IT' };
 // "Western Australia, New South Wales and the ACT, Tasmania, ... and Portugal" in each language (home page).
 for (const l of Object.keys(U)) {
   const list = (ids) => new Intl.ListFormat(LOCALES[l], { type: 'conjunction' }).format(ids.map((id) => U[l][`rn_${id}`] ?? U.en[`rn_${id}`]));
@@ -866,7 +1022,7 @@ function siteMain(D) {
   const root = document.documentElement;
   const P = (root.getAttribute('lang') || 'en').slice(0, 2);
   let L = P;
-  const LOC = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT' };
+  const LOC = { en: 'en-AU', es: 'es-ES', fr: 'fr-FR', pt: 'pt-PT', it: 'it-IT' };
   const fold = (s) => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   const e = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const all = (q, el) => Array.prototype.slice.call((el || document).querySelectorAll(q));
@@ -1472,7 +1628,7 @@ function siteMain(D) {
 }
 
 /** Each region's country, for the address lookup (ISO 3166 codes, lower case). */
-const COUNTRY = { wa: 'au', nsw: 'au', tas: 'au', es: 'es', fr: 'fr', mx: 'mx', pt: 'pt' };
+const COUNTRY = { wa: 'au', nsw: 'au', tas: 'au', es: 'es', fr: 'fr', mx: 'mx', pt: 'pt', it: 'it' };
 
 /** site.js as sent to the browser: siteMain's source, run with the texts and region facts it needs. */
 export function siteJs() {
@@ -1842,7 +1998,7 @@ ${q(4)}
 </section>
 <section class="credit"><p>${updatedTag(L, now, null)}</p>${w(L, 'disclaimer', null, 'p')}</section>`;
   const data = [
-    { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.rootDesc(cards.length), inLanguage: ['en', 'es', 'fr', 'pt'] },
+    { '@type': 'WebSite', name: 'Pumpwise', url: `${SITE_BASE}/`, description: t.rootDesc(cards.length), inLanguage: ['en', 'es', 'fr', 'it', 'pt'] },
     { '@type': 'Organization', name: 'Pumpwise', url: `${SITE_BASE}/`, logo: `${BASE}/logo.png`, email: SUPPORT_EMAIL },
     { '@type': 'MobileApplication', name: 'Pumpwise: Fuel Prices Near Me', operatingSystem: 'iOS', applicationCategory: 'TravelApplication', url: APP_STORE, offers: { '@type': 'Offer', price: 0, priceCurrency: 'AUD' } },
   ];

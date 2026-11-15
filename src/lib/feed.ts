@@ -26,9 +26,12 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt';
-/** In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France). */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt'];
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'it' | 'fr' | 'mx' | 'pt';
+/**
+ * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
+ * Italy before France: France's box reaches Turin, Milan and Genoa, Italy's boxes stop at the border).
+ */
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'it', 'fr', 'mx', 'pt'];
 /** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
 export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
 
@@ -75,6 +78,15 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 42.5, maxLat: 42.9, minLng: -1.75, maxLng: -0.75 }, // Navarra
     { minLat: 27.6, maxLat: 29.5, minLng: -18.2, maxLng: -13.3 }, // Canary Islands
     { minLat: 35.25, maxLat: 35.95, minLng: -5.4, maxLng: -2.9 }, // Ceuta and Melilla
+  ],
+  // Italy: the north stops at Ventimiglia (43.78) and east of 7.0, so Nice, Menton, Monaco and Briançon
+  // stay French; the peninsula box starts east of Corsica, and Sardinia's box stops south of it.
+  it: [
+    { minLat: 43.78, maxLat: 47.1, minLng: 7.0, maxLng: 13.95 }, // the north, from Liguria to Friuli
+    { minLat: 45.4, maxLat: 45.95, minLng: 6.8, maxLng: 7.0 }, // the western Aosta Valley
+    { minLat: 36.6, maxLat: 43.78, minLng: 9.7, maxLng: 18.6 }, // the peninsula and Sicily
+    { minLat: 38.8, maxLat: 41.32, minLng: 8.1, maxLng: 9.9 }, // Sardinia
+    { minLat: 35.4, maxLat: 36.9, minLng: 11.8, maxLng: 12.9 }, // Pantelleria, Lampedusa and Linosa
   ],
   fr: [{ minLat: 41.3, maxLat: 51.2, minLng: -5.3, maxLng: 9.7 }],
   mx: [{ minLat: 14.4, maxLat: 32.8, minLng: -118.5, maxLng: -86.6 }],
@@ -139,6 +151,13 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     url: 'https://catalogo.datosabiertos.miteco.gob.es/catalogo/dataset/902a266d-5ba2-4735-a378-45818ba5a4f4',
     attribution: 'Prices from the Geoportal de Gasolineras, MITECO, Government of Spain (CC BY 4.0)',
     reuse: 'cc',
+  },
+  it: {
+    owner: 'Ministero delle Imprese e del Made in Italy (MIMIT), Government of Italy',
+    licence: 'Italian Open Data License 2.0 (IODL 2.0)',
+    url: 'https://www.dati.gov.it/iodl/2.0/',
+    attribution: 'Prices from the Osservatorio prezzi carburanti, Ministero delle Imprese e del Made in Italy (MIMIT), under IODL 2.0; not an official MIMIT publication; each price carries the time the station reported it',
+    reuse: 'open',
   },
   fr: {
     owner: 'DGCCRF, Ministère de l’Économie, Government of France',
