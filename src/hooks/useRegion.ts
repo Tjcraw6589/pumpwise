@@ -1,4 +1,4 @@
-import { type FeedMeta, type RegionId, regionAt } from '@/lib/feed';
+import { type FeedMeta, REGION_IDS, type RegionId, regionAt } from '@/lib/feed';
 import { DEFAULT_REGION, EXPECTED_REGIONS, regionInfo, type RegionInfo } from '@/lib/regions';
 import { useLive } from '@/store/useLive';
 
@@ -16,9 +16,14 @@ export interface Coverage {
   known: boolean;
 }
 
-/** Regions with prices in a feed, and regions that are down. */
+/**
+ * Regions with prices in a feed, and regions that are down. The feed can gain regions this version of the
+ * app was not built with (a country added later): those are left out, so nothing looks up a region it
+ * does not know.
+ */
 export function coverageOf(meta: FeedMeta): Coverage {
-  const entries = Object.entries(meta.regions) as [RegionId, { status: string; stationCount: number }][];
+  const all = Object.entries(meta.regions) as [RegionId, { status: string; stationCount: number }][];
+  const entries = all.filter(([id]) => REGION_IDS.includes(id));
   return {
     live: entries.filter(([, r]) => r.status === 'live' && r.stationCount > 0).map(([id]) => id),
     down: entries.filter(([, r]) => r.status !== 'live' || r.stationCount === 0).map(([id]) => id),

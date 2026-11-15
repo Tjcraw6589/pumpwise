@@ -4,7 +4,11 @@ import { directionsUrls, openDirections } from '@/services/directions';
 import { FeedError, loadArea } from '@/services/feedClient';
 import { citiesFor, searchPlaces } from '@/services/placeSearch';
 
-import { mockFeedFetch, PERTH, resetStores, waDownMeta } from '../helpers';
+import { coverageOf } from '@/hooks/useRegion';
+import { type FeedMeta } from '@/lib/feed';
+
+import { fixtureFeed } from '../../scripts/feed/fixture-data.ts';
+import { FIXTURE_NOW, mockFeedFetch, PERTH, resetStores, waDownMeta } from '../helpers';
 
 describe('feed client', () => {
   beforeEach(() => resetStores());
@@ -40,6 +44,21 @@ describe('feed client', () => {
     mockFeedFetch({ offline: true });
     await expect(loadArea(PERTH, 8)).rejects.toMatchObject({ kind: 'offline' });
     await expect(loadArea(PERTH, 8)).rejects.toBeInstanceOf(FeedError);
+  });
+
+  test('a country added to the feed after this version was built is ignored, not a crash', async () => {
+    const feed = fixtureFeed(FIXTURE_NOW);
+    const later = { status: 'live', updatedAt: FIXTURE_NOW.toISOString(), stationCount: 5, tomorrow: false };
+    const meta = { ...feed.meta, regions: { ...feed.meta.regions, zz: later } } as unknown as FeedMeta;
+    // One station of the unknown country in every tile.
+    const tiles = feed.tiles.map((t) => ({ ...t, stations: [...t.stations, { ...t.stations[0], id: `zz-${t.tile}`, region: 'zz' }] }));
+    mockFeedFetch({ feed: { ...feed, meta, tiles } as unknown as typeof feed, meta });
+    const { stations } = await loadArea(PERTH, 8);
+    expect(stations.length).toBeGreaterThan(20);
+    expect(stations.every((s) => s.region === 'wa')).toBe(true);
+    const coverage = coverageOf(meta);
+    expect(coverage.live).toContain('wa');
+    expect([...coverage.live, ...coverage.down]).not.toContain('zz');
   });
 
   test('an unknown feed version is refused', async () => {
