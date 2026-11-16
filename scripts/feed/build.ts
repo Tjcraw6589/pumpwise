@@ -21,18 +21,34 @@ import {
 } from '../../src/lib/feed.ts';
 import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
 import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
+import { fetchHr, HR_MIN_STATIONS } from './sources/hr.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
 import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
 import { fetchPt, PT_MIN_STATIONS } from './sources/pt.ts';
 import { fetchQld, QLD_MIN_STATIONS, qldToken } from './sources/qld.ts';
+import { fetchSi, SI_MIN_STATIONS } from './sources/si.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
 import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = process.env.FEED_OUT_DIR ?? join(root, 'out', 'site');
 /** The live site's data folder; the previous run's prices are read from the newest version there. */
-const PUBLIC_DATA = (process.env.FEED_PUBLIC_DATA ?? 'https://tjcraw6589.github.io/pumpwise/data').replace(/\/$/, '');
+const PUBLIC_DATA = (process.env.FEED_PUBLIC_DATA ?? 'https://pumpwiseapp.com/data').replace(/\/$/, '');
 const FORCE = process.env.FEED_FORCE === '1';
+
+/**
+ * The longest one source may take. The whole job has 10 minutes; a source that is half working (slow
+ * answers, retries on every page) is given up for this run, and its previous prices are kept as usual.
+ */
+const SOURCE_DEADLINE_MS = 150_000;
+
+function withDeadline<T>(work: Promise<T>, ms: number, name: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`gave up after ${Math.round(ms / 1000)} s (${name})`)), ms);
+  });
+  return Promise.race([work, late]).finally(() => clearTimeout(timer));
+}
 
 interface Source {
   id: string;
@@ -79,6 +95,11 @@ const SOURCES: Source[] = [
   { id: 'mx', regions: ['mx'], everyMinutes: 170, minStations: MX_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchMx(now), tomorrow: false }) },
   // Portugal: stations enter prices on the DGEG site as they change; one 5 MB request every other run.
   { id: 'pt', regions: ['pt'], everyMinutes: 25, minStations: PT_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchPt(now), tomorrow: false }) },
+  // Slovenia: 23 small pages from goriva.si, a pause between each. The regulated prices change once a week
+  // (Tuesday) and the others a few times a day at most, so about every three hours.
+  { id: 'si', regions: ['si'], everyMinutes: 170, minStations: SI_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchSi(now), tomorrow: false }) },
+  // Croatia: one 330 KB file the Ministry rebuilds about every 20 minutes; most prices change once a week.
+  { id: 'hr', regions: ['hr'], everyMinutes: 55, minStations: HR_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchHr(now), tomorrow: false }) },
   {
     id: 'uk',
     regions: ['uk'],
@@ -209,7 +230,7 @@ async function main(): Promise<void> {
       continue;
     }
     try {
-      const result = await source.fetch(now);
+      const result = await withDeadline(source.fetch(now), SOURCE_DEADLINE_MS, source.id);
       const withPrices = result.stations.filter((s) => Object.keys(s.prices).length > 0);
       if (withPrices.length < source.minStations) {
         throw new Error(`only ${withPrices.length} stations with prices (expected at least ${source.minStations})`);

@@ -6,7 +6,7 @@ Pumpwise muestra los precios oficiales del combustible cerca de ti. Está hecha 
 
 ## Quién es el responsable
 
-Pumpwise la crea y publica un desarrollador independiente en Australia («Pumpwise», «nosotros»). Para cualquier cuestión sobre esta política, escribe a tyjcraw@gmail.com. Según la normativa europea de protección de datos, Pumpwise es el «responsable del tratamiento» del escaso tratamiento que aquí se describe.
+Pumpwise la crea y publica un desarrollador independiente en Estados Unidos («Pumpwise», «nosotros»). Para cualquier cuestión sobre esta política, escribe a pumpwiseapp@gmail.com. Según la normativa europea de protección de datos, Pumpwise es el «responsable del tratamiento» del escaso tratamiento que aquí se describe.
 
 ## La versión corta
 
@@ -68,13 +68,13 @@ No guardamos nada. Tus ajustes permanecen en tu teléfono hasta que borras la ap
 
 ## Tus derechos
 
-Si estás en la Unión Europea, el Reino Unido, Suiza u otro lugar con normas similares, tienes derecho a pedir acceso a tus datos personales, a que se corrijan o se supriman, a limitar u oponerte a su tratamiento, a recibirlos en un formato portable y a retirar tu consentimiento en cualquier momento sin que afecte a lo hecho antes. Como no tenemos ningún dato personal sobre ti, la mayoría de estas solicitudes tendrán la misma respuesta: no hay nada que encontrar. Las solicitudes sobre datos publicitarios corresponden a Google; también puedes cambiar tu consentimiento en Ajustes, en «Privacidad de los anuncios», y en los ajustes de privacidad de tu iPhone. Escribe a tyjcraw@gmail.com y responderemos en el plazo de un mes.
+Si estás en la Unión Europea, el Reino Unido, Suiza u otro lugar con normas similares, tienes derecho a pedir acceso a tus datos personales, a que se corrijan o se supriman, a limitar u oponerte a su tratamiento, a recibirlos en un formato portable y a retirar tu consentimiento en cualquier momento sin que afecte a lo hecho antes. Como no tenemos ningún dato personal sobre ti, la mayoría de estas solicitudes tendrán la misma respuesta: no hay nada que encontrar. Las solicitudes sobre datos publicitarios corresponden a Google; también puedes cambiar tu consentimiento en Ajustes, en «Privacidad de los anuncios», y en los ajustes de privacidad de tu iPhone. Escribe a pumpwiseapp@gmail.com y responderemos en el plazo de un mes.
 
 También tienes derecho a reclamar ante una autoridad de protección de datos: en España, la Agencia Española de Protección de Datos (www.aepd.es); en Francia, la Commission nationale de l'informatique et des libertés (www.cnil.fr); en Portugal, la Comissão Nacional de Proteção de Dados (www.cnpd.pt); en el Reino Unido, la Information Commissioner's Office (ico.org.uk); en Australia, la Office of the Australian Information Commissioner (www.oaic.gov.au); o la autoridad de tu propio país.
 
 ## Aviso de privacidad (México)
 
-En cumplimiento de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, Pumpwise, con contacto en tyjcraw@gmail.com, es el responsable de esta app. Pumpwise no recaba datos personales tuyos. La única información que sale de tu teléfono son los datos técnicos de publicidad y de actualización descritos arriba, que reciben directamente Google y Expo con las finalidades de mostrar anuncios y mantener la app actualizada. No realizamos transferencias de datos personales. Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición (derechos ARCO), revocar tu consentimiento o limitar el uso de tus datos escribiendo a tyjcraw@gmail.com; responderemos en los plazos que marca la ley. Puedes controlar la publicidad desde los ajustes de privacidad de tu iPhone. Los cambios en este aviso se publican en la dirección indicada más abajo.
+En cumplimiento de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, Pumpwise, con contacto en pumpwiseapp@gmail.com, es el responsable de esta app. Pumpwise no recaba datos personales tuyos. La única información que sale de tu teléfono son los datos técnicos de publicidad y de actualización descritos arriba, que reciben directamente Google y Expo con las finalidades de mostrar anuncios y mantener la app actualizada. No realizamos transferencias de datos personales. Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición (derechos ARCO), revocar tu consentimiento o limitar el uso de tus datos escribiendo a pumpwiseapp@gmail.com; responderemos en los plazos que marca la ley. Puedes controlar la publicidad desde los ajustes de privacidad de tu iPhone. Los cambios en este aviso se publican en la dirección indicada más abajo.
 
 ## Menores
 
@@ -86,4 +86,4 @@ Si esta política cambia, la nueva versión se publicará en https://tjcraw6589.
 
 ## Contacto
 
-Preguntas sobre privacidad: tyjcraw@gmail.com
+Preguntas sobre privacidad: pumpwiseapp@gmail.com

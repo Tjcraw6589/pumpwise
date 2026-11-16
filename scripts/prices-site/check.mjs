@@ -8,7 +8,7 @@
 // - the search finds nothing for midland, 2000, cascais, merida or zapopan;
 // - "Near me" (Lisbon, Perth, Madrid, Mexico City) lists no stations or its diesel chip does not filter;
 // - after picking a language in the header, a text of another language is left on the page.
-// Pages are served from out/site at their real address (https://tjcraw6589.github.io/pumpwise/...), so
+// Pages are served from out/site at their real address (https://pumpwiseapp.com/...), so
 // links and scripts behave as on the live site; the feed's tiles for "Near me" come from the live site.
 //
 // Usage: node scripts/prices-site/check.mjs [site folder, default out/site] [--shots folder] [--prefix name]
@@ -27,17 +27,17 @@ const shots = opt('--shots');
 const prefix = opt('--prefix') ?? 'after';
 const quick = args.includes('--shots-only') ? (args.splice(args.indexOf('--shots-only'), 1), true) : false;
 const site = resolve(args[0] ?? 'out/site');
-const ORIGIN = 'https://tjcraw6589.github.io';
-const BASE = `${ORIGIN}/pumpwise/prices`;
+const ORIGIN = 'https://pumpwiseapp.com';
+const BASE = `${ORIGIN}/prices`;
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.xml': 'application/xml' };
 
 const failures = [];
 const fail = (where, what) => failures.push(`${where}: ${what}`);
 
 async function serve(context) {
-  await context.route(`${ORIGIN}/pumpwise/**`, async (route) => {
+  await context.route(`${ORIGIN}/**`, async (route) => {
     const url = new URL(route.request().url());
-    const rel = decodeURIComponent(url.pathname.replace(/^\/pumpwise\//, ''));
+    const rel = decodeURIComponent(url.pathname.replace(/^\//, ''));
     if (rel.startsWith('data/')) return route.continue();
     let file = join(site, rel);
     if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
@@ -49,7 +49,7 @@ async function serve(context) {
 // Which pages to open: from the search index, each region's largest and smallest place. For pictures
 // only (--shots-only, also used on the old site), a fixed list.
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-const pages = [{ name: 'home', url: `${BASE}/`, kind: 'home' }, { name: '404', url: `${ORIGIN}/pumpwise/prices/no-such-town/`, kind: 'home' }];
+const pages = [{ name: 'home', url: `${BASE}/`, kind: 'home' }, { name: '404', url: `${ORIGIN}/prices/no-such-town/`, kind: 'home' }];
 if (quick) {
   for (const [name, path] of [['wa-region', 'western-australia/'], ['wa-perth', 'western-australia/perth/'], ['es-region', 'spain/'], ['es-madrid', 'spain/madrid/'], ['mx-region', 'mexico/'], ['mx-zapopan', 'mexico/zapopan/'], ['mx-guadalajara', 'mexico/guadalajara/'], ['pt-lisboa', 'portugal/lisboa/'], ['fr-paris', 'france/paris/']]) pages.push({ name, url: `${BASE}/${path}`, kind: 'place' });
 }

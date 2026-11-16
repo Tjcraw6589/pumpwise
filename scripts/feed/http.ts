@@ -1,7 +1,7 @@
 // Polite HTTP for the feed job: one request at a time per source, a gap between requests, and a
 // few retries with back-off for rate limits, server errors and dropped connections.
 
-export const USER_AGENT = 'Pumpwise-feed/2.0 (+https://tjcraw6589.github.io/pumpwise/)';
+export const USER_AGENT = 'Pumpwise-feed/2.0 (+https://pumpwiseapp.com/)';
 
 export function pause(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

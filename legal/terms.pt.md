@@ -42,4 +42,4 @@ Estas condições podem ser atualizadas. A versão em vigor está sempre em http
 
 ## Contacto
 
-tyjcraw@gmail.com
+pumpwiseapp@gmail.com
