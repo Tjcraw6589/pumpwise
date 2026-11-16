@@ -92,6 +92,22 @@ const ES: Record<RegionId, RegionText> = {
     reportLabel: 'Consultarlo en precoscombustiveis.dgeg.gov.pt',
     reportNote: 'Las gasolineras introducen sus propios precios en el sitio de la DGEG. Escribe a precoscombustiveis@dgeg.gov.pt si uno es incorrecto.',
   },
+  si: {
+    name: 'Eslovenia',
+    about:
+      'En Eslovenia las gasolineras comunican sus precios a goriva.si, el portal de precios de carburantes del Gobierno. Fuera de las autopistas el Gobierno fija el precio máximo de la gasolina de 95 octanos y del diésel normal, así que la mayoría de las gasolineras cobran lo mismo por ellos; los demás carburantes y las gasolineras de autopista fijan sus propios precios. El portal da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales.',
+    credit: 'Fuente: goriva.si, portal oficial de precios de carburantes de la República de Eslovenia',
+    reportLabel: 'Consultarlo en goriva.si',
+    reportNote: 'Las gasolineras eslovenas comunican sus precios al portal goriva.si del Gobierno.',
+  },
+  hr: {
+    name: 'Croacia',
+    about:
+      'En Croacia las gasolineras deben comunicar sus precios al Ministerio de Economía, que los publica en su portal minGO. Fuera de las autopistas el Gobierno fija cada semana el precio máximo de la gasolina y el diésel normales, así que la mayoría de las gasolineras cobran lo mismo por ellos; los carburantes premium y las gasolineras de autopista fijan sus propios precios. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales y omite las entradas que no se han renovado.',
+    credit: 'Fuente: Ministerio de Economía de la República de Croacia, portal de precios minGO. Pumpwise no es un servicio oficial del Ministerio',
+    reportLabel: 'Consultarlo en mzoe-gor.hr',
+    reportNote: 'Las gasolineras croatas deben comunicar sus precios al portal de precios del Ministerio de Economía.',
+  },
 };
 
 const FR: Record<RegionId, RegionText> = {
@@ -177,6 +193,24 @@ const FR: Record<RegionId, RegionText> = {
     reportLabel: 'Le vérifier sur precoscombustiveis.dgeg.gov.pt',
     reportNote: 'Les stations saisissent elles-mêmes leurs prix sur le site de la DGEG. Écrivez à precoscombustiveis@dgeg.gov.pt pour signaler une erreur.',
   },
+  si: {
+    name: 'Slovénie',
+    nameInSentence: 'la Slovénie',
+    about:
+      'En Slovénie, les stations déclarent leurs prix à goriva.si, le portail des prix des carburants du gouvernement. Hors autoroute, le gouvernement fixe le prix maximal de l’essence 95 et du gazole standard, si bien que la plupart des stations pratiquent le même prix pour ces carburants ; les autres carburants et les stations d’autoroute fixent leurs propres prix. Le portail donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels.',
+    credit: 'Source : goriva.si, portail officiel des prix des carburants de la République de Slovénie',
+    reportLabel: 'Le vérifier sur goriva.si',
+    reportNote: 'Les stations slovènes déclarent leurs prix au portail goriva.si du gouvernement.',
+  },
+  hr: {
+    name: 'Croatie',
+    nameInSentence: 'la Croatie',
+    about:
+      'En Croatie, les stations doivent déclarer leurs prix au ministère de l’Économie, qui les publie sur son portail minGO. Hors autoroute, le gouvernement fixe chaque semaine le prix maximal de l’essence et du gazole standard, si bien que la plupart des stations pratiquent le même prix pour ces carburants ; les carburants premium et les stations d’autoroute fixent leurs propres prix. La liste donne les prix en vigueur mais pas leur date, donc Pumpwise les affiche comme prix actuels et écarte les entrées qui n’ont pas été renouvelées.',
+    credit: 'Source : ministère de l’Économie de la République de Croatie, portail des prix minGO. Pumpwise n’est pas un service officiel du ministère',
+    reportLabel: 'Le vérifier sur mzoe-gor.hr',
+    reportNote: 'Les stations croates doivent déclarer leurs prix au portail des prix du ministère de l’Économie.',
+  },
 };
 
 const PT: Record<RegionId, RegionText> = {
@@ -258,6 +292,24 @@ const PT: Record<RegionId, RegionText> = {
     reportLabel: 'Verificar em precoscombustiveis.dgeg.gov.pt',
     reportNote: 'Os postos introduzem os seus próprios preços no sítio da DGEG. Escreva para precoscombustiveis@dgeg.gov.pt sobre um preço errado.',
   },
+  si: {
+    name: 'Eslovénia',
+    nameInSentence: 'a Eslovénia',
+    about:
+      'Na Eslovénia os postos comunicam os seus preços ao goriva.si, o portal de preços dos combustíveis do Governo. Fora das autoestradas o Governo fixa o preço máximo da gasolina 95 e do gasóleo simples, pelo que a maioria dos postos cobra o mesmo por eles; os outros combustíveis e os postos de autoestrada fixam os seus próprios preços. O portal indica os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais.',
+    credit: 'Fonte: goriva.si, portal oficial de preços dos combustíveis da República da Eslovénia',
+    reportLabel: 'Verificar em goriva.si',
+    reportNote: 'Os postos eslovenos comunicam os seus preços ao portal goriva.si do Governo.',
+  },
+  hr: {
+    name: 'Croácia',
+    nameInSentence: 'a Croácia',
+    about:
+      'Na Croácia os postos têm de comunicar os seus preços ao Ministério da Economia, que os publica no seu portal minGO. Fora das autoestradas o Governo fixa todas as semanas o preço máximo da gasolina e do gasóleo simples, pelo que a maioria dos postos cobra o mesmo por eles; os combustíveis premium e os postos de autoestrada fixam os seus próprios preços. A lista indica os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais e deixa de fora as entradas que não foram renovadas.',
+    credit: 'Fonte: Ministério da Economia da República da Croácia, portal de preços minGO. O Pumpwise não é um serviço oficial do Ministério',
+    reportLabel: 'Verificar em mzoe-gor.hr',
+    reportNote: 'Os postos croatas têm de comunicar os seus preços ao portal de preços do Ministério da Economia.',
+  },
 };
 
 const TEXTS: Record<Exclude<Lang, 'en'>, Record<RegionId, RegionText>> = { es: ES, fr: FR, pt: PT };
@@ -283,6 +335,8 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Unleaded 95 (E5)': 'Sin plomo 95 (E5)',
     'Gasóleo A, standard diesel': 'Gasóleo A, diésel normal',
     'Unleaded 98': 'Sin plomo 98',
+    'Unleaded 100': 'Sin plomo 100',
+    'Unleaded 100 (98 at a few stations)': 'Sin plomo 100 (98 en algunas gasolineras)',
     'Premium diesel': 'Diésel premium',
     'Premium unleaded 95': 'Sin plomo 95 premium',
     'Unleaded 95 with 10% ethanol': 'Sin plomo 95 con 10 % de etanol',
@@ -312,6 +366,8 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Unleaded 95 (E5)': 'Sans plomb 95 (E5)',
     'Gasóleo A, standard diesel': 'Gasóleo A, gazole standard',
     'Unleaded 98': 'Sans plomb 98',
+    'Unleaded 100': 'Sans plomb 100',
+    'Unleaded 100 (98 at a few stations)': 'Sans plomb 100 (98 dans quelques stations)',
     'Premium diesel': 'Gazole premium',
     'Premium unleaded 95': 'Sans plomb 95 premium',
     'Unleaded 95 with 10% ethanol': 'Sans plomb 95 avec 10 % d’éthanol',
@@ -341,6 +397,8 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Unleaded 95 (E5)': 'Sem chumbo 95 (E5)',
     'Gasóleo A, standard diesel': 'Gasóleo A, gasóleo simples',
     'Unleaded 98': 'Sem chumbo 98',
+    'Unleaded 100': 'Sem chumbo 100',
+    'Unleaded 100 (98 at a few stations)': 'Sem chumbo 100 (98 em alguns postos)',
     'Premium diesel': 'Gasóleo aditivado',
     'Premium unleaded 95': 'Sem chumbo 95 aditivada',
     'Unleaded 95 with 10% ethanol': 'Sem chumbo 95 com 10 % de etanol',

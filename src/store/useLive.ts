@@ -21,6 +21,8 @@ export interface LiveState {
   locationError: string | null;
   /** Suburb or town name for the search centre, such as "Cannington". */
   areaName: string | null;
+  /** Country (and state) of the search centre, for naming a place Pumpwise does not cover. */
+  areaCountry: { country: string | null; countryCode: string | null; region: string | null } | null;
   feedStatus: FeedStatus;
   /** A download is running while older prices stay on screen. */
   refreshing: boolean;
@@ -43,6 +45,7 @@ export const useLive = create<LiveState>()((set) => ({
   locating: false,
   locationError: null,
   areaName: null,
+  areaCountry: null,
   feedStatus: 'idle',
   refreshing: false,
   feedError: null,

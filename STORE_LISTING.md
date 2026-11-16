@@ -126,6 +126,12 @@ Now also in New South Wales, the ACT and Tasmania, with official FuelCheck price
 
 ## Version 1.2.0: Spain, France, Portugal and Mexico, available worldwide
 
+> **Updated 16 November 2026 (owner's decision, replaces "worldwide" below).** 1.2 also covers **Slovenia and Croatia**. Availability is no longer every storefront: the app is offered only in countries Pumpwise covers and countries connected to them by road.
+> - Australia.
+> - Europe: every mainland European storefront plus the United Kingdom and Ireland (not Iceland, Malta or Cyprus, which no road reaches; not Russia or Belarus).
+> - Americas: Mexico, the United States, Canada, Guatemala, Belize, El Salvador, Honduras, Nicaragua, Costa Rica and Panama.
+> Inside the app, a driver somewhere Pumpwise lacks is told so by name ("Sorry, we don't have fuel prices for Germany yet"), never with a general line.
+
 1.2 reads feed v4 (WA, NSW/ACT, Tasmania, Spain, France, Portugal, Mexico; Queensland once its key is in) and speaks English, Spanish, French and Portuguese, picked from the iPhone's language. Prices show the way each country's pumps write them: 189.9 (cents) in Australia, 1,659 (euros) in Spain, France and Portugal, 24.59 (pesos) in Mexico. The privacy policy and terms exist in all four languages (legal/*.md).
 
 ### In App Store Connect (all free, nothing to pay)
@@ -140,7 +146,7 @@ Now also in New South Wales, the ACT and Tasmania, with official FuelCheck price
 
 **What's New**
 ```
-Pumpwise now covers Spain, France, Portugal and Mexico, with official government prices.
+Pumpwise now covers Spain, France, Portugal, Slovenia, Croatia and Mexico, with official government prices.
 
 • Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
 • Prices the way each country writes them: 1,659 in Spain, France and Portugal, 24.59 in Mexico.
@@ -201,7 +207,7 @@ Prices from each government's official service: the Geoportal de Gasolineras (Sp
 ```
 **What's New**
 ```
-Pumpwise now covers Spain, France, Portugal and Mexico, with each government's official prices.
+Pumpwise now covers Spain, France, Portugal, Slovenia, Croatia and Mexico, with each government's official prices.
 
 • Look around any covered place from anywhere, even from home before the trip.
 • Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
@@ -251,7 +257,7 @@ Prices from each government's official service: the Comisión Nacional de Energ�
 ```
 **What's New**
 ```
-Pumpwise now covers Mexico, Spain, France and Portugal, with each government's official prices.
+Pumpwise now covers Mexico, Spain, France, Portugal, Slovenia and Croatia, with each government's official prices.
 
 • Look around any covered place from anywhere, even from home before the trip.
 • Spanish, French and Portuguese: Pumpwise follows your iPhone's language.
@@ -309,7 +315,7 @@ Precios del Geoportal de Gasolineras, Ministerio para la Transición Ecológica 
 ```
 **What's New**
 ```
-Pumpwise ya está en España, Francia, Portugal y México, con los precios oficiales de cada gobierno.
+Pumpwise ya está en España, Francia, Portugal, Eslovenia, Croacia y México, con los precios oficiales de cada gobierno.
 
 • La app, en español, francés y portugués.
 • Los precios, como en el surtidor: 1,659 en España.
@@ -366,7 +372,7 @@ Precios de la Comisión Reguladora de Energía (CRE), Gobierno de México. Pumpw
 ```
 **What's New**
 ```
-Pumpwise ya está en México, España, Francia y Portugal, con los precios oficiales de cada gobierno.
+Pumpwise ya está en México, España, Francia, Portugal, Eslovenia y Croacia, con los precios oficiales de cada gobierno.
 
 • La app, en español, francés y portugués.
 • Los precios, como en la bomba: 24.59 en México.
@@ -424,7 +430,7 @@ Prix issus de prix-carburants.gouv.fr (Licence Ouverte 2.0). Pumpwise n’est li
 ```
 **What's New**
 ```
-Pumpwise arrive en France, en Espagne, au Portugal et au Mexique, avec les prix officiels de chaque État.
+Pumpwise arrive en France, en Espagne, au Portugal, en Slovénie, en Croatie et au Mexique, avec les prix officiels de chaque État.
 
 • L’app en français, en espagnol et en portugais.
 • Les prix comme à la pompe : 1,659 en France.
@@ -481,7 +487,7 @@ Preços da Direção-Geral de Energia e Geologia (DGEG). O Pumpwise não está l
 ```
 **What's New**
 ```
-O Pumpwise chegou a Portugal, Espanha, França e México, com os preços oficiais de cada governo.
+O Pumpwise chegou a Portugal, Espanha, França, Eslovénia, Croácia e México, com os preços oficiais de cada governo.
 
 • A app em português, espanhol e francês.
 • Os preços como na bomba: 1,759 em Portugal.

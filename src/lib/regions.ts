@@ -34,7 +34,7 @@ export interface RegionInfo {
    * 3: whole currency to three decimals, as on European pumps ("€1.659"). 2: two decimals ("$24.59").
    */
   priceDecimals?: 2 | 3;
-  /** Prices on the pumps use a decimal comma ("1,659"): Spain and France. */
+  /** Prices on the pumps use a decimal comma ("1,659"): Spain, France, Portugal, Slovenia and Croatia. */
   decimalComma?: boolean;
   distanceUnit: DistanceUnit;
   economyUnit: EconomyUnit;
@@ -540,6 +540,9 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     id: 'si',
     name: 'Slovenia',
     currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'sl-SI',
+    decimalComma: true,
     priceUnit: 'c',
     priceDecimals: 3,
     distanceUnit: 'km',
@@ -584,6 +587,9 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     id: 'hr',
     name: 'Croatia',
     currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'hr-HR',
+    decimalComma: true,
     priceUnit: 'c',
     priceDecimals: 3,
     distanceUnit: 'km',
@@ -637,7 +643,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 export const DEFAULT_REGION: RegionId = 'wa';
 
 /** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
-export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB'> = {
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR'> = {
   wa: 'AU',
   nsw: 'AU',
   tas: 'AU',
@@ -647,6 +653,8 @@ export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' |
   fr: 'FR',
   mx: 'MX',
   pt: 'PT',
+  si: 'SI',
+  hr: 'HR',
 };
 
 /** "Western Australia · Australia", or just "Spain" where the region is the whole country. */

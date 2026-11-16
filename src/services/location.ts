@@ -58,16 +58,36 @@ export async function watchPosition(onMove: (position: LatLng) => void): Promise
   return () => subscription.remove();
 }
 
-/** A short place name for the header, such as "Harrogate". Uses the phone's own map service. */
-export async function areaNameFor(point: LatLng): Promise<string | null> {
+/** Where a point is, from the phone's own map service: the header's place name and the country. */
+export interface AreaInfo {
+  /** A short place name for the header, such as "Harrogate". */
+  name: string | null;
+  /** Country name in the phone's language ("Germany"), and its ISO code ("DE"). */
+  country: string | null;
+  countryCode: string | null;
+  /** State or province ("Victoria"), for a place Pumpwise lacks inside a country it partly covers. */
+  region: string | null;
+}
+
+export async function areaFor(point: LatLng): Promise<AreaInfo | null> {
   if (Platform.OS === 'web') return null;
   try {
     const [place] = await Location.reverseGeocodeAsync({ latitude: point.lat, longitude: point.lng });
     if (!place) return null;
-    return place.district || place.city || place.subregion || place.region || null;
+    return {
+      name: place.district || place.city || place.subregion || place.region || null,
+      country: place.country || null,
+      countryCode: place.isoCountryCode ? place.isoCountryCode.toUpperCase() : null,
+      region: place.region || null,
+    };
   } catch {
     return null;
   }
+}
+
+/** A short place name for the header, such as "Harrogate". Uses the phone's own map service. */
+export async function areaNameFor(point: LatLng): Promise<string | null> {
+  return (await areaFor(point))?.name ?? null;
 }
 
 export function openAppSettings(): void {

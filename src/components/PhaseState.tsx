@@ -8,7 +8,7 @@ import { t } from '@/i18n';
 import type { RegionId } from '@/lib/feed';
 import type { NearbyPhase } from '@/lib/nearby';
 import type { Place } from '@/lib/places';
-import { fuelOption, regionHeading, REGIONS } from '@/lib/regions';
+import { fuelOption, REGION_COUNTRY, regionHeading, REGIONS } from '@/lib/regions';
 import { radiusLabel, sameRadius, toKm } from '@/lib/units';
 import { currentPosition, openAppSettings, requestPermission } from '@/services/location';
 import { useLive } from '@/store/useLive';
@@ -112,6 +112,11 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
   const coverage = useCoverage();
   const choosePlace = useStore((s) => s.choosePlace);
   const choose = () => router.push('/place');
+  // Name the place Pumpwise lacks: the country, or the state inside a country it partly covers
+  // (Victoria, when New South Wales is covered). Unknown without the phone's map service.
+  const area = useLive((s) => s.areaCountry);
+  const coveredCountries = coverage.live.map((id) => REGION_COUNTRY[id] as string);
+  const uncovered = area ? (area.countryCode && coveredCountries.includes(area.countryCode) ? (area.region ?? area.country) : area.country) : null;
 
   switch (phase) {
     case 'loading':
@@ -176,8 +181,8 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
       return (
         <EmptyState
           icon="earth"
-          title={t('state.notCoveredTitle')}
-          body={t('state.notCoveredBody')}
+          title={uncovered ? t('state.notCoveredTitleFor', uncovered) : t('state.notCoveredTitle')}
+          body={uncovered ? t('state.notCoveredBodyFor', uncovered) : t('state.notCoveredBody')}
           testID="state-not-covered"
         >
           <CoveredPlaces regions={coverage.live} onPick={choosePlace} />

@@ -5,7 +5,7 @@ import { regionAt } from '@/lib/feed';
 import { distanceKm, type LatLng } from '@/lib/geo';
 import { needsReload } from '@/lib/nearby';
 import { FeedError, loadArea } from '@/services/feedClient';
-import { areaNameFor, checkPermission, currentPosition, watchPosition } from '@/services/location';
+import { areaFor, checkPermission, currentPosition, watchPosition } from '@/services/location';
 import { useLive } from '@/store/useLive';
 import { useStore } from '@/store/useStore';
 
@@ -79,13 +79,17 @@ export function useLiveController(): void {
   useEffect(() => {
     if (!center) return;
     if (mode === 'place' && place) {
-      useLive.getState().set({ areaName: place.name });
+      useLive.getState().set({ areaName: place.name, areaCountry: null });
       namedFor.current = place;
+      // The country is still wanted, to name it if the chosen place is somewhere Pumpwise lacks.
+      void areaFor(place).then((area) => {
+        if (namedFor.current === place) useLive.getState().set({ areaCountry: area });
+      });
       return;
     }
     if (namedFor.current && distanceKm(namedFor.current, center) < 0.8) return;
     namedFor.current = center;
-    void areaNameFor(center).then((name) => useLive.getState().set({ areaName: name }));
+    void areaFor(center).then((area) => useLive.getState().set({ areaName: area?.name ?? null, areaCountry: area }));
   }, [center, mode, place]);
 
   const load = useCallback(async (target: LatLng, radius: number, force: boolean) => {
