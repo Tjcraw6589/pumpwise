@@ -47,7 +47,7 @@ job runs it after every feed build (about every 15 minutes), as a step that may 
 - `pages.mjs` is pure (feed in, pages out); `build.mjs` reads `out/site/data/v4` and writes `out/site/prices`.
 - Each page shows the source's credit, licence and update time from `meta.json`; a region whose licence forbids
   republishing (Queensland) gets no pages. Prices older than 10 days are left out.
-- Spain and Mexico are written in Spanish, France in French, Portugal in Portuguese.
+- Spain and Mexico are written in Spanish, France in French, Portugal in Portuguese. Slovenia and Croatia are in English, with each country's own fuel names.
 - The App Store link shows only where `app: true` in `REGIONS` (Western Australia until 1.2 is released; then
   set it to true for the regions 1.2 covers).
 - Try it: `npm run feed` (or any folder holding `data/v4`), then `npm run prices`.

@@ -223,3 +223,73 @@ test('site.js is valid script', () => {
   // eslint-disable-next-line no-new-func
   assert.doesNotThrow(() => new Function(siteJs()));
 });
+
+test('Croatia and Slovenia: capped prices, shared lowest price, no report times, local fuel names', () => {
+  const hr = [];
+  // Four stations at the capped price, one dearer: nobody is singled out as "the cheapest".
+  for (let i = 0; i < 4; i++) hr.push(st('hr', 'Zagreb', 45.81 + i / 1000, 15.98, { regular: 161, diesel: 185 }));
+  hr.push(st('hr', 'Zagreb', 45.82, 15.99, { regular: 175, diesel: 208 }));
+  const si = [];
+  for (let i = 0; i < 3; i++) si.push(st('si', 'Ljubljana', 46.05 + i / 1000, 14.5, { regular: 150.6 - i, diesel: 184.8 }, { postcode: '1000' }));
+  const { files, stats } = buildSite(meta(['hr', 'si']), { hr, si });
+  const zagreb = files.get('croatia/zagreb/index.html');
+  assert.match(zagreb, /Eurosuper 95/);
+  assert.match(zagreb, /Eurodizel/);
+  assert.match(zagreb, /Lowest price, the same at 4 stations/);
+  assert.match(zagreb, /The lowest price for Eurosuper 95 in Zagreb today is 1,610 €, at 4 stations\./);
+  assert.ok(!zagreb.includes('data-k="bestNow"'), 'no single cheapest station among equals');
+  assert.match(zagreb, /data-k="capNote"/);
+  assert.ok(!zagreb.includes('data-k="reported"'), 'the source gives no report times');
+  assert.match(zagreb, /Ministry of Economy|Test source/);
+  const ljubljana = files.get('slovenia/ljubljana/index.html');
+  assert.match(ljubljana, /Bencin 95/);
+  assert.match(ljubljana, /data-k="bestNow"/); // one station is cheaper than the rest here
+  assert.match(ljubljana, /data-k="siPlaces"/);
+  assert.match(ljubljana, /data-k="capNote"/);
+  assert.equal(stats.regions, 2);
+  // Both appear on the home page and in the search index.
+  assert.match(files.get('index.html'), /croatia\//);
+  assert.ok(JSON.parse(files.get('places.json')).r.some((r) => r[0] === 'si'));
+});
+
+test('review fixes: Đ in addresses, company forms, brand words, real low prices, postcodes, long ties', () => {
+  // Đakovo is found under D, at /dakovo/.
+  const hr = [];
+  for (let i = 0; i < 3; i++) hr.push(st('hr', 'Đakovo', 45.31 + i / 1000, 18.41, { regular: 161 }));
+  // 60 stations at one price are all listed: the list is not cut among equals.
+  for (let i = 0; i < 60; i++) hr.push(st('hr', 'Zagreb', 45.8 + i / 10000, 15.98, { regular: 161 }, i === 0 ? { postcode: '10000' } : {}));
+  const { files } = buildSite(meta(['hr']), { hr });
+  assert.ok(files.has('croatia/dakovo/index.html'));
+  const zagreb = files.get('croatia/zagreb/index.html');
+  assert.equal((zagreb.match(/<li class="st/g) || []).length, 60);
+  assert.ok(!zagreb.includes('data-k="capped"'));
+  assert.ok(!/Official/i.test(files.get('croatia/index.html').match(/<meta name="description"[^>]*>/)[0]), 'Croatia: nothing calls the prices official');
+  assert.ok(!files.get('croatia/index.html').includes('data-k="cheapPlaces"'), 'no ranking of towns where prices are capped');
+  assert.match(zagreb, /"addressCountry":"HR"/);
+  // One postcode among 63 stations is not a postcode index.
+  assert.deepEqual(JSON.parse(files.get('places.json')).c, []);
+  // Company forms and "no number" stay lower case; a brand is in the name only as a whole word.
+  assert.equal(tidyText('Kero-Benz d.o.o.'), 'Kero-Benz d.o.o.');
+  assert.equal(tidyText('Industrijska b.b.'), 'Industrijska b.b.');
+  assert.equal(tidyText('E.s. Castilho'), 'E.S. Castilho');
+  assert.equal(stationName({ name: 'Krapina-jug', brand: 'INA' }), 'Krapina-jug (INA)');
+  assert.equal(stationName({ name: 'INA Zagreb', brand: 'INA' }), 'INA Zagreb');
+  assert.equal(stationName({ name: '24Xpress Lansvale', brand: '24Xpress' }), '24Xpress Lansvale');
+  // A low price that another station matches is real; a lone one is doubted. LPG may sit further under.
+  const two = [899, 899, 1149, 1153, 1153, 1198].map((p) => ({ s: { tags: [] }, p }));
+  assert.equal(markDoubts(two, 'lpg').length, 6);
+  const lone = [700, 1149, 1153, 1153, 1198].map((p) => ({ s: { tags: [] }, p }));
+  assert.equal(markDoubts(lone, 'lpg')[0].p, 1149);
+  const lpgLow = [790, 1149, 1153, 1153, 1198].map((p) => ({ s: { tags: [] }, p }));
+  assert.equal(markDoubts(lpgLow, 'lpg')[0].p, 790);
+  assert.equal(markDoubts(lpgLow.map((r) => ({ ...r })), 'regular')[0].p, 1149);
+});
+
+test('regions without price times show when their prices were collected, not when the pages were built', () => {
+  const mx = [];
+  for (let i = 0; i < 3; i++) mx.push(st('mx', 'Zapopan', 20.72 + i / 1000, -103.39, { regular: 2300 + i }, { state: 'Jalisco' }));
+  const m = meta(['mx']);
+  m.regions.mx.updatedAt = '2026-11-12T18:00:00.000Z';
+  const html = buildSite(m, { mx }).files.get('mexico/zapopan/index.html');
+  assert.match(html, /<time class="upd" datetime="2026-11-12T18:00:00.000Z"/);
+});

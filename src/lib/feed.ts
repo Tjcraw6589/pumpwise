@@ -26,9 +26,12 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt';
-/** In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France). */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt'];
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr';
+/**
+ * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
+ * Slovenia before Croatia).
+ */
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
 /** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
 export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
 
@@ -85,6 +88,29 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 32.3, maxLat: 33.2, minLng: -17.4, maxLng: -16.2 }, // Madeira
     { minLat: 36.8, maxLat: 39.8, minLng: -31.4, maxLng: -24.9 }, // the Azores
   ],
+  // Slovenia in boxes that follow its border with Croatia (Istria, the Kolpa, the Sotla, then the Drava
+  // and the Mura), drawn from where the two countries' stations stand, so that every station of both
+  // countries falls on its own side (Bregana, Kumrovec, Čabar and Mursko Središće are Croatian; Obrežje,
+  // Bizeljsko, Ormož and Pince are Slovenian). Checked before Croatia.
+  si: [
+    { minLat: 45.46, maxLat: 45.75, minLng: 13.55, maxLng: 14.2 }, // the coast and the Karst
+    { minLat: 45.5, maxLat: 45.75, minLng: 14.2, maxLng: 14.55 }, // Ilirska Bistrica
+    { minLat: 45.62, maxLat: 45.75, minLng: 14.55, maxLng: 14.75 }, // north of Čabar
+    { minLat: 45.45, maxLat: 45.64, minLng: 14.75, maxLng: 15.3 }, // Kočevje and southern Bela krajina
+    { minLat: 45.64, maxLat: 45.75, minLng: 14.75, maxLng: 15.33 }, // Metlika
+    { minLat: 45.75, maxLat: 46.2, minLng: 13.38, maxLng: 15.66 }, // Nova Gorica, Ljubljana, Novo mesto, Brežice
+    { minLat: 45.845, maxLat: 45.9, minLng: 15.66, maxLng: 15.7 }, // Obrežje
+    { minLat: 45.95, maxLat: 46.05, minLng: 15.66, maxLng: 15.71 }, // Bizeljsko
+    { minLat: 46.2, maxLat: 46.3, minLng: 13.38, maxLng: 15.72 }, // Kranj, Celje, Rogatec
+    { minLat: 46.3, maxLat: 46.45, minLng: 13.38, maxLng: 16.0 }, // Ptuj
+    { minLat: 46.386, maxLat: 46.45, minLng: 16.0, maxLng: 16.3 }, // Zavrč, Ormož, Središče ob Dravi
+    { minLat: 46.45, maxLat: 46.54, minLng: 13.38, maxLng: 16.25 }, // Maribor, Ljutomer
+    { minLat: 46.515, maxLat: 46.54, minLng: 16.45, maxLng: 16.61 }, // Pince
+    { minLat: 46.54, maxLat: 46.88, minLng: 13.38, maxLng: 16.61 }, // Murska Sobota, Lendava
+  ],
+  // Croatia: one box round its crescent. It takes in Bosnia and Herzegovina and the edges of its other
+  // neighbours, where Pumpwise has no prices anyway.
+  hr: [{ minLat: 42.35, maxLat: 46.56, minLng: 13.45, maxLng: 19.45 }],
 };
 
 /** Who owns each region's prices and what their licence asks for; written into every feed's meta.json. */
@@ -159,6 +185,20 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     licence: 'DGEG site terms: free use, naming the DGEG as the source, with each price’s last-update time and a faithful reproduction',
     url: 'https://precoscombustiveis.dgeg.gov.pt',
     attribution: 'Prices from the Direção-Geral de Energia e Geologia (DGEG), precoscombustiveis.dgeg.gov.pt; each price carries its last-update time',
+    reuse: 'owner-terms',
+  },
+  si: {
+    owner: 'Republic of Slovenia, the Ministry responsible for energy (goriva.si)',
+    licence: 'goriva.si terms of data reuse: free reuse for any lawful purpose, commercial included, naming the source',
+    url: 'https://goriva.si/goriva/terms-of-use/',
+    attribution: 'goriva.si, official fuel price portal of the Republic of Slovenia (prices in force when the feed last collected them)',
+    reuse: 'owner-terms',
+  },
+  hr: {
+    owner: 'Ministry of Economy of the Republic of Croatia (minGO fuel price portal, mzoe-gor.hr)',
+    licence: 'The Ministry’s open data terms: copying, publishing and commercial use allowed, naming the source (as the Croatian Open Licence)',
+    url: 'https://mingo.gov.hr/otvoreni-podaci/8611',
+    attribution: 'Ministry of Economy of the Republic of Croatia, minGO fuel price portal (www.min-go.hr, mzoe-gor.hr); prices in force when the feed last collected them, filtered and sorted by Pumpwise, which is not a service of the Ministry and is not endorsed by it',
     reuse: 'owner-terms',
   },
 };

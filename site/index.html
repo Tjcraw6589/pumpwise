@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pumpwise: cheapest fuel near you, from official prices</title>
-<meta name="description" content="Today's cheapest petrol and diesel near you, from official government prices in 7 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
+<meta name="description" content="Today's cheapest petrol and diesel near you, from official government prices in 9 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
 <link rel="canonical" href="https://pumpwiseapp.com/">
 <meta property="og:title" content="Pumpwise: cheapest fuel near you, from official prices">
-<meta property="og:description" content="Today's cheapest petrol and diesel near you, from official government prices in 7 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
+<meta property="og:description" content="Today's cheapest petrol and diesel near you, from official government prices in 9 countries and states. Free, no sign up. Plus the Pumpwise iPhone app.">
 <meta property="og:url" content="https://pumpwiseapp.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pumpwise">
@@ -127,6 +127,13 @@ a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2
 .seg{display:inline-flex;margin:0 0 10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
 .seg button{min-height:44px;padding:0 16px;border:0;background:transparent;color:var(--fg);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--amber);color:#101820}
+.radius{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:12px 0 0}
+.radius .seg{margin:0}
+.rlabel{font-size:14px;font-weight:700;letter-spacing:.02em}
+.rseg button{padding:0 12px}
+.morewrap{margin:12px 0 0}
+.nearmore{border:0;font:inherit;font-weight:700;cursor:pointer}
+.osm a{color:inherit}
 .when.cheap{color:var(--cheap);font-weight:700}
 .hero .nearstatus,.hero .note{color:#C9D1DB}
 .hero .nearres{background:var(--bg);color:var(--fg);border-radius:16px;padding:4px 12px 8px;margin:12px 0 0}
@@ -265,10 +272,10 @@ a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{
 <main id="main" tabindex="-1">
 <section class="hero">
 <h1 data-k="rootH1">Find the cheapest fuel near you</h1>
-<p class="lead">Official prices from tens of thousands of stations in 7 countries and states, updated through the day.</p>
+<p class="lead">Official prices from tens of thousands of stations in 9 countries and states, updated through the day.</p>
 <p><a class="btn" href="https://pumpwiseapp.com/prices/">See fuel prices by town<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></p>
 <p class="poplabel" data-k="regions">Countries and states</p>
-<nav class="chips" aria-label="Countries and states"><a class="chip" href="https://pumpwiseapp.com/prices/western-australia/"><span data-k="rn_wa">Western Australia</span></a><a class="chip" href="https://pumpwiseapp.com/prices/new-south-wales/"><span data-k="rn_nsw">New South Wales and the ACT</span></a><a class="chip" href="https://pumpwiseapp.com/prices/tasmania/"><span data-k="rn_tas">Tasmania</span></a><a class="chip" href="https://pumpwiseapp.com/prices/spain/"><span data-k="rn_es">Spain</span></a><a class="chip" href="https://pumpwiseapp.com/prices/france/"><span data-k="rn_fr">France</span></a><a class="chip" href="https://pumpwiseapp.com/prices/mexico/"><span data-k="rn_mx">Mexico</span></a><a class="chip" href="https://pumpwiseapp.com/prices/portugal/"><span data-k="rn_pt">Portugal</span></a></nav>
+<nav class="chips" aria-label="Countries and states"><a class="chip" href="https://pumpwiseapp.com/prices/western-australia/"><span data-k="rn_wa">Western Australia</span></a><a class="chip" href="https://pumpwiseapp.com/prices/new-south-wales/"><span data-k="rn_nsw">New South Wales and the ACT</span></a><a class="chip" href="https://pumpwiseapp.com/prices/tasmania/"><span data-k="rn_tas">Tasmania</span></a><a class="chip" href="https://pumpwiseapp.com/prices/spain/"><span data-k="rn_es">Spain</span></a><a class="chip" href="https://pumpwiseapp.com/prices/france/"><span data-k="rn_fr">France</span></a><a class="chip" href="https://pumpwiseapp.com/prices/mexico/"><span data-k="rn_mx">Mexico</span></a><a class="chip" href="https://pumpwiseapp.com/prices/portugal/"><span data-k="rn_pt">Portugal</span></a><a class="chip" href="https://pumpwiseapp.com/prices/slovenia/"><span data-k="rn_si">Slovenia</span></a><a class="chip" href="https://pumpwiseapp.com/prices/croatia/"><span data-k="rn_hr">Croatia</span></a></nav>
 </section>
 <ul class="trust"><li data-k="trust1">Official government prices</li><li data-k="trust2">Updated through the day</li><li data-k="trust3">Free to use, no sign up</li></ul>
 <section class="appcard" id="app" aria-labelledby="app-h">
@@ -277,7 +284,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{
 <p class="lead" data-k="appLead">Open the app and see the nearest station and the cheapest one around you. Directions take one tap.</p>
 <ul class="ticks"><li data-k="appB1">Tomorrow's prices from 2:30pm, so you know whether to fill up today or wait.</li><li data-k="appB2">Shows if a cheaper station is worth the drive, counting the fuel you use to get there.</li><li data-k="appB3">Free. The app has no account and no adverts.</li></ul>
 <a class="btn" href="https://apps.apple.com/au/app/pumpwise-fuel-prices-near-me/id6828174153"><span data-k="appLink">Get Pumpwise on the App Store</span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-<p class="note" data-k="appWhere" data-v="{&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;},&quot;k&quot;:7}">The app covers Western Australia for now. This website covers all 7 countries and states.</p>
+<p class="note" data-k="appWhere" data-v="{&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;},&quot;k&quot;:9}">The app covers Western Australia for now. This website covers all 9 countries and states.</p>
 </div>
 </section>
 <section class="support" id="support" aria-labelledby="support-h">
@@ -289,7 +296,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{
 </div>
 <div class="faq">
 <h3 data-k="faqH">Common questions</h3>
-<details open><summary><span data-k="faq1q">Where does Pumpwise work?</span></summary><p data-k="faq1a" data-v="{&quot;r&quot;:{&quot;k&quot;:&quot;regionList&quot;},&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;}}">The website covers Western Australia, New South Wales and the ACT, Tasmania, Spain, France, Mexico and Portugal. The iPhone app covers Western Australia for now.</p></details>
+<details open><summary><span data-k="faq1q">Where does Pumpwise work?</span></summary><p data-k="faq1a" data-v="{&quot;r&quot;:{&quot;k&quot;:&quot;regionList&quot;},&quot;a&quot;:{&quot;k&quot;:&quot;appList&quot;}}">The website covers Western Australia, New South Wales and the ACT, Tasmania, Spain, France, Mexico, Portugal, Slovenia and Croatia. The iPhone app covers Western Australia for now.</p></details>
 <details><summary><span data-k="faq2q">A price looks wrong. What can I do?</span></summary><p data-k="faq2a">Prices are the ones stations report to each official service, so always check the price at the pump. If a station in Western Australia is not selling at its published price, FuelWatch can help.</p><p><a href="https://www.fuelwatch.wa.gov.au/contact"><span data-k="faq2link">Contact FuelWatch</span></a></p></details>
 <details><summary><span data-k="faq3q">Does Pumpwise track me?</span></summary><p data-k="faq3a">Pumpwise has no accounts, and your location stays on your phone or in your browser. The website shows Google adverts, which may use cookies; visitors in Europe and the UK are asked first. The app has no adverts.</p><p><a href="https://pumpwiseapp.com/privacy.html"><span data-k="faq3link">Read the privacy policy</span></a></p></details>
 <details><summary><span data-k="faq4q">Why is my country or state missing?</span></summary><p data-k="faq4a">Pumpwise adds a place when its government publishes station prices that anyone may use for free. If you know of one, send an email.</p></details>

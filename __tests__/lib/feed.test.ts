@@ -103,6 +103,22 @@ describe('shared helpers', () => {
     expect(regionAt(37.21, -7.4)).toBe('es'); // Ayamonte
     expect(regionAt(32.65, -16.91)).toBe('pt'); // Funchal, Madeira
     expect(regionAt(37.74, -25.67)).toBe('pt'); // Ponta Delgada, the Azores
+    // Slovenia and Croatia: towns on each side of their winding border.
+    expect(regionAt(46.0569, 14.5058)).toBe('si'); // Ljubljana
+    expect(regionAt(46.5547, 15.6459)).toBe('si'); // Maribor
+    expect(regionAt(45.5481, 13.7302)).toBe('si'); // Koper
+    expect(regionAt(45.8545, 15.6863)).toBe('si'); // Obrežje, the last Slovenian station before the border
+    expect(regionAt(46.4098, 16.1607)).toBe('si'); // Ormož
+    expect(regionAt(46.522, 16.5198)).toBe('si'); // Pince
+    expect(regionAt(45.815, 15.9819)).toBe('hr'); // Zagreb
+    expect(regionAt(45.839, 15.6957)).toBe('hr'); // Bregana, two kilometres from Obrežje
+    expect(regionAt(46.0758, 15.6821)).toBe('hr'); // Kumrovec
+    expect(regionAt(45.5928, 14.6505)).toBe('hr'); // Čabar
+    expect(regionAt(46.3829, 16.0604)).toBe('hr'); // Cestica
+    expect(regionAt(46.5031, 16.431)).toBe('hr'); // Mursko Središće
+    expect(regionAt(45.3271, 14.4422)).toBe('hr'); // Rijeka
+    expect(regionAt(43.5081, 16.4402)).toBe('hr'); // Split
+    expect(regionAt(42.6507, 18.0944)).toBe('hr'); // Dubrovnik
     expect(regionAt(19.43, -99.13)).toBe('mx'); // Mexico City
     expect(regionAt(21.16, -86.85)).toBe('mx'); // Cancún
     expect(regionAt(40.71, -74.0)).toBeNull(); // New York
