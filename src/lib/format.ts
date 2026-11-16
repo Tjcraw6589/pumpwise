@@ -1,13 +1,44 @@
 import { localClock } from './hours';
 
-/** 139.9 → "139.9" (pence or cents per litre, to one decimal place as on station signs). */
-export function formatPrice(price: number): string {
-  return price.toFixed(1);
+/** How a region writes a price per litre (see `RegionInfo.priceDecimals`). */
+export interface PriceStyle {
+  priceUnit: string;
+  priceDecimals?: 2 | 3;
+  currency: string;
+  id?: string;
+}
+
+/**
+ * 139.9 → "139.9" (pence or cents per litre, to one decimal place as on station signs). Where pumps
+ * show whole currency, the feed's hundredths become it: 165.9 → "1.659" (3), 2459 → "24.59" (2).
+ */
+export function formatPrice(price: number, decimals?: 2 | 3): string {
+  return decimals ? (price / 100).toFixed(decimals) : price.toFixed(1);
+}
+
+/**
+ * A price split for a forecourt sign: the large digits and the small ones after them.
+ * "189" + ".9" for cents, "1.65" + "9" for euros (the thousandth is small on European signs),
+ * "24.59" + "" for pesos.
+ */
+export function priceParts(price: number, decimals?: 2 | 3): [string, string] {
+  if (decimals === 3) {
+    const text = formatPrice(price, 3);
+    return [text.slice(0, -1), text.slice(-1)];
+  }
+  if (decimals === 2) return [formatPrice(price, 2), ''];
+  const text = formatPrice(price);
+  return [text.slice(0, -2), text.slice(-2)];
 }
 
 /** "185.8 cents a litre": screen readers say "185.8c" badly, so prices get their unit in words. */
-export function spokenPrice(price: number, unit: string): string {
-  const word = unit === 'p' ? 'pence' : unit === 'c' ? 'cents' : unit;
+export function spokenPrice(price: number, unit: string | PriceStyle): string {
+  if (typeof unit !== 'string' && unit.priceDecimals) {
+    const money = unit.currency === '€' ? 'euros' : unit.currency === '£' ? 'pounds' : unit.id === 'mx' ? 'pesos' : 'dollars';
+    return `${formatPrice(price, unit.priceDecimals)} ${money} a litre`;
+  }
+  const code = typeof unit === 'string' ? unit : unit.priceUnit;
+  const word = code === 'p' ? 'pence' : code === 'c' ? 'cents' : code;
   return `${formatPrice(price)} ${word} a litre`;
 }
 

@@ -122,7 +122,7 @@ export default function MapScreen() {
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`${isCheapest ? 'Cheapest' : 'Selected'}: ${selected.station.name}, ${spokenPrice(selected.price.p, region.priceUnit)}, ${[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(', ')}`}
+                accessibilityLabel={`${isCheapest ? 'Cheapest' : 'Selected'}: ${selected.station.name}, ${spokenPrice(selected.price.p, region)}, ${[formatDistance(selected.distance, region.distanceUnit), selected.open.label].filter(Boolean).join(', ')}`}
                 accessibilityHint="Opens the station's prices and hours"
                 onPress={() => router.push({ pathname: '/station/[id]', params: { id: selected.station.id } })}
                 style={styles.row}

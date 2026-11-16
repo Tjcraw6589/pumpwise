@@ -7,7 +7,7 @@
  */
 
 /** The feed version this build of the app reads (its app.json `extra.feedUrl` must match). */
-export const FEED_VERSION = 3;
+export const FEED_VERSION = 4;
 /**
  * Version 2 of the feed (Western Australia only) stays online for Pumpwise 1.0, which can't read
  * the regions added since. It is published alongside the newer versions at data/v2.

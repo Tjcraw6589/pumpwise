@@ -17,7 +17,7 @@ import { TomorrowTag } from './TomorrowTag';
 /** What VoiceOver reads for a headline card: name, price, distance and opening. */
 function spokenSummary(item: RankedStation): string {
   const region = REGIONS[item.station.region];
-  return [item.station.name, spokenPrice(item.price.p, region.priceUnit), formatDistance(item.distance, region.distanceUnit), item.open.label]
+  return [item.station.name, spokenPrice(item.price.p, region), formatDistance(item.distance, region.distanceUnit), item.open.label]
     .filter(Boolean)
     .join(', ');
 }

@@ -33,7 +33,7 @@ export function StationRow({ item, band, sortBy, now, onPress }: StationRowProps
       accessibilityRole="button"
       accessibilityLabel={[
         station.name,
-        spokenPrice(item.price.p, region.priceUnit),
+        spokenPrice(item.price.p, region),
         formatDistance(item.distance, region.distanceUnit),
         closed ? 'Closed' : open.label,
         note,

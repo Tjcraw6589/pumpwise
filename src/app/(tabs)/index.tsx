@@ -50,7 +50,7 @@ function BestValueRow({ item, onPress }: { item: RankedStation; onPress: () => v
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Best value once you count the drive: ${item.station.name}, ${spokenPrice(item.price.p, region.priceUnit)}, ${formatDistance(item.distance, region.distanceUnit)}, ${formatMoney(item.realCost, region.currency)} with the fuel to get there and back`}
+      accessibilityLabel={`Best value once you count the drive: ${item.station.name}, ${spokenPrice(item.price.p, region)}, ${formatDistance(item.distance, region.distanceUnit)}, ${formatMoney(item.realCost, region.currency)} with the fuel to get there and back`}
       onPress={onPress}
       testID="best-value-row"
       style={({ pressed }) => [

@@ -1,7 +1,7 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { useRegion } from '@/hooks/useRegion';
-import { formatPrice, spokenPrice } from '@/lib/format';
+import { priceParts, spokenPrice } from '@/lib/format';
 import { useTheme } from '@/theme/useTheme';
 
 import { AppText } from './AppText';
@@ -31,19 +31,19 @@ const SIZES: Record<SignSize, { digits: number; tenth: number; padH: number; pad
 
 /**
  * A forecourt price sign: lit digits on a dark panel, whole pence large and the tenth of a penny
- * smaller, as on UK pole signs. Always dark, in light and dark mode alike.
+ * smaller, as on UK pole signs (euro regions: the thousandth smaller; pesos: two decimals). Always dark, in light and dark mode alike.
  */
 export function PriceSign({ pence, tone = 'normal', size = 'md', label, unit, style, testID }: PriceSignProps) {
   const { colors, fonts, radius } = useTheme();
   const region = useRegion();
   const s = SIZES[size];
-  const [whole, tenth] = formatPrice(pence).split('.');
+  const [whole, small] = priceParts(pence, region.priceDecimals);
   const digitColor = tone === 'cheap' ? colors.signCheap : tone === 'muted' ? colors.signLabel : colors.signDigits;
   return (
     <View
       testID={testID}
       accessible
-      accessibilityLabel={spokenPrice(pence, unit ?? region.priceUnit)}
+      accessibilityLabel={spokenPrice(pence, unit ?? region)}
       style={[
         styles.panel,
         {
@@ -74,7 +74,7 @@ export function PriceSign({ pence, tone = 'normal', size = 'md', label, unit, st
           }}
           maxFontSizeMultiplier={1.2}
         >
-          .{tenth}
+          {small}
         </AppText>
       </View>
       {label ? (
