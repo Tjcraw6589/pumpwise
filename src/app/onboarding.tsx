@@ -88,9 +88,7 @@ export default function OnboardingScreen() {
             <View style={[styles.fact, { backgroundColor: colors.surface, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginTop: gap }]}>
               <Ionicons name="shield-checkmark" size={20} color={colors.cheap} />
               <AppText variant="caption" style={[styles.flex, { marginLeft: spacing.sm }]}>
-                {coverage?.live.some((id) => !['wa', 'nsw', 'tas', 'qld'].includes(id))
-                  ? 'Official fuel prices from government price schemes in Australia, Europe and Mexico, with the source named on every screen.'
-                  : coverage?.live.includes('nsw')
+                {coverage?.live.includes('nsw')
                   ? 'Official government prices that stations must report by law: FuelWatch in WA, FuelCheck in NSW, the ACT and Tasmania.'
                   : "Official government prices. In WA every station's price is fixed for the day, and tomorrow's are out by 2:30pm."}
               </AppText>

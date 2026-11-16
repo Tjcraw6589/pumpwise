@@ -1,4 +1,4 @@
-import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, priceParts, spokenPrice, standingLabel, timeAgo } from '@/lib/format';
+import { dailyLabel, formatChange, formatMoney, formatPrice, freshness, spokenPrice, standingLabel, timeAgo } from '@/lib/format';
 import { distanceKm, regionForRadius } from '@/lib/geo';
 import { feedWarning, nearbyPhase, needsReload, RELOAD_AFTER_MS } from '@/lib/nearby';
 import { classifyQuery } from '@/lib/places';
@@ -31,15 +31,6 @@ describe('format', () => {
     expect(formatPrice(200)).toBe('200.0');
     expect(spokenPrice(185.8, 'c')).toBe('185.8 cents a litre');
     expect(spokenPrice(139.9, 'p')).toBe('139.9 pence a litre');
-    // Euro regions show whole euros to the thousandth, Mexico pesos to the centavo.
-    expect(formatPrice(165.9, 3)).toBe('1.659');
-    expect(formatPrice(2459, 2)).toBe('24.59');
-    expect(priceParts(189.9)).toEqual(['189', '.9']);
-    expect(priceParts(165.9, 3)).toEqual(['1.65', '9']);
-    expect(priceParts(2459, 2)).toEqual(['24.59', '']);
-    expect(spokenPrice(165.9, { priceUnit: 'c', priceDecimals: 3, currency: '€' })).toBe('1.659 euros a litre');
-    expect(spokenPrice(2459, { priceUnit: 'c', priceDecimals: 2, currency: '$', id: 'mx' })).toBe('24.59 pesos a litre');
-    expect(spokenPrice(185.8, { priceUnit: 'c', currency: '$' })).toBe('185.8 cents a litre');
     expect(formatMoney(2.4, '$')).toBe('$2.40');
     expect(formatMoney(-0.5, '£')).toBe('-£0.50');
     expect(formatChange(-4)).toBe('−4.0');

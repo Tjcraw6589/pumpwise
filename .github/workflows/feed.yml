@@ -8,9 +8,8 @@
 # only when the NSW_FUEL_API_KEY and NSW_FUEL_API_SECRET secrets exist; Spain every 30 minutes,
 # France every run and Mexico every 3 hours, no keys needed; Queensland only when the
 # QLD_FUEL_API_TOKEN secret exists).
-# The site carries data/v4 (every region live on 16 Nov 2026, for Pumpwise 1.1; a region added later
-# needs a new feed version, because 1.1 cannot read a region it was not built with), data/v3 (WA,
-# NSW, ACT, Tasmania, unused) and data/v2 (Western Australia only, for 1.0). The UK Fuel Finder source only runs
+# The site carries data/v4 (every region, for Pumpwise 1.2), data/v3 (WA, NSW, ACT, Tasmania, for
+# 1.1) and data/v2 (Western Australia only, for 1.0). The UK Fuel Finder source only runs
 # when FUEL_FINDER_CLIENT_ID and FUEL_FINDER_CLIENT_SECRET secrets exist, and that service refuses
 # connections from outside the UK, so it stays off on GitHub's servers.
 # After the feed, the job writes the price pages (prices/, see scripts/prices-site): a step that may

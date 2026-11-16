@@ -127,8 +127,8 @@ export default function StationScreen() {
               accessibilityState={{ selected: isChosen }}
               accessibilityLabel={[
                 f.label,
-                spokenPrice(price.p, region),
-                next !== undefined ? `tomorrow ${spokenPrice(next, region)}` : null,
+                spokenPrice(price.p, region.priceUnit),
+                next !== undefined ? `tomorrow ${spokenPrice(next, region.priceUnit)}` : null,
               ]
                 .filter(Boolean)
                 .join(', ')}
@@ -148,14 +148,14 @@ export default function StationScreen() {
                 </AppText>
               </View>
               <AppText variant="priceXL" style={{ color: isChosen ? colors.signCheap : colors.signDigits, fontSize: 38, lineHeight: 42, width: 92, textAlign: 'right' }}>
-                {formatPrice(price.p, region.priceDecimals)}
+                {formatPrice(price.p)}
               </AppText>
               {hasTomorrow ? (
                 <View style={{ width: 78, alignItems: 'flex-end' }}>
                   {next !== undefined ? (
                     <>
                       <AppText variant="stat" style={{ color: '#E9EDF2' }}>
-                        {formatPrice(next, region.priceDecimals)}
+                        {formatPrice(next)}
                       </AppText>
                       <AppText variant="small" style={{ color: next < price.p ? colors.signCheap : next > price.p ? '#FF8A80' : colors.signLabel }}>
                         {formatChange(next - price.p)}

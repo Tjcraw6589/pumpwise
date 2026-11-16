@@ -1,6 +1,5 @@
 import { StyleSheet, View } from 'react-native';
 
-import { useRegion } from '@/hooks/useRegion';
 import { formatPrice } from '@/lib/format';
 import type { PriceBand } from '@/lib/ranking';
 import { useTheme } from '@/theme/useTheme';
@@ -10,7 +9,6 @@ import { AppText } from './AppText';
 /** A small price sign with a pointer, used as a map marker. Green digits for the cheapest quarter. */
 export function MapPin({ pence, band, selected, stale }: { pence: number; band: PriceBand; selected: boolean; stale: boolean }) {
   const { colors, fonts } = useTheme();
-  const { priceDecimals } = useRegion();
   const digit = stale ? colors.signLabel : band === 'low' ? colors.signCheap : band === 'high' ? '#FF8A80' : colors.signDigits;
   return (
     <View style={styles.wrap} pointerEvents="none">
@@ -27,7 +25,7 @@ export function MapPin({ pence, band, selected, stale }: { pence: number; band: 
         ]}
       >
         <AppText style={{ fontFamily: fonts.display, fontSize: selected ? 19 : 15, lineHeight: selected ? 22 : 18, color: digit }} maxFontSizeMultiplier={1}>
-          {formatPrice(pence, priceDecimals)}
+          {formatPrice(pence)}
         </AppText>
       </View>
       <View style={[styles.pointer, { borderTopColor: selected ? colors.accent : colors.sign }]} />
