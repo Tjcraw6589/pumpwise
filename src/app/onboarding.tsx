@@ -79,7 +79,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
         {step < 2 ? (
-          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={14} testID="onboarding-skip">
+          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={{ left: 14, right: 14 }} style={styles.skip} testID="onboarding-skip">
             <AppText variant="small" tone="muted">
               {t('onboard.skip')}
             </AppText>
@@ -199,7 +199,8 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 40 },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 56 },
+  skip: { minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' },
   dots: { flexDirection: 'row', gap: 6 },
   dot: { height: 8, borderRadius: 4 },
   body: { flexGrow: 1, justifyContent: 'center' },

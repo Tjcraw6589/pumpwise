@@ -62,7 +62,8 @@ export interface RegionInfo {
    * longitude where a region spans time zones (Spain's Canary Islands are an hour behind).
    */
   utcOffsetMinutes: (date: Date, lng?: number) => number;
-  source: { name: string; url: string; credit: string };
+  /** placesCredit: who the town names come from, when that is not the price source (Mexico: INEGI). */
+  source: { name: string; url: string; credit: string; placesCredit?: string };
   report: { label: string; url: string; note: string };
   /** One-paragraph explanation for the About screen. */
   about: string;
@@ -461,6 +462,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       name: 'Comisión Nacional de Energía',
       url: 'https://www.gob.mx/cne',
       credit: 'Prices reported to the Comisión Nacional de Energía (CNE, formerly CRE), Government of Mexico (CC BY 4.0)',
+      placesCredit: 'Town names: INEGI, Marco Geoestadístico 2024',
     },
     report: {
       label: 'Report it to PROFECO',
@@ -468,7 +470,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       note: 'Stations report their prices to the CNE; PROFECO handles complaints at the pump.',
     },
     about:
-      'In Mexico fuel stations report their prices to the Comisión Nacional de Energía (CNE, formerly the CRE), which publishes them as open data. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices and the date they were collected.',
+      'In Mexico fuel stations report their prices to the Comisión Nacional de Energía (CNE, formerly the CRE), which publishes them as open data. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices and the date they were collected. The list has no addresses, so Pumpwise names each station’s municipality using the boundaries of INEGI’s Marco Geoestadístico 2024.',
     cities: [
       { name: 'Ciudad de México', detail: 'Mexico', lat: 19.4326, lng: -99.1332 },
       { name: 'Guadalajara', detail: 'Mexico', lat: 20.6597, lng: -103.3496 },

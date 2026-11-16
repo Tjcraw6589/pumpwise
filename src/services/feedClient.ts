@@ -1,5 +1,5 @@
 import { FEED_URL } from '@/config/app';
-import { type FeedMeta, type FeedStation, type FeedTile, FEED_VERSION, tilesForArea } from '@/lib/feed';
+import { type FeedMeta, type FeedStation, type FeedTile, FEED_VERSION, REGION_IDS, tilesForArea } from '@/lib/feed';
 import type { LatLng } from '@/lib/geo';
 
 /**
@@ -73,7 +73,8 @@ export async function loadArea(center: LatLng, radiusKm: number): Promise<AreaRe
   const stations: FeedStation[] = [];
   for (const tile of tiles) {
     for (const station of tile.stations ?? []) {
-      if (seen.has(station.id)) continue;
+      // A station of a region this version does not know (a country added to the feed later) is skipped.
+      if (seen.has(station.id) || !REGION_IDS.includes(station.region)) continue;
       seen.add(station.id);
       stations.push(station);
     }

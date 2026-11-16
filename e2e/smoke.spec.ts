@@ -81,8 +81,10 @@ test.describe('Pumpwise smoke', () => {
     await expect(nearby.getByTestId('cheapest-card')).toBeVisible();
 
     // Settings survive a fresh start; onboarding is not shown again. (Let the tab switch finish first.)
+    // The router can still be finishing its own address change, which cancels a load started at that moment
+    // (net::ERR_ABORTED), so the load is tried once more.
     await page.waitForLoadState('networkidle');
-    await page.goto('/');
+    await page.goto('/').catch(() => page.goto('/'));
     await expect(page.getByTestId('onboarding')).toHaveCount(0);
     await expect(nearby.getByTestId('fuel-chip')).toContainText('Diesel');
     await expect(nearby.getByTestId('place-chip')).toContainText('Fremantle');

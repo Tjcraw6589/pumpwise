@@ -17,9 +17,9 @@ Everything below fits Apple's field limits (counts given per field). Paste as-is
 | Availability | 1.0 and 1.1: Australia. 1.2: every country or region except China mainland (see "Version 1.2.0") |
 | Age rating | 4+ (answer "None" to every content question) |
 | Copyright | Use the same line as Bowerly |
-| Privacy policy URL | https://tjcraw6589.github.io/pumpwise/privacy.html |
-| Support URL | https://tjcraw6589.github.io/pumpwise/ |
-| Marketing URL | https://tjcraw6589.github.io/pumpwise/ |
+| Privacy policy URL | https://pumpwiseapp.com/privacy.html |
+| Support URL | https://pumpwiseapp.com/ |
+| Marketing URL | https://pumpwiseapp.com/ |
 | Support email | pumpwiseapp@gmail.com |
 
 "Pumpwise" was checked with the iTunes Search API in the Australian, UK and US App Stores on 28 October 2026: no app uses it.
@@ -92,7 +92,7 @@ First release, covering Western Australia.
 
 ## Version 1.1.0
 
-Paste one of these into **What's New in This Version** (4,000 max). Use the first only once https://tjcraw6589.github.io/pumpwise/data/v3/meta.json shows `"nsw": {"status": "live"`; otherwise use the second.
+Paste one of these into **What's New in This Version** (4,000 max). Use the first only once https://pumpwiseapp.com/data/v3/meta.json shows `"nsw": {"status": "live"`; otherwise use the second.
 
 **What's New**, if NSW is live
 ```
@@ -496,7 +496,7 @@ O Pumpwise chegou a Portugal, Espanha, França, Eslovénia, Croácia e México, 
 
 ### Review notes for 1.2
 ```
-Pumpwise shows official fuel prices that stations must report to government schemes: FuelWatch (Western Australia), FuelCheck (New South Wales, the ACT and Tasmania), the Geoportal de Gasolineras (Spain), prix-carburants.gouv.fr (France), the DGEG (Portugal) and the Comisión Nacional de Energía (Mexico). Each source is credited, with a link, on every screen with prices; the licences are listed at https://tjcraw6589.github.io/pumpwise/data-licences.html.
+Pumpwise shows official fuel prices that stations must report to government schemes: FuelWatch (Western Australia), FuelCheck (New South Wales, the ACT and Tasmania), the Geoportal de Gasolineras (Spain), prix-carburants.gouv.fr (France), the DGEG (Portugal) and the Comisión Nacional de Energía (Mexico). Each source is credited, with a link, on every screen with prices; the licences are listed at https://pumpwiseapp.com/data-licences.html.
 
 Pumpwise is available worldwide, but official prices exist only in the places listed above. If you are reviewing somewhere else, the Nearby tab says "No official fuel prices here yet" and lists each place that has them: tap one (for example "Western Australia · Australia" or "Spain") to see live prices, or tap "Choose a place" and pick a city such as Madrid, Paris, Lisboa or Ciudad de México. The app follows the iPhone's language: English, Spanish, French or Portuguese.
 

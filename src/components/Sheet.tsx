@@ -61,7 +61,7 @@ export function Sheet({ visible, onClose, title, children, maxHeightRatio = 0.85
             {title ? (
               <View style={[styles.header, { paddingHorizontal: spacing.lg, marginBottom: spacing.sm }]}>
                 <AppText variant="h3">{title}</AppText>
-                <Pressable accessibilityRole="button" accessibilityLabel={t('action.close')} onPress={onClose} hitSlop={12} testID={testID ? `${testID}-close` : undefined}>
+                <Pressable accessibilityRole="button" accessibilityLabel={t('action.close')} onPress={onClose} hitSlop={{ top: 14, bottom: 12, left: 12, right: 12 }} testID={testID ? `${testID}-close` : undefined}>
                   <Ionicons name="close" size={22} color={colors.textMuted} />
                 </Pressable>
               </View>

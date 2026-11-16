@@ -24,6 +24,7 @@ export function SegmentedControl<K extends string>({ options, value, onChange, t
             accessibilityRole="button"
             accessibilityState={{ selected }}
             testID={testID ? `${testID}-${o.key}` : undefined}
+            hitSlop={SEGMENT_SLOP}
             onPress={() => {
               if (!selected) {
                 selectionHaptic();
@@ -45,6 +46,10 @@ export function SegmentedControl<K extends string>({ options, value, onChange, t
     </View>
   );
 }
+
+/** The segments are 32 points tall (16 of text, 8 above and below), like Apple's own; the slop makes the tap area 44. */
+export const SEGMENT_HEIGHT = 32;
+export const SEGMENT_SLOP = { top: 6, bottom: 6 } as const;
 
 const styles = StyleSheet.create({
   track: { flexDirection: 'row', padding: 3 },

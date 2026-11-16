@@ -28,7 +28,7 @@ export function Notice({ tone = 'info', icon, text, action, testID }: NoticeProp
         {text}
       </AppText>
       {action ? (
-        <Pressable accessibilityRole="button" onPress={action.onPress} hitSlop={8} style={{ marginLeft: spacing.sm }}>
+        <Pressable accessibilityRole="button" onPress={action.onPress} hitSlop={{ top: 14, bottom: 14, left: 10, right: 10 }} style={{ marginLeft: spacing.sm }}>
           <AppText variant="small" style={{ color: fg }}>
             {action.label}
           </AppText>

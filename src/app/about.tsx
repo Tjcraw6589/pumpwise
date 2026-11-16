@@ -29,7 +29,7 @@ function Para({ title, children }: { title: string; children: ReactNode }) {
 function Link({ label, url, testID }: { label: string; url: string; testID?: string }) {
   const { spacing } = useTheme();
   return (
-    <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(url)} hitSlop={6} style={{ marginTop: spacing.sm }} testID={testID}>
+    <Pressable accessibilityRole="link" onPress={() => void Linking.openURL(url)} style={{ minHeight: 44, justifyContent: 'center', marginTop: spacing.xs }} testID={testID}>
       <AppText variant="bodyBold" tone="accent">
         {label}
       </AppText>
@@ -59,7 +59,7 @@ export default function AboutScreen() {
           <View key={id} testID={`about-${id}`}>
             <Para title={region.name}>{region.about}</Para>
             <AppText variant="caption" tone="muted" style={{ marginTop: spacing.xs }}>
-              {region.source.credit}.
+              {region.source.credit}.{region.source.placesCredit ? ` ${region.source.placesCredit}.` : ''}
             </AppText>
             <Link label={region.source.url.replace(/^https:\/\//, '')} url={region.source.url} testID={`about-source-${id}`} />
             <Link label={t('about.priceWrong', region.report.label)} url={region.report.url} />
