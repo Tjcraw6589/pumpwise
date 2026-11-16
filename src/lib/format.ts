@@ -5,7 +5,7 @@ import { localClock } from './hours';
 /** What price formatting needs to know about a region (see `RegionInfo`). */
 export interface PriceStyle {
   priceUnit: string;
-  priceDecimals?: 2 | 3;
+  priceDecimals?: 1 | 2 | 3;
   decimalComma?: boolean;
   currency: string;
   currencyCode: string;

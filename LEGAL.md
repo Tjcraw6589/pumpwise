@@ -91,7 +91,14 @@ How to read the tags on sources: `[retrieved 2026-11-08]` means the text was rea
 - **Terms** (the site's privacy and security notice, `[retrieved 2026-11-08]`): "A informação disponível neste sítio é gratuita, podendo ser utilizada livremente. A reutilização desta informação deverá assegurar a adequada identificação da Direção-Geral de Energia e Geologia enquanto fonte dos dados, bem como a indicação da data-hora da última atualização dos preços e a reprodução fiel de toda a informação." In English: the information is free and may be used freely; reuse must identify the DGEG as the source, give the date and time the prices were last updated, and reproduce the information faithfully.
 - **Where Pumpwise complies:** the credit names the DGEG; every Portuguese price carries its own last-update time and the app shows "Updated … ago"; prices are reproduced exactly as published (euro prices to the tenth of a cent). The feed stores the DGEG's time for each price.
 
-## Our own feed (data/v2, data/v3, data/v4 on GitHub Pages)
+## Denmark and Iceland (company prices, not government data)
+
+Added 16 November 2026 in feed v5. Neither is an official government source, and the app and website say so wherever these prices appear.
+
+- **Denmark:** prices come from the fuel companies' own public price interfaces, which Danish law requires them to publish so prices can be compared. First version: OK (https://mobility-prices.ok.dk/api/v1/fuel-prices) and Shell (https://shellpumpepriser.geoapp.me/v1/prices), the two whose data includes map coordinates. Neither interface shows reuse terms of its own. Credit: "Prices published by OK and Shell". If either company objects, switch its part off in `scripts/feed/sources/dk.ts`.
+- **Iceland:** prices come from Gasvaktin (https://github.com/gasvaktin/gasvaktin), an open project under the MIT licence that collects the companies' website prices. The MIT licence covers Gasvaktin's code and files; the prices themselves are facts each company publishes. Member and discount prices are not shown. If Gasvaktin stops updating, the feed drops Iceland by itself once the station count falls.
+
+## Our own feed (data/v2 to data/v5 on GitHub Pages)
 
 The feed is a copy of the official prices in a different shape, rebuilt every 15 minutes. From 8 November 2026 each `meta.json` carries a `licences` section naming, for every region, the data owner, the licence and the attribution to use, and the website has a page listing them (https://tjcraw6589.github.io/pumpwise/data-licences.html). In short:
 

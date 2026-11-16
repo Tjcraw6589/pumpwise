@@ -110,6 +110,22 @@ const ES: Record<RegionId, RegionText> = {
     reportLabel: 'Consultarlo en mzoe-gor.hr',
     reportNote: 'Las gasolineras croatas deben comunicar sus precios al portal de precios del Ministerio de Economía.',
   },
+  dk: {
+    name: 'Dinamarca',
+    about:
+      'En Dinamarca cada compañía de carburantes debe publicar el precio actual en el surtidor de cada una de sus gasolineras en cuanto cambia. Pumpwise lee los servicios públicos de precios de las propias compañías, por ahora los de OK y Shell, así que las gasolineras de otras marcas aún no aparecen. Son las cifras de las propias compañías, no datos del Gobierno.',
+    credit: 'Precios publicados por las propias compañías de carburantes (OK y Shell), como exige la ley danesa. No son datos del Gobierno',
+    reportLabel: 'Avisar a la Autoridad danesa de Competencia y Consumo',
+    reportNote: 'Las compañías danesas deben publicar el precio del surtidor en cuanto cambia.',
+  },
+  is: {
+    name: 'Islandia',
+    about:
+      'Islandia no tiene un registro oficial de precios en el surtidor. Pumpwise muestra los precios que las seis compañías de carburantes publican en sus propias webs (Atlantsolía, Costco, N1, Olís, ÓB y Orkan), recogidos cada 15 minutos por el proyecto abierto Gasvaktin. No se incluyen los descuentos de las tarjetas de fidelidad. La lista da los precios vigentes pero no cuándo se fijó cada uno, así que Pumpwise los muestra como precios actuales.',
+    credit: 'Precios de las webs de las propias compañías de carburantes, recogidos por Gasvaktin (licencia MIT). No son datos del Gobierno',
+    reportLabel: 'Consultarlo en gasvaktin.is',
+    reportNote: 'Los precios islandeses proceden de la web de cada compañía de carburantes.',
+  },
 };
 
 const FR: Record<RegionId, RegionText> = {
@@ -214,6 +230,24 @@ const FR: Record<RegionId, RegionText> = {
     reportLabel: 'Le vérifier sur mzoe-gor.hr',
     reportNote: 'Les stations croates doivent déclarer leurs prix au portail des prix du ministère de l’Économie.',
   },
+  dk: {
+    name: 'Danemark',
+    nameInSentence: 'le Danemark',
+    about:
+      'Au Danemark, chaque compagnie pétrolière doit publier le prix à la pompe de chacune de ses stations dès qu’il change. Pumpwise lit les services publics de prix des compagnies elles-mêmes, pour l’instant ceux d’OK et de Shell : les stations des autres marques ne sont pas encore affichées. Ce sont les chiffres des compagnies, pas des données de l’État.',
+    credit: 'Prix publiés par les compagnies pétrolières elles-mêmes (OK et Shell), comme l’exige la loi danoise. Ce ne sont pas des données de l’État',
+    reportLabel: 'Prévenir l’Autorité danoise de la concurrence et de la consommation',
+    reportNote: 'Les compagnies danoises doivent publier le prix à la pompe dès qu’il change.',
+  },
+  is: {
+    name: 'Islande',
+    nameInSentence: 'l’Islande',
+    about:
+      'L’Islande n’a pas de registre officiel des prix à la pompe. Pumpwise affiche les prix que les six compagnies pétrolières publient sur leurs propres sites (Atlantsolía, Costco, N1, Olís, ÓB et Orkan), relevés toutes les 15 minutes par le projet ouvert Gasvaktin. Les remises des cartes de fidélité ne sont pas incluses. La liste donne les prix en vigueur mais pas le moment où chacun a été fixé : Pumpwise les présente donc comme des prix actuels.',
+    credit: 'Prix des sites des compagnies pétrolières elles-mêmes, relevés par Gasvaktin (licence MIT). Ce ne sont pas des données de l’État',
+    reportLabel: 'Vérifier sur gasvaktin.is',
+    reportNote: 'Les prix islandais viennent du site de chaque compagnie pétrolière.',
+  },
 };
 
 const PT: Record<RegionId, RegionText> = {
@@ -313,6 +347,24 @@ const PT: Record<RegionId, RegionText> = {
     credit: 'Fonte: Ministério da Economia da República da Croácia, portal de preços minGO. O Pumpwise não é um serviço oficial do Ministério',
     reportLabel: 'Verificar em mzoe-gor.hr',
     reportNote: 'Os postos croatas têm de comunicar os seus preços ao portal de preços do Ministério da Economia.',
+  },
+  dk: {
+    name: 'Dinamarca',
+    nameInSentence: 'a Dinamarca',
+    about:
+      'Na Dinamarca cada empresa de combustíveis tem de publicar o preço atual na bomba de cada um dos seus postos assim que muda. O Pumpwise lê os serviços públicos de preços das próprias empresas, por agora os da OK e da Shell, pelo que os postos de outras marcas ainda não aparecem. São os valores das próprias empresas, não dados do Governo.',
+    credit: 'Preços publicados pelas próprias empresas de combustíveis (OK e Shell), como exige a lei dinamarquesa. Não são dados do Governo',
+    reportLabel: 'Avisar a Autoridade dinamarquesa da Concorrência e do Consumo',
+    reportNote: 'As empresas dinamarquesas têm de publicar o preço na bomba assim que muda.',
+  },
+  is: {
+    name: 'Islândia',
+    nameInSentence: 'a Islândia',
+    about:
+      'A Islândia não tem um registo oficial dos preços na bomba. O Pumpwise mostra os preços que as seis empresas de combustíveis publicam nos seus próprios sites (Atlantsolía, Costco, N1, Olís, ÓB e Orkan), recolhidos de 15 em 15 minutos pelo projeto aberto Gasvaktin. Os descontos dos cartões de fidelização não estão incluídos. A lista dá os preços em vigor mas não quando cada um foi fixado, por isso o Pumpwise mostra-os como preços atuais.',
+    credit: 'Preços dos sites das próprias empresas de combustíveis, recolhidos pelo Gasvaktin (licença MIT). Não são dados do Governo',
+    reportLabel: 'Verificar em gasvaktin.is',
+    reportNote: 'Os preços islandeses vêm do site de cada empresa de combustíveis.',
   },
 };
 

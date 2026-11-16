@@ -503,6 +503,74 @@ Pumpwise is available worldwide, but official prices exist only in the places li
 No account and no in-app purchases. One small banner ad on the Nearby tab. Location is used only while the app is open and never leaves the device.
 ```
 
+## Version 1.3.0: Denmark and Iceland
+
+1.3 reads feed v5 and adds **Denmark** and **Iceland**. These two are not government prices. Denmark shows the prices OK and Shell publish themselves (Danish law makes fuel companies publish them); Iceland shows the companies' website prices as collected by the open project Gasvaktin. The app says so on every screen with those prices. Prices are in kroner: 16,09 kr. in Denmark, 252,2 kr. in Iceland. Build it with the GitHub "iPhone build" workflow, branch **main**. Do not submit until 1.2 is approved and released, and only on the owner's say so.
+
+### In App Store Connect
+
+1. Create version **1.3.0** once 1.2 is released, and pick the new build.
+2. **Pricing and Availability**: add the **Iceland** storefront (it was left out of 1.2 because Pumpwise had no prices there).
+3. Paste What's New below in each language. In each description, add Denmark and Iceland to the list of places, and where the text says every price is an official government price, add the sentence given under each language.
+4. This is also the version to add the Spanish (Spain), Spanish (Mexico), French and Portuguese (Portugal) listings from the 1.2 section above, if they were not added with 1.2.
+
+### English (Australia, U.K., U.S.)
+
+**What's New**
+```
+Pumpwise now covers Denmark and Iceland.
+
+In Denmark you see the prices OK and Shell publish for their own stations. In Iceland you see each fuel company's listed price. These come from the companies, not from a government, and the app says so wherever they appear.
+```
+**Add to the description**
+```
+In Denmark and Iceland the prices come from the fuel companies themselves, not from a government.
+```
+
+### Spanish (Spain and Mexico)
+
+**What's New**
+```
+Pumpwise ya cubre Dinamarca e Islandia.
+
+En Dinamarca verás los precios que OK y Shell publican para sus propias estaciones. En Islandia verás el precio de lista de cada compañía. Estos precios vienen de las compañías, no de un gobierno, y la app lo indica allí donde aparecen.
+```
+**Add to the description**
+```
+En Dinamarca e Islandia los precios vienen de las propias compañías de carburantes, no de un gobierno.
+```
+
+### French
+
+**What's New**
+```
+Pumpwise couvre maintenant le Danemark et l’Islande.
+
+Au Danemark, vous voyez les prix que OK et Shell publient pour leurs propres stations. En Islande, vous voyez le prix affiché par chaque compagnie. Ces prix viennent des compagnies, pas d’un gouvernement, et l’app le précise partout où ils apparaissent.
+```
+**Add to the description**
+```
+Au Danemark et en Islande, les prix viennent des compagnies pétrolières et non d’un gouvernement.
+```
+
+### Portuguese (Portugal)
+
+**What's New**
+```
+O Pumpwise já cobre a Dinamarca e a Islândia.
+
+Na Dinamarca vê os preços que a OK e a Shell publicam para os seus próprios postos. Na Islândia vê o preço de tabela de cada empresa. Estes preços vêm das empresas, não de um governo, e a app indica isso sempre que aparecem.
+```
+**Add to the description**
+```
+Na Dinamarca e na Islândia os preços vêm das próprias empresas de combustíveis, não de um governo.
+```
+
+### Review notes for 1.3 (add to the 1.2 notes)
+```
+New in 1.3: Denmark and Iceland. These prices are not government data. In Denmark they come from the public price services that OK and Shell run for their own stations. In Iceland they are each fuel company's website price, collected by the open project Gasvaktin. The app credits them this way on every screen where they appear, and the sources are listed at https://pumpwiseapp.com/data-licences.html. To see them, tap "Choose a place" and pick Copenhagen or Reykjavík.
+```
+
 ## ASO check for 1.1 (ASO.dev plugin skills, 3 November 2026)
 
 Checked with the ASO.dev `metadata-validation`, `keyword-research` and `whats-new-release-notes` rules. Pumpwise isn't live yet, so there are no rankings, ratings or downloads to score; this covers the text only.

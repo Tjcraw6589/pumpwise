@@ -19,9 +19,11 @@ import {
   type RegionId,
   type RegionStatus,
 } from '../../src/lib/feed.ts';
+import { DK_MIN_STATIONS, fetchDk } from './sources/dk.ts';
 import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
 import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
 import { fetchHr, HR_MIN_STATIONS } from './sources/hr.ts';
+import { fetchIs, IS_MIN_STATIONS } from './sources/is.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
 import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
 import { fetchPt, PT_MIN_STATIONS } from './sources/pt.ts';
@@ -100,6 +102,11 @@ const SOURCES: Source[] = [
   { id: 'si', regions: ['si'], everyMinutes: 170, minStations: SI_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchSi(now), tomorrow: false }) },
   // Croatia: one 330 KB file the Ministry rebuilds about every 20 minutes; most prices change once a week.
   { id: 'hr', regions: ['hr'], everyMinutes: 55, minStations: HR_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchHr(now), tomorrow: false }) },
+  // Denmark: the fuel companies' own public price APIs (OK and Shell), one request each. OK lets answers be
+  // cached for two minutes; prices change a few times a day, so every other run.
+  { id: 'dk', regions: ['dk'], everyMinutes: 25, minStations: DK_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchDk(now), tomorrow: false }) },
+  // Iceland: one 45 KB file Gasvaktin rebuilds every 15 minutes from the fuel companies' websites.
+  { id: 'is', regions: ['is'], everyMinutes: 25, minStations: IS_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIs(now), tomorrow: false }) },
   {
     id: 'uk',
     regions: ['uk'],
@@ -176,9 +183,9 @@ function writeData(feed: BuiltFeed, dataDir: string): void {
 }
 
 /**
- * The site and every published feed version: data/v4 with every region (plus one bundle file per
- * region, for the next run to reuse), data/v3 for Pumpwise 1.1 and data/v2 for 1.0, each limited to
- * the regions its app knows.
+ * The site and every published feed version: data/v5 with every region (plus one bundle file per
+ * region, for the next run to reuse), data/v4 for Pumpwise 1.2, data/v3 for 1.1 and data/v2 for 1.0,
+ * each limited to the regions its app knows.
  */
 export function writeSite(
   stations: FeedStation[],

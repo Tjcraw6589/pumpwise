@@ -16,7 +16,7 @@ on:
       ref:
         description: Branch to build
         required: true
-        default: regions-1.2
+        default: main
       testflight:
         description: Upload to TestFlight when the build succeeds
         type: boolean

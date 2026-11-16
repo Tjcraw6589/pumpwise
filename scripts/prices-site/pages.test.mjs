@@ -293,3 +293,23 @@ test('regions without price times show when their prices were collected, not whe
   const html = buildSite(m, { mx }).files.get('mexico/zapopan/index.html');
   assert.match(html, /<time class="upd" datetime="2026-11-12T18:00:00.000Z"/);
 });
+
+test('Denmark and Iceland: kroner the local way, and prices credited to the companies, not a government', () => {
+  const dk = [];
+  for (let i = 0; i < 4; i++) dk.push(st('dk', 'Odense', 55.4 + i / 1000, 10.39, { regular: 1609, diesel: 1829 }));
+  const is = [];
+  for (let i = 0; i < 4; i++) is.push(st('is', 'Akureyri', 65.68 + i / 1000, -18.1, { regular: 25220, diesel: 31420 }));
+  const { files } = buildSite(meta(['dk', 'is']), { dk, is });
+  const dkPage = files.get('denmark/odense/index.html');
+  const isPage = files.get('iceland/akureyri/index.html');
+  assert.ok(dkPage && isPage);
+  assert.match(dkPage, /16,09 kr\.|16,09 kr\./);
+  assert.match(isPage, /252,2 kr\.|252,2 kr\./);
+  for (const page of [dkPage, isPage]) {
+    assert.match(page, /not government data/);
+    assert.match(page, /data-k="disclaimerCompany"/);
+    assert.doesNotMatch(page, /official/i);
+  }
+  assert.match(dkPage, /data-k="dkOnly"/);
+  assert.ok(!isPage.includes('data-k="dkOnly"'));
+});

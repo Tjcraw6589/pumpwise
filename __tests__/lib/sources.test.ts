@@ -285,16 +285,20 @@ describe('published feed versions', () => {
     tags: [],
     prices: { regular: { p: 170, at: NOW.toISOString() } },
   });
-  const stations = [station('wa-1', 'wa', -31.95, 115.86), station('nsw-1', 'nsw', -33.87, 151.21), station('es-1', 'es', 40.42, -3.7), station('mx-1', 'mx', 19.43, -99.13)];
+  const stations = [station('wa-1', 'wa', -31.95, 115.86), station('nsw-1', 'nsw', -33.87, 151.21), station('es-1', 'es', 40.42, -3.7), station('mx-1', 'mx', 19.43, -99.13), station('dk-1', 'dk', 55.68, 12.57)];
   const live: RegionStatus = { status: 'live', updatedAt: NOW.toISOString(), stationCount: 1, tomorrow: false };
-  const regions = { wa: live, nsw: live, es: live, mx: live };
+  const regions = { wa: live, nsw: live, es: live, mx: live, dk: live };
 
   test('the newest version carries every region; older versions only the regions their apps know', () => {
-    expect(PUBLISHED_FEEDS.map((p) => p.version)).toEqual([LATEST_FEED_VERSION, 3, 2]);
-    const [v4, v3, v2] = PUBLISHED_FEEDS.map((p) => feedForVersion(stations, regions, NOW, p));
+    expect(PUBLISHED_FEEDS.map((p) => p.version)).toEqual([LATEST_FEED_VERSION, 4, 3, 2]);
+    const [v5, v4, v3, v2] = PUBLISHED_FEEDS.map((p) => feedForVersion(stations, regions, NOW, p));
+    expect(v5?.meta.v).toBe(5);
+    expect(Object.keys(v5?.meta.regions ?? {}).sort()).toEqual(['dk', 'es', 'mx', 'nsw', 'wa']);
+    expect(v5?.meta.stationCount).toBe(5);
     expect(v4?.meta.v).toBe(4);
     expect(Object.keys(v4?.meta.regions ?? {}).sort()).toEqual(['es', 'mx', 'nsw', 'wa']);
     expect(v4?.meta.stationCount).toBe(4);
+    expect(v4?.tiles.flatMap((t) => t.stations).some((s) => s.region === 'dk')).toBe(false);
     expect(v3?.meta.v).toBe(3);
     expect(Object.keys(v3?.meta.regions ?? {}).sort()).toEqual(['nsw', 'wa']);
     expect(v3?.tiles.flatMap((t) => t.stations).map((s) => s.region).sort()).toEqual(['nsw', 'wa']);

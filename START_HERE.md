@@ -66,6 +66,10 @@ Queensland gives its prices to apps that sign up as a "publisher" at https://www
 
 If that is fine with you, follow the checklist page's Queensland task. If not, Queensland simply stays off; nothing else is affected. The full register of every source's licence is in LEGAL.md.
 
+## Denmark and Iceland (added 16 November 2026, app version 1.3)
+
+Both are on the website now and in the app from version 1.3 (feed v5). They are company prices, not government prices, and the app and website say so. Denmark has OK and Shell stations only for now; other Danish companies publish prices without map positions, so they come later. The store text for 1.3 is in STORE_LISTING.md under "Version 1.3.0". Build 1.3 with the "iPhone build" workflow, branch **main**. Do not submit it until 1.2 is released.
+
 ## Adding more places later
 
 - **Spain, France, Portugal and Mexico**: live in feed v4 since November 2026; version 1.2 shows them in Spanish, French and Portuguese.

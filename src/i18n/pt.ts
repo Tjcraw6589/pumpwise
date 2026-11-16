@@ -142,6 +142,8 @@ export const pt: Strings = {
   'country.GB': 'Reino Unido',
   'country.SI': 'Eslovénia',
   'country.HR': 'Croácia',
+  'country.DK': 'Dinamarca',
+  'country.IS': 'Islândia',
   'state.lookAround': (city: string) => `Ver ${city}`,
   'state.regionDownTitle': 'Os preços estão a caminho',
   'state.regionDownBody': (region: string) => `Não foi possível recolher os preços de ${region} agora. Costumam voltar dentro de uma hora.`,

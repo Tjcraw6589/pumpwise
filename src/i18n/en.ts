@@ -139,6 +139,8 @@ export const en = {
   'country.GB': 'United Kingdom',
   'country.SI': 'Slovenia',
   'country.HR': 'Croatia',
+  'country.DK': 'Denmark',
+  'country.IS': 'Iceland',
   'state.lookAround': (city: string) => `Look around ${city}`,
   'state.regionDownTitle': 'Prices are on their way',
   'state.regionDownBody': (region: string) => `${region} prices couldn't be collected just now. They usually come back within the hour.`,

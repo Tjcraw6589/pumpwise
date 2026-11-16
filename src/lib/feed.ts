@@ -7,14 +7,14 @@
  */
 
 /** The feed version this build of the app reads (its app.json `extra.feedUrl` must match). */
-export const FEED_VERSION = 4;
+export const FEED_VERSION = 5;
 /**
  * Version 2 of the feed (Western Australia only) stays online for Pumpwise 1.0, which can't read
  * the regions added since. It is published alongside the newer versions at data/v2.
  */
 export const LEGACY_VERSION = 2;
 /** The newest feed version, with every region. The feed job reads the previous run's prices from it. */
-export const LATEST_FEED_VERSION = 4;
+export const LATEST_FEED_VERSION = 5;
 /** Stations are grouped into square tiles of this many degrees, so the app downloads only its area. */
 export const TILE_DEG = 0.5;
 
@@ -26,12 +26,14 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr';
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is';
 /**
  * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
  * Slovenia before Croatia).
  */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
+/** The regions Pumpwise 1.2 was built with; only these go into the version 4 feed. */
+export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
 /** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
 export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
 
@@ -42,6 +44,7 @@ export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
  */
 export const PUBLISHED_FEEDS: readonly { version: number; regions: readonly RegionId[] | 'all' }[] = [
   { version: LATEST_FEED_VERSION, regions: 'all' },
+  { version: 4, regions: V4_REGION_IDS },
   { version: 3, regions: ['wa', 'nsw', 'tas', 'uk'] },
   { version: LEGACY_VERSION, regions: LEGACY_REGION_IDS },
 ];
@@ -111,6 +114,16 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
   // Croatia: one box round its crescent. It takes in Bosnia and Herzegovina and the edges of its other
   // neighbours, where Pumpwise has no prices anyway.
   hr: [{ minLat: 42.35, maxLat: 46.56, minLng: 13.45, maxLng: 19.45 }],
+  // Denmark in boxes that stop at the German border (Flensburg is out, Padborg and Sønderborg are in)
+  // and short of the Swedish coast across the Øresund. Greenland and the Faroe Islands are not covered.
+  dk: [
+    { minLat: 54.8, maxLat: 57.8, minLng: 8.0, maxLng: 10.95 }, // Jutland and Funen
+    { minLat: 54.72, maxLat: 54.8, minLng: 10.2, maxLng: 10.95 }, // Ærø and the south of Langeland
+    { minLat: 54.55, maxLat: 56.2, minLng: 10.95, maxLng: 12.65 }, // Zealand, Lolland, Falster and Møn
+    { minLat: 56.2, maxLat: 57.8, minLng: 10.95, maxLng: 11.7 }, // Anholt and Læsø
+    { minLat: 54.95, maxLat: 55.35, minLng: 14.6, maxLng: 15.25 }, // Bornholm
+  ],
+  is: [{ minLat: 63.2, maxLat: 66.6, minLng: -24.6, maxLng: -13.4 }],
 };
 
 /** Who owns each region's prices and what their licence asks for; written into every feed's meta.json. */
@@ -201,6 +214,20 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     attribution: 'Ministry of Economy of the Republic of Croatia, minGO fuel price portal (www.min-go.hr, mzoe-gor.hr); prices in force when the feed last collected them, filtered and sorted by Pumpwise, which is not a service of the Ministry and is not endorsed by it',
     reuse: 'owner-terms',
   },
+  dk: {
+    owner: 'The Danish fuel companies (OK a.m.b.a. and Shell stations in Denmark), each for its own stations',
+    licence: 'No written licence. Danish price rules (brændstofprisbekendtgørelsen § 16a, in force since January 2026) require each fuel company to publish its current pump prices in a public API',
+    url: 'https://kfst.dk',
+    attribution: 'Prices published by the fuel companies in their own public price APIs (OK, Shell), as Danish law requires; each price carries the time the company last changed it. Not government data, and Pumpwise is not connected to these companies',
+    reuse: 'owner-terms',
+  },
+  is: {
+    owner: 'The Icelandic fuel companies (Atlantsolía, Costco, N1, Olís, ÓB, Orkan), collected by the Gasvaktin project',
+    licence: 'Gasvaktin is published under the MIT licence (Copyright (c) 2016 gasvaktin); the companies publish no licence for their prices',
+    url: 'https://github.com/gasvaktin/gasvaktin',
+    attribution: 'Prices from the fuel companies’ own websites, collected by Gasvaktin (github.com/gasvaktin/gasvaktin, MIT licence); prices in force when the feed last collected them. Not government data',
+    reuse: 'owner-terms',
+  },
 };
 
 /** First Sunday of a month at 02:00 Australian Eastern Standard Time (16:00 UTC the day before). */
@@ -251,7 +278,8 @@ export function isEuropeanSummerTime(date: Date): boolean {
 export interface FeedPrice {
   /**
    * Hundredths of the local currency per litre, one decimal place: pence or cents (139.9 means
-   * 1.399 a litre, and €1.659 is 165.9), or centavos in Mexico (24.59 pesos is 2459).
+   * 1.399 a litre, and €1.659 is 165.9), or centavos in Mexico (24.59 pesos is 2459). Danish and
+   * Icelandic kroner follow the same rule (16.09 kr. is 1609, 252.2 kr. is 25220).
    */
   p: number;
   /**

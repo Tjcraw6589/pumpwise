@@ -31,9 +31,10 @@ export interface RegionInfo {
   priceUnit: string;
   /**
    * How a price per litre is shown. Absent: hundredths with one decimal and `priceUnit` ("189.9c").
-   * 3: whole currency to three decimals, as on European pumps ("€1.659"). 2: two decimals ("$24.59").
+   * 3: whole currency to three decimals, as on European pumps ("€1.659"). 2: two decimals ("$24.59",
+   * "16,09 kr."). 1: one decimal, as Icelandic pumps write krónur ("252,2 kr.").
    */
-  priceDecimals?: 2 | 3;
+  priceDecimals?: 1 | 2 | 3;
   /** Prices on the pumps use a decimal comma ("1,659"): Spain, France, Portugal, Slovenia and Croatia. */
   decimalComma?: boolean;
   distanceUnit: DistanceUnit;
@@ -634,6 +635,99 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Šibenik', detail: 'Croatia', lat: 43.735, lng: 15.8952 },
     ],
   },
+  dk: {
+    id: 'dk',
+    name: 'Denmark',
+    currency: 'kr.',
+    currencyCode: 'DKK',
+    numberLocale: 'da-DK',
+    decimalComma: true,
+    priceUnit: 'øre',
+    priceDecimals: 2,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Blyfri 95', pumpCode: 'E10', description: 'Unleaded 95 with up to 10% ethanol', common: true },
+      { kind: 'diesel', label: 'Diesel', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'super', label: 'Oktan 98/100', pumpCode: '98+', description: 'Unleaded 98', common: true },
+      { kind: 'premium-diesel', label: 'Diesel premium', pumpCode: 'B7+', description: 'Branded diesel', common: true },
+      { kind: 'premium', label: 'Blyfri 95 E5', pumpCode: 'E5', description: 'Unleaded 95 (E5)', common: false },
+      { kind: 'hvo', label: 'HVO100', pumpCode: 'XTL', description: 'Renewable diesel', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    priceMode: 'reported',
+    // The companies must publish every change at once, so an old price is still the price on the pump.
+    pricesStand: true,
+    utcOffsetMinutes: (date) => (isEuropeanSummerTime(date) ? 120 : 60),
+    source: {
+      name: 'OK and Shell',
+      url: 'https://kfst.dk',
+      credit: 'Prices published by the fuel companies themselves (OK and Shell), as Danish law requires. Not government data',
+    },
+    report: {
+      label: 'Tell the Danish Competition and Consumer Authority',
+      url: 'https://kfst.dk',
+      note: 'Danish fuel companies must publish the price on the pump as soon as it changes.',
+    },
+    about:
+      'In Denmark each fuel company must publish the current pump price of every one of its stations as soon as it changes. Pumpwise reads the companies’ own public price services, for now those of OK and Shell, so other brands’ stations are not shown yet. These are the companies’ own figures, not government data.',
+    cities: [
+      { name: 'Copenhagen', detail: 'Denmark', lat: 55.6761, lng: 12.5683 },
+      { name: 'Aarhus', detail: 'Denmark', lat: 56.1629, lng: 10.2039 },
+      { name: 'Odense', detail: 'Denmark', lat: 55.4038, lng: 10.4024 },
+      { name: 'Aalborg', detail: 'Denmark', lat: 57.0488, lng: 9.9217 },
+      { name: 'Esbjerg', detail: 'Denmark', lat: 55.4765, lng: 8.4594 },
+      { name: 'Randers', detail: 'Denmark', lat: 56.4607, lng: 10.0364 },
+      { name: 'Kolding', detail: 'Denmark', lat: 55.4904, lng: 9.4722 },
+      { name: 'Horsens', detail: 'Denmark', lat: 55.8607, lng: 9.8503 },
+      { name: 'Vejle', detail: 'Denmark', lat: 55.7113, lng: 9.5357 },
+      { name: 'Roskilde', detail: 'Denmark', lat: 55.6415, lng: 12.0803 },
+    ],
+  },
+  is: {
+    id: 'is',
+    name: 'Iceland',
+    currency: 'kr.',
+    currencyCode: 'ISK',
+    numberLocale: 'is-IS',
+    decimalComma: true,
+    priceUnit: 'kr.',
+    priceDecimals: 1,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Bensín 95', pumpCode: '95', description: 'Unleaded 95', common: true },
+      { kind: 'diesel', label: 'Dísil', pumpCode: 'D', description: 'Standard diesel', common: true },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    // Gasvaktin lists the prices in force without the time each was set.
+    priceMode: 'current',
+    utcOffsetMinutes: () => 0,
+    source: {
+      name: 'Gasvaktin',
+      url: 'https://gasvaktin.is',
+      credit: 'Prices from the fuel companies’ own websites, collected by Gasvaktin (MIT licence). Not government data',
+    },
+    report: {
+      label: 'Check it on gasvaktin.is',
+      url: 'https://gasvaktin.is',
+      note: 'Icelandic prices come from each fuel company’s own website.',
+    },
+    about:
+      'Iceland has no government register of pump prices. Pumpwise shows the prices the six fuel companies publish on their own websites (Atlantsolía, Costco, N1, Olís, ÓB and Orkan), collected every 15 minutes by the open Gasvaktin project. Loyalty card discounts are left out. The list gives the prices in force but not when each was set, so Pumpwise shows them as current prices.',
+    cities: [
+      { name: 'Reykjavík', detail: 'Iceland', lat: 64.1466, lng: -21.9426 },
+      { name: 'Kópavogur', detail: 'Iceland', lat: 64.1101, lng: -21.907 },
+      { name: 'Hafnarfjörður', detail: 'Iceland', lat: 64.0671, lng: -21.9377 },
+      { name: 'Akureyri', detail: 'Iceland', lat: 65.6885, lng: -18.1262 },
+      { name: 'Reykjanesbær', detail: 'Iceland', lat: 63.9998, lng: -22.5583 },
+      { name: 'Selfoss', detail: 'Iceland', lat: 63.9331, lng: -20.9971 },
+      { name: 'Egilsstaðir', detail: 'Iceland', lat: 65.2669, lng: -14.3948 },
+      { name: 'Ísafjörður', detail: 'Iceland', lat: 66.075, lng: -23.135 },
+    ],
+  },
 };
 
 /** Every region, with its names and explanations in the phone's language. */
@@ -645,7 +739,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 export const DEFAULT_REGION: RegionId = 'wa';
 
 /** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
-export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR'> = {
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS'> = {
   wa: 'AU',
   nsw: 'AU',
   tas: 'AU',
@@ -657,6 +751,8 @@ export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' |
   pt: 'PT',
   si: 'SI',
   hr: 'HR',
+  dk: 'DK',
+  is: 'IS',
 };
 
 /** "Western Australia · Australia", or just "Spain" where the region is the whole country. */
@@ -675,7 +771,7 @@ export function regionsHereFirst(live: readonly RegionId[], here: RegionId | nul
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx', 'pt'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];
