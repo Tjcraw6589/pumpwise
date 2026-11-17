@@ -177,6 +177,9 @@ describe('Denmark, companies that publish an address only', () => {
     expect(drafts).toHaveLength(1);
     expect(drafts[0].station).toMatchObject({ id: 'dk-q8-8001', brand: 'F24', town: 'Svendborg' });
     expect(Object.keys(drafts[0].station.prices).sort()).toEqual(['diesel', 'premium', 'regular']);
+    const odd = buildDkQ8({ data: { stationsPrices: [{ stationId: '1', stationName: 'Q8', address: 'Nyropsgade 42 København v 1602 Danmark', products: [{ productName: 'GoEasy Diesel', price: 14.29, priceChangeDate: '2026-11-17T10:07:00Z' }] }] } }, now);
+    expect(odd[0].station.town).toBe('København V');
+    expect(odd[0].query).toBe('Nyropsgade 42, 1602 København v');
   });
 
   it('uses a saved position, asks again when the address moved, and waits after a miss', () => {

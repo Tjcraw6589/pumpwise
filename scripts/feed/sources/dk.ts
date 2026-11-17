@@ -191,8 +191,10 @@ export function buildDkQ8(body: unknown, now: Date): DkDraft[] {
     }
     if (Object.keys(prices).length === 0) continue;
     const brand = /f24/i.test(asString(raw.stationName)) ? 'F24' : 'Q8';
+    // Shown as "København V", not "København v", and without notes such as "(nord)". The lookup keeps the text as published.
+    const town = where.town.replace(/\s*\([^)]*\)\s*/g, ' ').trim().replace(/\s([a-zæøå])$/, (_, letter: string) => ` ${letter.toUpperCase()}`);
     drafts.push({
-      station: { id: `dk-q8-${id}`, region: 'dk', name: `${brand} ${where.town}`, brand, address: where.street, town: where.town, postcode: where.postcode, hours: null, tags: [], prices },
+      station: { id: `dk-q8-${id}`, region: 'dk', name: `${brand} ${town}`, brand, address: where.street, town, postcode: where.postcode, hours: null, tags: [], prices },
       query: `${where.street}, ${where.postcode} ${where.town}`,
     });
   }
