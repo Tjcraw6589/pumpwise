@@ -33,7 +33,9 @@ export function qcPrice(value: unknown): number | null {
 export function qcAddress(text: string): { street: string; town: string } {
   const parts = text.split(',').map((part) => part.replace(/\s+/g, ' ').trim()).filter(Boolean);
   if (parts.length < 2) return { street: parts[0] ?? '', town: '' };
-  return { street: parts.slice(0, -1).join(', '), town: tidyName(parts[parts.length - 1] ?? '', 'fr') };
+  // One spelling per town, so "Sainte-Catherine-De-La-Jacques-Cartier" and "…-de-la-…" share a page, and no "(ville & paroisse)".
+  const town = tidyName((parts[parts.length - 1] ?? '').replace(/\s*\([^)]*\)\s*/g, ' '), 'fr').replace(/-(De|Du|Des|La|Le|Les|Sur|Sous|En|Aux|Au|Et)(?=-)/g, (m) => m.toLowerCase());
+  return { street: parts.slice(0, -1).join(', '), town };
 }
 
 export function buildQcStations(body: unknown, now: Date): FeedStation[] {
