@@ -103,7 +103,7 @@ const SOURCES: Source[] = [
   { id: 'si', regions: ['si'], everyMinutes: 170, minStations: SI_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchSi(now), tomorrow: false }) },
   // Croatia: one 330 KB file the Ministry rebuilds about every 20 minutes; most prices change once a week.
   { id: 'hr', regions: ['hr'], everyMinutes: 55, minStations: HR_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchHr(now), tomorrow: false }) },
-  // Denmark: the fuel companies' own public price APIs (OK and Shell), one request each. OK lets answers be
+  // Denmark: the fuel companies' own public price APIs (OK, Shell, Circle K, Q8), one request each. OK lets answers be
   // cached for two minutes; prices change a few times a day, so every other run.
   { id: 'dk', regions: ['dk'], everyMinutes: 25, minStations: DK_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchDk(now), tomorrow: false }) },
   // Iceland: one 45 KB file Gasvaktin rebuilds every 15 minutes from the fuel companies' websites.

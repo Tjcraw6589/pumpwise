@@ -227,10 +227,10 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     reuse: 'owner-terms',
   },
   dk: {
-    owner: 'The Danish fuel companies (OK a.m.b.a. and Shell stations in Denmark), each for its own stations',
+    owner: 'The Danish fuel companies (OK, Shell, Circle K with INGO, Q8 with F24), each for its own stations',
     licence: 'No written licence. Danish price rules (brændstofprisbekendtgørelsen § 16a, in force since January 2026) require each fuel company to publish its current pump prices in a public API',
     url: 'https://kfst.dk',
-    attribution: 'Prices published by the fuel companies in their own public price APIs (OK, Shell), as Danish law requires; each price carries the time the company last changed it. Not government data, and Pumpwise is not connected to these companies',
+    attribution: 'Prices published by the fuel companies in their own public price APIs (OK, Shell, Circle K, Q8), as Danish law requires; each price carries the time the company last changed it. Circle K and Q8 station positions are found from their addresses with OpenStreetMap data (© OpenStreetMap contributors, ODbL). Not government data, and Pumpwise is not connected to these companies',
     reuse: 'owner-terms',
   },
   is: {

@@ -131,3 +131,69 @@ describe('Iceland: Gasvaktin', () => {
     expect(stations[0]?.prices).toEqual({ regular: { p: 25220, at: NOW.toISOString() }, diesel: { p: 31420, at: NOW.toISOString() } });
   });
 });
+
+describe('Denmark, companies that publish an address only', () => {
+  const { buildDkCircleK, buildDkQ8, dkQ8Address, placeDkDrafts, dkLookupResult } = require('../../scripts/feed/sources/dk.ts');
+  const now = new Date('2026-11-17T12:00:00Z');
+  const circleK = {
+    sites: [
+      {
+        id: '10105',
+        name: 'CIRCLE K SØNDERBRO,  AALBORG',
+        address: { street: 'Sønderbro 24', city: 'Aalborg', postalCode: '9000', country: 'DK' },
+        fuelPrices: [
+          { displayName: 'miles 95', price: 15.99, lastUpdated: '2026-11-17T09:59:13.406Z' },
+          { displayName: 'miles+ 95', price: 16.89, lastUpdated: '2026-11-17T09:59:13.406Z' },
+          { displayName: 'miles diesel', price: 14.49, lastUpdated: '2026-11-17T09:59:13.406Z' },
+          { displayName: 'miles+ diesel', price: 15.39, lastUpdated: '2026-11-17T09:59:13.406Z' },
+        ],
+      },
+      { id: '2', name: 'INGO Odense', address: { street: 'Vestergade 1', city: 'Odense', postalCode: '5000' }, fuelPrices: [{ displayName: 'miles 95', price: 15.5, lastUpdated: '2026-11-17T09:00:00Z' }] },
+    ],
+  };
+
+  it('reads Circle K and INGO with the right fuels and brand', () => {
+    const drafts = buildDkCircleK(circleK, now);
+    expect(drafts).toHaveLength(2);
+    expect(drafts[0].station).toMatchObject({ id: 'dk-ck-10105', brand: 'Circle K', town: 'Aalborg', postcode: '9000' });
+    expect(drafts[0].station.prices).toMatchObject({ regular: { p: 1599 }, premium: { p: 1689 }, diesel: { p: 1449 }, 'premium-diesel': { p: 1539 } });
+    expect(drafts[0].query).toBe('Sønderbro 24, 9000 Aalborg');
+    expect(drafts[1].station.brand).toBe('INGO');
+  });
+
+  it('splits a Q8 address', () => {
+    expect(dkQ8Address('Dronningemaen 34 Svendborg 5700 Danmark')).toEqual({ street: 'Dronningemaen 34', town: 'Svendborg', postcode: '5700' });
+    expect(dkQ8Address('Gl. Kongevej 12 A Frederiksberg C 1850 Danmark')).toEqual({ street: 'Gl. Kongevej 12 A', town: 'Frederiksberg C', postcode: '1850' });
+    expect(dkQ8Address('somewhere')).toBeNull();
+  });
+
+  it('reads Q8 and F24 and leaves out what is not road fuel', () => {
+    const drafts = buildDkQ8({ data: { stationsPrices: [{ stationId: '8001', stationName: 'F24', address: 'Dronningemaen 34 Svendborg 5700 Danmark', products: [
+      { productName: 'GoEasy 95 E10', price: 15.79, priceChangeDate: '2026-11-17T10:07:00Z' },
+      { productName: 'GoEasy 95 Extra E5', price: 17.29, priceChangeDate: '2026-11-17T10:07:00Z' },
+      { productName: 'GoEasy Diesel', price: 14.29, priceChangeDate: '2026-11-17T10:07:00Z' },
+      { productName: 'AdBlue', price: 9.5, priceChangeDate: '2026-11-17T10:07:00Z' },
+    ] }] } }, now);
+    expect(drafts).toHaveLength(1);
+    expect(drafts[0].station).toMatchObject({ id: 'dk-q8-8001', brand: 'F24', town: 'Svendborg' });
+    expect(Object.keys(drafts[0].station.prices).sort()).toEqual(['diesel', 'premium', 'regular']);
+  });
+
+  it('uses a saved position, asks again when the address moved, and waits after a miss', () => {
+    const drafts = buildDkCircleK(circleK, now);
+    const places = { 'dk-ck-10105': { a: 'Sønderbro 24, 9000 Aalborg', lat: 57.04, lng: 9.93 }, 'dk-ck-2': { a: 'Vestergade 1, 5000 Odense', miss: '2026-11-16' } };
+    const first = placeDkDrafts(drafts, places, now);
+    expect(first.stations).toHaveLength(1);
+    expect(first.stations[0]).toMatchObject({ lat: 57.04, lng: 9.93 });
+    expect(first.todo).toHaveLength(0);
+    expect(placeDkDrafts(drafts, places, new Date('2026-12-20T00:00:00Z')).todo).toHaveLength(1);
+    expect(placeDkDrafts(drafts, { 'dk-ck-10105': { a: 'Old road 1, 9000 Aalborg', lat: 57, lng: 9.9 } }, now).todo).toHaveLength(2);
+  });
+
+  it('refuses a lookup that is a whole town or outside Denmark', () => {
+    expect(dkLookupResult([{ lat: '57.0421', lon: '9.9312', place_rank: 30 }])).toMatchObject({ lat: 57.0421, lng: 9.9312, r: 30 });
+    expect(dkLookupResult([{ lat: '57.0421', lon: '9.9312', place_rank: 16 }])).toBeNull();
+    expect(dkLookupResult([{ lat: '48.85', lon: '2.35', place_rank: 30 }])).toBeNull();
+    expect(dkLookupResult([])).toBeNull();
+  });
+});

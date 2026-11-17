@@ -68,7 +68,7 @@ If that is fine with you, follow the checklist page's Queensland task. If not, Q
 
 ## Denmark and Iceland (added 16 November 2026, app version 1.3)
 
-Both are on the website now and in the app from version 1.3 (feed v5). They are company prices, not government prices, and the app and website say so. Denmark has OK and Shell stations only for now; other Danish companies publish prices without map positions, so they come later. The store text for 1.3 is in STORE_LISTING.md under "Version 1.3.0". Build 1.3 with the "iPhone build" workflow, branch **main**. Do not submit it until 1.2 is released.
+Both are on the website now and in the app from version 1.3 (feed v5). They are company prices, not government prices, and the app and website say so. Denmark has OK, Shell, Circle K with INGO and Q8 with F24 (the last two are placed on the map from their addresses, see LEGAL.md); Uno-X, OIL! and Go'on come later. The store text for 1.3 is in STORE_LISTING.md under "Version 1.3.0". Build 1.3 with the "iPhone build" workflow, branch **main**. Do not submit it until 1.2 is released.
 
 ## United Kingdom (added 17 November 2026: website now, app from 1.4)
 

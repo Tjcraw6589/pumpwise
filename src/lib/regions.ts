@@ -661,9 +661,9 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     pricesStand: true,
     utcOffsetMinutes: (date) => (isEuropeanSummerTime(date) ? 120 : 60),
     source: {
-      name: 'OK and Shell',
+      name: 'OK, Shell, Circle K and Q8',
       url: 'https://kfst.dk',
-      credit: 'Prices published by the fuel companies themselves (OK and Shell), as Danish law requires. Not government data',
+      credit: 'Prices published by the fuel companies themselves (OK, Shell, Circle K with INGO, Q8 with F24), as Danish law requires. Not government data',
     },
     report: {
       label: 'Tell the Danish Competition and Consumer Authority',
@@ -671,7 +671,7 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       note: 'Danish fuel companies must publish the price on the pump as soon as it changes.',
     },
     about:
-      'In Denmark each fuel company must publish the current pump price of every one of its stations as soon as it changes. Pumpwise reads the companies’ own public price services, for now those of OK and Shell, so other brands’ stations are not shown yet. These are the companies’ own figures, not government data.',
+      'In Denmark each fuel company must publish the current pump price of every one of its stations as soon as it changes. Pumpwise reads the companies’ own public price services, those of OK, Shell, Circle K with INGO and Q8 with F24; other brands’ stations are not shown yet. These are the companies’ own figures, not government data.',
     cities: [
       { name: 'Copenhagen', detail: 'Denmark', lat: 55.6761, lng: 12.5683 },
       { name: 'Aarhus', detail: 'Denmark', lat: 56.1629, lng: 10.2039 },

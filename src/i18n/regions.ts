@@ -113,8 +113,8 @@ const ES: Record<RegionId, RegionText> = {
   dk: {
     name: 'Dinamarca',
     about:
-      'En Dinamarca cada compañía de carburantes debe publicar el precio actual en el surtidor de cada una de sus gasolineras en cuanto cambia. Pumpwise lee los servicios públicos de precios de las propias compañías, por ahora los de OK y Shell, así que las gasolineras de otras marcas aún no aparecen. Son las cifras de las propias compañías, no datos del Gobierno.',
-    credit: 'Precios publicados por las propias compañías de carburantes (OK y Shell), como exige la ley danesa. No son datos del Gobierno',
+      'En Dinamarca cada compañía de carburantes debe publicar el precio actual en el surtidor de cada una de sus gasolineras en cuanto cambia. Pumpwise lee los servicios públicos de precios de las propias compañías, los de OK, Shell, Circle K con INGO y Q8 con F24; las gasolineras de otras marcas aún no aparecen. Son las cifras de las propias compañías, no datos del Gobierno.',
+    credit: 'Precios publicados por las propias compañías de carburantes (OK, Shell, Circle K con INGO, Q8 con F24), como exige la ley danesa. No son datos del Gobierno',
     reportLabel: 'Avisar a la Autoridad danesa de Competencia y Consumo',
     reportNote: 'Las compañías danesas deben publicar el precio del surtidor en cuanto cambia.',
   },
@@ -234,8 +234,8 @@ const FR: Record<RegionId, RegionText> = {
     name: 'Danemark',
     nameInSentence: 'le Danemark',
     about:
-      'Au Danemark, chaque compagnie pétrolière doit publier le prix à la pompe de chacune de ses stations dès qu’il change. Pumpwise lit les services publics de prix des compagnies elles-mêmes, pour l’instant ceux d’OK et de Shell : les stations des autres marques ne sont pas encore affichées. Ce sont les chiffres des compagnies, pas des données de l’État.',
-    credit: 'Prix publiés par les compagnies pétrolières elles-mêmes (OK et Shell), comme l’exige la loi danoise. Ce ne sont pas des données de l’État',
+      'Au Danemark, chaque compagnie pétrolière doit publier le prix à la pompe de chacune de ses stations dès qu’il change. Pumpwise lit les services publics de prix des compagnies elles-mêmes, ceux d’OK, de Shell, de Circle K avec INGO et de Q8 avec F24 ; les stations des autres marques ne sont pas encore affichées. Ce sont les chiffres des compagnies, pas des données de l’État.',
+    credit: 'Prix publiés par les compagnies pétrolières elles-mêmes (OK, Shell, Circle K avec INGO, Q8 avec F24), comme l’exige la loi danoise. Ce ne sont pas des données de l’État',
     reportLabel: 'Prévenir l’Autorité danoise de la concurrence et de la consommation',
     reportNote: 'Les compagnies danoises doivent publier le prix à la pompe dès qu’il change.',
   },
@@ -352,8 +352,8 @@ const PT: Record<RegionId, RegionText> = {
     name: 'Dinamarca',
     nameInSentence: 'a Dinamarca',
     about:
-      'Na Dinamarca cada empresa de combustíveis tem de publicar o preço atual na bomba de cada um dos seus postos assim que muda. O Pumpwise lê os serviços públicos de preços das próprias empresas, por agora os da OK e da Shell, pelo que os postos de outras marcas ainda não aparecem. São os valores das próprias empresas, não dados do Governo.',
-    credit: 'Preços publicados pelas próprias empresas de combustíveis (OK e Shell), como exige a lei dinamarquesa. Não são dados do Governo',
+      'Na Dinamarca cada empresa de combustíveis tem de publicar o preço atual na bomba de cada um dos seus postos assim que muda. O Pumpwise lê os serviços públicos de preços das próprias empresas, os da OK, da Shell, da Circle K com INGO e da Q8 com F24; os postos de outras marcas ainda não aparecem. São os valores das próprias empresas, não dados do Governo.',
+    credit: 'Preços publicados pelas próprias empresas de combustíveis (OK, Shell, Circle K com INGO, Q8 com F24), como exige a lei dinamarquesa. Não são dados do Governo',
     reportLabel: 'Avisar a Autoridade dinamarquesa da Concorrência e do Consumo',
     reportNote: 'As empresas dinamarquesas têm de publicar o preço na bomba assim que muda.',
   },

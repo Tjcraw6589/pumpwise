@@ -51,6 +51,18 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
+      # The Stats page's history lives on the "stats" branch: one line of averages per day. It is checked
+      # out here, read and updated by the price pages step, and committed back below. If the branch cannot
+      # be checked out the page is drawn from today alone and nothing is saved.
+      # The same branch keeps dk-places.json: where the Danish stations that publish only an address are
+      # (see scripts/feed/sources/dk.ts), so each address is looked up once.
+      - name: Fetch the saved daily averages
+        id: stats
+        continue-on-error: true
+        uses: actions/checkout@v7
+        with:
+          ref: stats
+          path: .stats
       - name: Build the feed and site
         run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/feed/build.ts
         env:
@@ -59,19 +71,10 @@ jobs:
           NSW_FUEL_API_KEY: ${{ secrets.NSW_FUEL_API_KEY }}
           NSW_FUEL_API_SECRET: ${{ secrets.NSW_FUEL_API_SECRET }}
           QLD_FUEL_API_TOKEN: ${{ secrets.QLD_FUEL_API_TOKEN }}
+          GEO_DIR: ${{ steps.stats.outcome == 'success' && '.stats' || '' }}
       # Fuel price pages for the website (prices/: one page per town and city, made from the feed that
       # was just built). Allowed to fail and limited to 3 minutes: if it goes wrong, the feed and the
       # rest of the site are published as usual, only without these pages.
-      # The Stats page's history lives on the "stats" branch: one line of averages per day. It is checked
-      # out here, read and updated by the price pages step, and committed back below. If the branch cannot
-      # be checked out the page is drawn from today alone and nothing is saved.
-      - name: Fetch the saved daily averages
-        id: stats
-        continue-on-error: true
-        uses: actions/checkout@v7
-        with:
-          ref: stats
-          path: .stats
       - name: Price pages for the website
         continue-on-error: true
         timeout-minutes: 3
@@ -86,10 +89,15 @@ jobs:
         working-directory: .stats
         run: |
           git add history.json
+          if [ -f dk-places.json ]; then git add dk-places.json; fi
           if git diff --cached --quiet; then exit 0; fi
           today=$(date -u +%F)
           last=$(git log -1 --format=%ct)
-          if ! git log -1 --format=%s | grep -q "$today" || [ $(( $(date +%s) - last )) -gt 10800 ]; then
+          # Newly found station positions are always saved, so no address is looked up twice.
+          if ! git diff --cached --quiet -- dk-places.json 2>/dev/null; then
+            git -c user.name="Pumpwise feed" -c user.email="pumpwiseapp@gmail.com" commit -q -m "Station positions $today"
+            git push -q origin HEAD:stats
+          elif ! git log -1 --format=%s | grep -q "$today" || [ $(( $(date +%s) - last )) -gt 10800 ]; then
             git -c user.name="Pumpwise feed" -c user.email="pumpwiseapp@gmail.com" commit -q -m "Daily averages $today"
             git push -q origin HEAD:stats
           fi
