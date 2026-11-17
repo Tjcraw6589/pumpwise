@@ -1731,7 +1731,8 @@ ${noindex ? '' : `<meta property="og:url" content="${esc(canonical)}">\n`}<meta 
 <meta property="article:modified_time" content="${esc(modified)}">
 <meta name="theme-color" content="#101820" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101820" media="(prefers-color-scheme: dark)">
-<link rel="icon" type="image/png" href="${BASE}/favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="${SITE_BASE}/favicon.png">
+<link rel="apple-touch-icon" href="${SITE_BASE}/apple-touch-icon.png">
 <link rel="stylesheet" href="${BASE}/style.css">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
 <script src="${BASE}/site.js" defer></script>
@@ -2163,7 +2164,8 @@ export function fallbackRoot() {
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pumpwise">
 <meta name="theme-color" content="#101820">
-<link rel="icon" type="image/png" href="${SITE_BASE}/favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="${SITE_BASE}/favicon.png">
+<link rel="apple-touch-icon" href="${SITE_BASE}/apple-touch-icon.png">
 ${ADSENSE_CLIENT ? `<meta name="google-adsense-account" content="${ADSENSE_CLIENT}">\n<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>\n` : ''}<style>
 ${STYLE}
 </style>
