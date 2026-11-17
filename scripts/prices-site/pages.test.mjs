@@ -353,7 +353,7 @@ test('Stats page: countries compared in euros, a trend from the saved days, and 
 
 test('Pages say how often their prices are checked', () => {
   const fr = [];
-  for (let i = 0; i < 4; i++) fr.push(st('fr', 'Lyon', 45.75 + i / 1000, 4.85, { e10: 190 + i }));
+  for (let i = 0; i < 4; i++) fr.push(st('fr', 'Lyon', 45.75 + i / 1000, 4.85, { regular: 190 + i }));
   const mx = [];
   for (let i = 0; i < 4; i++) mx.push(st('mx', 'Puebla', 19.04 + i / 1000, -98.2, { regular: 2300 + i }));
   const { files } = buildSite(meta(['fr', 'mx']), { fr, mx });
