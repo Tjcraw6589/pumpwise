@@ -1127,6 +1127,68 @@ function siteMain(D) {
     return nm ? nm.textContent : '';
   }
   const onLanguage = [];
+  // Stats page: the country comparison in the visitor's choice of currency, per litre or per US gallon.
+  // Every figure carries its value in euro cents a litre (data-e); the rates travel with the section.
+  const rankBox = document.getElementById('rank');
+  if (rankBox && rankBox.getAttribute('data-fx')) {
+    let rates = {};
+    try {
+      rates = JSON.parse(rankBox.getAttribute('data-fx'));
+    } catch (err) {
+      rates = { EUR: 1 };
+    }
+    const curSel = document.getElementById('cursel');
+    const unitSel = document.getElementById('unitsel');
+    const curNames = () => {
+      let names = null;
+      try {
+        names = new Intl.DisplayNames([L], { type: 'currency' });
+      } catch (err) {
+        names = null;
+      }
+      all('option', curSel).forEach((o) => {
+        let nm = '';
+        try {
+          nm = names ? names.of(o.value) : '';
+        } catch (err) {
+          nm = '';
+        }
+        o.textContent = nm && nm !== o.value ? o.value + ' · ' + nm.charAt(0).toUpperCase() + nm.slice(1) : o.value;
+      });
+    };
+    const paint = () => {
+      const cur = rates[curSel.value] > 0 ? curSel.value : 'EUR';
+      const per = unitSel.value === 'g' ? 3.785411784 : 1;
+      all('.cv', rankBox).forEach((el) => {
+        const v = (Number(el.getAttribute('data-e')) / 100) * rates[cur] * per;
+        const digits = v < 10 ? (per === 1 ? 3 : 2) : v < 1000 ? 2 : 0;
+        let text = '';
+        try {
+          text = new Intl.NumberFormat(L, { style: 'currency', currency: cur, minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v);
+        } catch (err) {
+          text = v.toFixed(digits) + ' ' + cur;
+        }
+        el.textContent = text;
+      });
+    };
+    const savedCur = store.get('pw-cur');
+    if (savedCur && rates[savedCur] > 0) curSel.value = savedCur;
+    if (store.get('pw-unit') === 'g') unitSel.value = 'g';
+    curNames();
+    paint();
+    curSel.addEventListener('change', () => {
+      store.set('pw-cur', curSel.value);
+      paint();
+    });
+    unitSel.addEventListener('change', () => {
+      store.set('pw-unit', unitSel.value);
+      paint();
+    });
+    onLanguage.push(() => {
+      curNames();
+      paint();
+    });
+  }
   function apply(l) {
     L = l;
     all('[data-k]').forEach((el) => {

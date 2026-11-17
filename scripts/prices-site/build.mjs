@@ -54,9 +54,24 @@ try {
   const xml = await fetch('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', { signal: AbortSignal.timeout(10000) }).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))));
   const rates = {};
   for (const m of xml.matchAll(/currency='([A-Z]{3})'\s+rate='([0-9.]+)'/g)) rates[m[1]] = Number(m[2]);
-  const want = ['USD', 'AUD', 'MXN', 'DKK', 'ISK', 'GBP'];
-  if (want.every((c) => rates[c] > 0)) {
-    fx = Object.fromEntries(want.map((c) => [c, rates[c]]));
+  // Every currency of a country whose App Store offers Pumpwise. The bank lists most of them; the rest are
+  // filled from a free daily table (fawazahmed0/currency-api, public domain), and three are pegged by law.
+  const want = ['USD', 'AUD', 'CAD', 'MXN', 'GBP', 'CHF', 'DKK', 'SEK', 'NOK', 'PLN', 'CZK', 'HUF', 'RON', 'ISK', 'GTQ', 'BZD', 'HNL', 'NIO', 'CRC', 'ALL', 'BAM', 'MDL', 'MKD', 'RSD', 'UAH'];
+  const core = ['USD', 'AUD', 'MXN', 'DKK', 'ISK'];
+  if (core.every((c) => rates[c] > 0)) {
+    if (!(rates.BAM > 0)) rates.BAM = 1.95583;
+    if (!(rates.BZD > 0)) rates.BZD = rates.USD * 2;
+    const missing = want.filter((c) => !(rates[c] > 0));
+    if (missing.length) {
+      try {
+        const table = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.min.json', { signal: AbortSignal.timeout(10000) }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))));
+        // Used only where it agrees with the bank on the dollar to within 2%, as a check that it is sane.
+        if (table.eur && Math.abs(table.eur.usd / rates.USD - 1) < 0.02) for (const c of missing) if (table.eur[c.toLowerCase()] > 0) rates[c] = Number(table.eur[c.toLowerCase()].toPrecision(6));
+      } catch (e) {
+        console.log(`Stats: extra exchange rates not read (${e.message})`);
+      }
+    }
+    fx = Object.fromEntries(want.filter((c) => rates[c] > 0).map((c) => [c, rates[c]]));
     fxDate = /time='(\d{4}-\d{2}-\d{2})'/.exec(xml)?.[1] ?? null;
   }
 } catch (e) {

@@ -14,7 +14,6 @@ const PETROL = ['regular', 'e10', 'premium', 'super'];
 const DIESEL = ['diesel', 'premium-diesel'];
 /** Each region's currency, as the European Central Bank names it. */
 export const CURRENCY = { wa: 'AUD', nsw: 'AUD', tas: 'AUD', qld: 'AUD', uk: 'GBP', es: 'EUR', fr: 'EUR', pt: 'EUR', si: 'EUR', hr: 'EUR', mx: 'MXN', dk: 'DKK', is: 'ISK' };
-const LITRES_PER_US_GALLON = 3.785411784;
 const FILL = 50;
 const BRAND_MIN = 8;
 const TOWN_MIN = 3;
@@ -25,10 +24,11 @@ export const STATS_WORDS = {
     statsNav: 'Stats', statsH1: 'Fuel price statistics',
     statsLead: 'What {n} stations in {k} countries and states charge today, and how prices are moving. Worked out from the same prices as the rest of Pumpwise and refreshed through the day.',
     tileStations: 'stations tracked', tilePlaces: 'towns and cities', tileRegions: 'countries and states', tilePrices: 'prices on record today',
-    rankH: 'Where fuel costs least today', rankSub: 'average, in euros per litre', petrolWord: 'Petrol', dieselWord: 'Diesel',
-    fxNote: 'Prices are converted with the European Central Bank reference rates of {d}. Each bar is the average of every station with a current price.',
+    rankH: 'Where fuel costs least today', rankSub: 'average of every station',
+    curPick: 'Show prices in', perL: 'per litre', perG: 'per US gallon', petrolWord: 'Petrol', dieselWord: 'Diesel',
+    fxNote: 'Prices are converted with the European Central Bank reference rates of {d}. Currencies the bank does not list use open market rates. Each bar is the average of every station with a current price.',
     noFx: 'Exchange rates could not be read just now, so countries are not compared on this visit.',
-    showNumbers: 'Show the numbers', thPlace: 'Country or state', thLocal: 'Local price', thEur: 'Euros per litre', thUsd: 'US dollars per US gallon',
+    showNumbers: 'Show the numbers', thPlace: 'Country or state', thLocal: 'Local price', thEur: 'Chosen currency',
     trendH: 'How prices are moving', trendSub: 'average each day, per litre',
     trendStart: 'Pumpwise began recording daily averages on {d}. Each line grows by one point a day, so the picture gets better every week.',
     sinceYesterday: 'since yesterday', in7: 'in 7 days', in30: 'in 30 days', thDay: 'Day',
@@ -46,10 +46,11 @@ export const STATS_WORDS = {
     statsNav: 'Estadísticas', statsH1: 'Estadísticas de precios de carburantes',
     statsLead: 'Lo que cobran hoy {n} gasolineras en {k} países y estados, y cómo se mueven los precios. Calculado con los mismos precios que el resto de Pumpwise y actualizado a lo largo del día.',
     tileStations: 'gasolineras seguidas', tilePlaces: 'pueblos y ciudades', tileRegions: 'países y estados', tilePrices: 'precios registrados hoy',
-    rankH: 'Dónde cuesta menos el carburante hoy', rankSub: 'media, en euros por litro', petrolWord: 'Gasolina', dieselWord: 'Diésel',
-    fxNote: 'Los precios se convierten con los tipos de referencia del Banco Central Europeo del {d}. Cada barra es la media de todas las gasolineras con precio vigente.',
+    rankH: 'Dónde cuesta menos el carburante hoy', rankSub: 'media de todas las gasolineras',
+    curPick: 'Ver precios en', perL: 'por litro', perG: 'por galón de EE. UU.', petrolWord: 'Gasolina', dieselWord: 'Diésel',
+    fxNote: 'Los precios se convierten con los tipos de referencia del Banco Central Europeo del {d}. Las monedas que el banco no publica usan tipos de mercado. Cada barra es la media de todas las gasolineras con precio vigente.',
     noFx: 'Ahora mismo no se han podido leer los tipos de cambio, así que en esta visita no se comparan los países.',
-    showNumbers: 'Ver las cifras', thPlace: 'País o estado', thLocal: 'Precio local', thEur: 'Euros por litro', thUsd: 'Dólares de EE. UU. por galón',
+    showNumbers: 'Ver las cifras', thPlace: 'País o estado', thLocal: 'Precio local', thEur: 'Moneda elegida',
     trendH: 'Cómo se mueven los precios', trendSub: 'media de cada día, por litro',
     trendStart: 'Pumpwise empezó a guardar las medias diarias el {d}. Cada línea gana un punto al día, así que la imagen mejora cada semana.',
     sinceYesterday: 'desde ayer', in7: 'en 7 días', in30: 'en 30 días', thDay: 'Día',
@@ -67,10 +68,11 @@ export const STATS_WORDS = {
     statsNav: 'Statistiques', statsH1: 'Statistiques des prix des carburants',
     statsLead: 'Ce que facturent aujourd’hui {n} stations dans {k} pays et États, et comment les prix évoluent. Calculé avec les mêmes prix que le reste de Pumpwise et actualisé au fil de la journée.',
     tileStations: 'stations suivies', tilePlaces: 'villes et communes', tileRegions: 'pays et États', tilePrices: 'prix relevés aujourd’hui',
-    rankH: 'Où le carburant coûte le moins aujourd’hui', rankSub: 'moyenne, en euros par litre', petrolWord: 'Essence', dieselWord: 'Gazole',
-    fxNote: 'Les prix sont convertis avec les taux de référence de la Banque centrale européenne du {d}. Chaque barre est la moyenne de toutes les stations ayant un prix en vigueur.',
+    rankH: 'Où le carburant coûte le moins aujourd’hui', rankSub: 'moyenne de toutes les stations',
+    curPick: 'Afficher les prix en', perL: 'par litre', perG: 'par gallon US', petrolWord: 'Essence', dieselWord: 'Gazole',
+    fxNote: 'Les prix sont convertis avec les taux de référence de la Banque centrale européenne du {d}. Les devises que la banque ne publie pas utilisent des taux de marché. Chaque barre est la moyenne de toutes les stations ayant un prix en vigueur.',
     noFx: 'Les taux de change n’ont pas pu être lus pour l’instant ; les pays ne sont donc pas comparés lors de cette visite.',
-    showNumbers: 'Voir les chiffres', thPlace: 'Pays ou État', thLocal: 'Prix local', thEur: 'Euros par litre', thUsd: 'Dollars US par gallon US',
+    showNumbers: 'Voir les chiffres', thPlace: 'Pays ou État', thLocal: 'Prix local', thEur: 'Devise choisie',
     trendH: 'Comment les prix évoluent', trendSub: 'moyenne de chaque jour, par litre',
     trendStart: 'Pumpwise a commencé à enregistrer les moyennes quotidiennes le {d}. Chaque courbe gagne un point par jour ; l’image s’affine donc chaque semaine.',
     sinceYesterday: 'depuis hier', in7: 'en 7 jours', in30: 'en 30 jours', thDay: 'Jour',
@@ -88,10 +90,11 @@ export const STATS_WORDS = {
     statsNav: 'Estatísticas', statsH1: 'Estatísticas dos preços dos combustíveis',
     statsLead: 'O que cobram hoje {n} postos em {k} países e estados, e como os preços estão a evoluir. Calculado com os mesmos preços do resto do Pumpwise e atualizado ao longo do dia.',
     tileStations: 'postos acompanhados', tilePlaces: 'vilas e cidades', tileRegions: 'países e estados', tilePrices: 'preços registados hoje',
-    rankH: 'Onde o combustível custa menos hoje', rankSub: 'média, em euros por litro', petrolWord: 'Gasolina', dieselWord: 'Gasóleo',
-    fxNote: 'Os preços são convertidos com as taxas de referência do Banco Central Europeu de {d}. Cada barra é a média de todos os postos com preço em vigor.',
+    rankH: 'Onde o combustível custa menos hoje', rankSub: 'média de todos os postos',
+    curPick: 'Ver preços em', perL: 'por litro', perG: 'por galão dos EUA', petrolWord: 'Gasolina', dieselWord: 'Gasóleo',
+    fxNote: 'Os preços são convertidos com as taxas de referência do Banco Central Europeu de {d}. As moedas que o banco não publica usam taxas de mercado. Cada barra é a média de todos os postos com preço em vigor.',
     noFx: 'Não foi possível ler as taxas de câmbio neste momento, por isso os países não são comparados nesta visita.',
-    showNumbers: 'Ver os números', thPlace: 'País ou estado', thLocal: 'Preço local', thEur: 'Euros por litro', thUsd: 'Dólares dos EUA por galão',
+    showNumbers: 'Ver os números', thPlace: 'País ou estado', thLocal: 'Preço local', thEur: 'Moeda escolhida',
     trendH: 'Como os preços estão a evoluir', trendSub: 'média de cada dia, por litro',
     trendStart: 'O Pumpwise começou a guardar as médias diárias em {d}. Cada linha ganha um ponto por dia, por isso a imagem melhora todas as semanas.',
     sinceYesterday: 'desde ontem', in7: 'em 7 dias', in30: 'em 30 dias', thDay: 'Dia',
@@ -111,56 +114,58 @@ export const STATS_STYLE = `
 /* Stats page. Petrol is blue and diesel orange everywhere; text never takes a series colour. */
 .stats{--s1:#2a78d6;--s2:#eb6834}
 @media (prefers-color-scheme:dark){.stats{--s1:#3987e5;--s2:#d95926}}
-.tiles{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.tiles li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
-.tiles b{display:block;font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-.3px}
-.tiles span{color:var(--muted);font-size:14px}
-.jump{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
-.jump a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:600;font-size:14px;text-decoration:none}
-.jump a:hover{border-color:var(--amber)}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
-.panel h3{margin:0 0 2px;font-size:16px;line-height:1.3}
-.panel .sub{margin:0 0 10px;color:var(--muted);font-size:13px}
-.pair{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
-.key{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 8px;font-size:13px;color:var(--muted)}
-.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.key .k1 i,.hb.k1 .hb-b,.hist.k1 i,.dot.k1{background:var(--s1)}
-.key .k2 i,.hb.k2 .hb-b,.hist.k2 i,.dot.k2{background:var(--s2)}
-.hbars{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.hb{display:grid;grid-template-columns:minmax(92px,34%) minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14px}
-.hb-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);text-decoration:none}
+.stats .tiles{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stats .tiles li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+.stats .tiles b{display:block;font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-.3px}
+.stats .tiles span{color:var(--muted);font-size:14px}
+.stats .jump{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.stats .jump a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--fg);font-weight:600;font-size:14px;text-decoration:none}
+.stats .jump a:hover{border-color:var(--amber)}
+.stats .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.stats .panel h3{margin:0 0 2px;font-size:16px;line-height:1.3}
+.stats .panel .sub{margin:0 0 10px;color:var(--muted);font-size:13px}
+.stats .pair{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.stats .key{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 8px;font-size:13px;color:var(--muted)}
+.stats .key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.stats .key .k1 i,.stats .hb.k1 .hb-b,.stats .hist.k1 i,.stats .dot.k1{background:var(--s1)}
+.stats .key .k2 i,.stats .hb.k2 .hb-b,.stats .hist.k2 i,.stats .dot.k2{background:var(--s2)}
+.stats .hbars{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.stats .hb{display:grid;grid-template-columns:minmax(92px,34%) minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14px}
+.stats .hb-l{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg);text-decoration:none}
 a.hb-l{color:var(--link);text-decoration:underline;text-underline-offset:2px}
-.hb-t{height:16px;display:block}
-.hb-b{display:block;height:100%;min-width:2px;border-radius:0 4px 4px 0}
-.hb:hover .hb-b{filter:brightness(1.12)}
-.hb-v{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
-.hist{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--border)}
-.hist i{flex:1;min-height:1px;border-radius:4px 4px 0 0}
-.hist i:hover{filter:brightness(1.12)}
-.axis{display:flex;justify-content:space-between;margin-top:4px;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
-.line{position:relative;height:150px;margin-right:64px;border-bottom:1px solid var(--border)}
-.line svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.line .grid{stroke:var(--border);stroke-width:1;vector-effect:non-scaling-stroke}
-.line path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
-.line .p1{stroke:var(--s1)}
-.line .p2{stroke:var(--s2)}
-.dot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;box-shadow:0 0 0 2px var(--card)}
-.end{position:absolute;left:100%;margin-left:8px;transform:translateY(-50%);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
-.yl{position:absolute;left:0;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--card);padding:0 3px 0 0}
-.moves{display:flex;flex-wrap:wrap;gap:4px 12px;margin:8px 0 0;font-size:13px;color:var(--muted)}
-.moves b{color:var(--fg);font-variant-numeric:tabular-nums}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 12px;padding:0;list-style:none}
-.facts li{background:var(--card2);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--muted)}
-.facts b{display:block;color:var(--fg);font-size:18px;line-height:1.25;font-weight:800;font-variant-numeric:tabular-nums}
-.rstat{margin-top:28px;scroll-margin-top:76px}
-.rstat>h2{display:flex;align-items:center;gap:8px}
-.rstat>h2 a{font-size:14px;font-weight:600;margin-left:auto}
-.nums{margin-top:8px}
-.nums summary{cursor:pointer;color:var(--link);font-size:13px;font-weight:600;min-height:32px;display:inline-flex;align-items:center}
-.nums table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
-.nums th,.nums td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--border)}
-.nums th:first-child,.nums td:first-child{text-align:left}
-.note{color:var(--muted);font-size:13px}
+.stats .hb-t{height:16px;display:block}
+.stats .hb-b{display:block;height:100%;min-width:2px;border-radius:0 4px 4px 0}
+.stats .hb:hover .hb-b{filter:brightness(1.12)}
+.stats .hb-v{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.stats .hist{display:flex;align-items:flex-end;gap:2px;height:120px;border-bottom:1px solid var(--border)}
+.stats .hist i{flex:1;min-height:1px;border-radius:4px 4px 0 0}
+.stats .hist i:hover{filter:brightness(1.12)}
+.stats .axis{display:flex;justify-content:space-between;margin-top:4px;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.stats .line{position:relative;height:150px;margin-right:64px;border-bottom:1px solid var(--border)}
+.stats .line svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.stats .line .grid{stroke:var(--border);stroke-width:1;vector-effect:non-scaling-stroke}
+.stats .line path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.stats .line .p1{stroke:var(--s1)}
+.stats .line .p2{stroke:var(--s2)}
+.stats .dot{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;box-shadow:0 0 0 2px var(--card)}
+.stats .end{position:absolute;left:100%;margin-left:8px;transform:translateY(-50%);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stats .yl{position:absolute;left:0;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--card);padding:0 3px 0 0}
+.stats .moves{display:flex;flex-wrap:wrap;gap:4px 12px;margin:8px 0 0;font-size:13px;color:var(--muted)}
+.stats .moves b{color:var(--fg);font-variant-numeric:tabular-nums}
+.stats .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 12px;padding:0;list-style:none}
+.stats .facts li{background:var(--card2);border-radius:10px;padding:8px 10px;font-size:13px;color:var(--muted)}
+.stats .facts b{display:block;color:var(--fg);font-size:18px;line-height:1.25;font-weight:800;font-variant-numeric:tabular-nums}
+.stats .rstat{margin-top:28px;scroll-margin-top:76px}
+.stats .rstat>h2{display:flex;align-items:center;gap:8px}
+.stats .rstat>h2 a{font-size:14px;font-weight:600;margin-left:auto}
+.stats .nums{margin-top:8px}
+.stats .nums summary{cursor:pointer;color:var(--link);font-size:13px;font-weight:600;min-height:32px;display:inline-flex;align-items:center}
+.stats .nums table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.stats .nums th,.stats .nums td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--border)}
+.stats .nums th:first-child,.stats .nums td:first-child{text-align:left}
+.stats .note{color:var(--muted);font-size:13px}
+.stats .curbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px;font-size:14px;font-weight:700}
+.stats .curbar select{min-height:44px;max-width:100%;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--fg);font:inherit;font-size:15px;font-weight:600}
 `;
 
 const mean = (list) => list.reduce((t, v) => t + v, 0) / list.length;
@@ -224,14 +229,15 @@ export function statsPage({ cards, now, days, fx, fxDate, totals, h }) {
       .sort((a, b) => a.eur - b.eur);
     if (rows.length < 2) return '';
     const top = Math.max(...rows.map((r) => r.eur));
-    const usd = (r) => (fx && fx.USD > 0 ? `$${((r.eur / 100) * fx.USD * LITRES_PER_US_GALLON).toFixed(2)}` : '');
     return `<div class="panel"><h3>${w(L, word)}</h3><p class="sub">${w(L, 'rankSub')}</p>
-<ol class="hbars">${rows.map((r) => `<li class="hb ${cls}" title="${esc(`${r.f.label}: ${money(r.f.avg, r.c.cfg.money)}`)}"><a class="hb-l" href="#s-${r.c.id}">${flag(r.c.id)} ${name(r.c.id)}</a><span class="hb-t"><span class="hb-b" style="width:${((r.eur / top) * 100).toFixed(1)}%"></span></span><span class="hb-v">${esc(euro(r.eur))}</span></li>`).join('')}</ol>
-${numbers([w(L, 'thPlace'), w(L, 'thLocal'), w(L, 'thEur'), w(L, 'thUsd')], rows.map((r) => [`${flag(r.c.id)} ${name(r.c.id)}`, esc(money(r.f.avg, r.c.cfg.money)), esc(euro(r.eur)), esc(usd(r))]))}</div>`;
+<ol class="hbars">${rows.map((r) => `<li class="hb ${cls}" title="${esc(`${r.f.label}: ${money(r.f.avg, r.c.cfg.money)}`)}"><a class="hb-l" href="#s-${r.c.id}">${flag(r.c.id)} ${name(r.c.id)}</a><span class="hb-t"><span class="hb-b" style="width:${((r.eur / top) * 100).toFixed(1)}%"></span></span><span class="hb-v cv" data-e="${r.eur.toFixed(2)}">${esc(euro(r.eur))}</span></li>`).join('')}</ol>
+${numbers([w(L, 'thPlace'), w(L, 'thLocal'), w(L, 'thEur')], rows.map((r) => [`${flag(r.c.id)} ${name(r.c.id)}`, esc(money(r.f.avg, r.c.cfg.money)), `<span class="cv" data-e="${r.eur.toFixed(2)}">${esc(euro(r.eur))}</span>`]))}</div>`;
   };
   const ranks = [rank('petrol', 'k1', 'petrolWord'), rank('diesel', 'k2', 'dieselWord')].filter(Boolean);
   const rankBlock = ranks.length
-    ? `<section><h2>${w(L, 'rankH')}</h2><div class="pair">${ranks.join('\n')}</div>${w(L, 'fxNote', { d: fxDate ? dayLabel(fxDate) : '' }, 'p', ' class="note"')}</section>`
+    ? `<section id="rank" data-fx="${esc(JSON.stringify({ EUR: 1, ...(fx ?? {}) }))}"><h2>${w(L, 'rankH')}</h2>
+<p class="curbar"><label for="cursel" data-k="curPick">${esc(say(L, 'curPick'))}</label><select id="cursel">${['EUR', ...Object.keys(fx ?? {}).sort()].map((c) => `<option value="${c}">${c}</option>`).join('')}</select><select id="unitsel" aria-labelledby="cursel"><option value="l" data-k="perL">${esc(say(L, 'perL'))}</option><option value="g" data-k="perG">${esc(say(L, 'perG'))}</option></select></p>
+<div class="pair">${ranks.join('\n')}</div>${w(L, 'fxNote', { d: fxDate ? dayLabel(fxDate) : '' }, 'p', ' class="note"')}</section>`
     : `<section><h2>${w(L, 'rankH')}</h2>${w(L, 'noFx', null, 'p', ' class="note"')}</section>`;
 
   // One region's daily averages as lines: petrol and diesel share one axis (same money, same litre).
