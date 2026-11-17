@@ -27,7 +27,57 @@ for (const id of Object.keys(meta.regions ?? {})) {
   if (existsSync(file)) byRegion[id] = JSON.parse(readFileSync(file, 'utf8'));
 }
 
-const { files, rootFiles, urls, stats } = buildSite(meta, byRegion);
+// The Stats page's memory: one line of averages per day, kept on the repository's "stats" branch (the feed
+// job checks it out into STATS_DIR and commits it back). Without that folder, or if the file there cannot
+// be read, the page is drawn from today alone and nothing is saved, so a bad run can never wipe the record.
+const statsDir = process.env.STATS_DIR ? resolve(process.env.STATS_DIR) : '';
+const historyFile = statsDir ? join(statsDir, 'history.json') : '';
+let history = [];
+let keepHistory = false;
+if (statsDir && existsSync(statsDir)) {
+  try {
+    if (existsSync(historyFile)) {
+      const read = JSON.parse(readFileSync(historyFile, 'utf8'));
+      if (!Array.isArray(read.days)) throw new Error('no "days" list');
+      history = read.days;
+    }
+    keepHistory = true;
+  } catch (e) {
+    console.log(`Stats: the saved history could not be read (${e.message}); today is drawn alone and nothing is saved`);
+  }
+}
+// Exchange rates for comparing countries: the European Central Bank's daily reference rates (free to reuse
+// with the source named). When it cannot be reached, the last rates saved with the history are used.
+let fx = null;
+let fxDate = null;
+try {
+  const xml = await fetch('https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml', { signal: AbortSignal.timeout(10000) }).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))));
+  const rates = {};
+  for (const m of xml.matchAll(/currency='([A-Z]{3})'\s+rate='([0-9.]+)'/g)) rates[m[1]] = Number(m[2]);
+  const want = ['USD', 'AUD', 'MXN', 'DKK', 'ISK', 'GBP'];
+  if (want.every((c) => rates[c] > 0)) {
+    fx = Object.fromEntries(want.map((c) => [c, rates[c]]));
+    fxDate = /time='(\d{4}-\d{2}-\d{2})'/.exec(xml)?.[1] ?? null;
+  }
+} catch (e) {
+  console.log(`Stats: exchange rates not read (${e.message})`);
+}
+if (!fx) {
+  const last = history.filter((d) => d.fx).pop();
+  if (last) {
+    fx = last.fx;
+    fxDate = last.fxd ?? last.d;
+  }
+}
+
+const { files, rootFiles, urls, stats, day } = buildSite(meta, byRegion, { history, fx, fxDate });
+if (keepHistory && day && Object.keys(day.r).length) {
+  const days = [...history.filter((d) => d && d.d && d.d !== day.d), { ...day, ...(fxDate ? { fxd: fxDate } : {}) }].sort((x, y) => (x.d < y.d ? -1 : 1)).slice(-1500);
+  // One day per line, so each daily commit on the stats branch changes one line.
+  writeFileSync(historyFile, `{"v":1,"days":[\n${days.map((d) => JSON.stringify(d)).join(',\n')}\n]}\n`);
+  files.set('stats/history.json', readFileSync(historyFile, 'utf8'));
+  console.log(`Stats: ${days.length} day${days.length === 1 ? '' : 's'} on record`);
+}
 
 // Written beside the final folder and swapped in at the end, so a failure never leaves half a site.
 const target = join(site, 'prices');

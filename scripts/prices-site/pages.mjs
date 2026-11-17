@@ -13,6 +13,8 @@
 
 // The site's own domain since 13 November 2026 (GitHub Pages sends the old tjcraw6589.github.io/pumpwise/
 // addresses here with a permanent redirect, so old links, the app's feed address and Search Console keep working).
+import { STATS_STYLE, STATS_WORDS, statsDay, statsPage, withToday } from './stats.mjs';
+
 export const SITE_BASE = 'https://pumpwiseapp.com';
 // Google AdSense publisher ID (ca-pub-...), empty until Tyler's AdSense account exists. When set, every page
 // except Tasmania's loads Google's ad script and the site root gets ads.txt. Tasmania stays ad free because its
@@ -537,6 +539,8 @@ export function say(lang, key, v) {
 }
 
 /** Visible text that site.js can switch into the visitor's language. */
+for (const l of Object.keys(STATS_WORDS)) Object.assign(U[l], STATS_WORDS[l]);
+
 function w(lang, key, v, tag = 'span', attrs = '') {
   return `<${tag}${attrs} data-k="${key}"${v ? ` data-v="${esc(JSON.stringify(v))}"` : ''}>${esc(say(lang, key, v))}</${tag}>`;
 }
@@ -933,7 +937,7 @@ let assetMark = null;
 function assetV() {
   if (assetMark === null) {
     let h = 5381;
-    const text = STYLE + siteJs();
+    const text = STYLE + STATS_STYLE + siteJs();
     for (let i = 0; i < text.length; i++) h = ((h * 33) ^ text.charCodeAt(i)) >>> 0;
     assetMark = h.toString(36);
   }
@@ -1756,7 +1760,7 @@ ${ADSENSE_CLIENT && ads ? `<script async src="https://pagead2.googlesyndication.
 ${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
 <header class="top"><div class="bar">
 <a class="brand" href="${SITE_BASE}/"${root ? ' aria-current="page"' : ''}>${MARK}<span>Pumpwise</span></a>
-<nav class="menu">${langPicker(L)}<a class="home" href="${BASE}/">${w(L, 'home')}</a><a class="findlink" href="${BASE}/#find" aria-label="${esc(say(L, 'find'))}" data-kl="find">${ICON_SEARCH}${w(L, 'find')}</a></nav>
+<nav class="menu">${langPicker(L)}<a class="home" href="${BASE}/">${w(L, 'home')}</a><a class="statlink" href="${BASE}/stats/">${w(L, 'statsNav')}</a><a class="findlink" href="${BASE}/#find" aria-label="${esc(say(L, 'find'))}" data-kl="find">${ICON_SEARCH}${w(L, 'find')}</a></nav>
 </div></header>
 <main id="main" tabindex="-1">
 ${trail}
@@ -2189,7 +2193,7 @@ ${STYLE}
 ${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
 <header class="top"><div class="bar">
 <a class="brand" href="${SITE_BASE}/" aria-current="page">${MARK}<span>Pumpwise</span></a>
-<nav class="menu"><a class="home" href="${BASE}/">${w(L, 'home')}</a></nav>
+<nav class="menu"><a class="home" href="${BASE}/">${w(L, 'home')}</a><a class="statlink" href="${BASE}/stats/">${w(L, 'statsNav')}</a></nav>
 </div></header>
 <main id="main" tabindex="-1">
 <section class="hero">
@@ -2261,7 +2265,7 @@ main:focus{outline:none}
 .langwrap{display:inline-flex;align-items:center}
 select.lang{min-height:44px;padding:0 28px 0 10px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:#101820 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23F3F0E8' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") right 8px center/14px no-repeat;color:#F3F0E8;font:inherit;font-size:15px;font-weight:600;-webkit-appearance:none;appearance:none;cursor:pointer}
 select.lang:hover{background-color:#1A2430}
-@media (max-width:380px){.brand span{display:none}}
+@media (max-width:389px){.brand span{display:none}}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 a{color:var(--link)}
@@ -2276,7 +2280,7 @@ main{padding-top:4px;padding-bottom:48px}
 .menu a:hover{background:rgba(255,255,255,.08)}
 .menu .findlink{background:var(--amber);color:#101820}
 .menu .findlink:hover{background:#FFC54D}
-@media (max-width:560px){.menu a:not(.findlink){display:none}.menu .findlink span{display:none}.menu .findlink{width:44px;justify-content:center;padding:0}}
+@media (max-width:560px){.menu a:not(.findlink):not(.statlink){display:none}.menu .statlink{padding:0 8px;font-size:14px}.menu .findlink span{display:none}.menu .findlink{width:44px;justify-content:center;padding:0}}
 .crumbs{display:flex;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted);margin:2px 0 0}
 .crumbs a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 2px;font-weight:600;text-decoration:none}
 .crumbs a:hover{text-decoration:underline}
@@ -2518,7 +2522,7 @@ a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{
  * @param byRegion region id to its station list (data/v4/regions/<id>.json)
  * @returns files (path under prices/ to text), rootFiles (path at the site root to text) and counts
  */
-export function buildSite(meta, byRegion) {
+export function buildSite(meta, byRegion, opts = {}) {
   const now = new Date(meta.generatedAt);
   const cutoff = now.getTime() - STALE_DAYS * 86400000;
   const files = new Map();
@@ -2592,7 +2596,8 @@ export function buildSite(meta, byRegion) {
       appPlace = { name: big[0].name, url: `${regionUrl}${big[0].slug}/`, label: f.label, money: cfg.money, today: f.min.p, avg: f.avg,
         tomorrow: both.length >= 2 ? Math.min(...both.map((r) => r.s.tomorrow[f.kind])) : 0 };
     }
-    cards.push({ id, cfg, t, regionUrl, places: places.length, stations: stations.length, fuels: all.fuels, top });
+    cards.push({ id, cfg, t, regionUrl, places: places.length, stations: stations.length, fuels: all.fuels, top, placeList: places });
+    stats.prices = (stats.prices ?? 0) + stations.reduce((n, s) => n + Object.keys(s.prices ?? {}).length, 0);
     stats.regions += 1;
     stats.places += places.length;
     stats.stations += stations.length;
@@ -2601,6 +2606,16 @@ export function buildSite(meta, byRegion) {
   const total = stats.stations.toLocaleString('en-US');
   files.set('index.html', homePage(cards, total, now, dataBase));
   urls.unshift(`${BASE}/`);
+  // The Stats page: today's figures, drawn after the days recorded before (opts.history), in euros where
+  // exchange rates are known (opts.fx). Today's line goes back to the caller, which keeps the history.
+  const day = statsDay(cards, now, opts.fx ?? null);
+  files.set('stats/index.html', statsPage({
+    cards, now, days: withToday(opts.history, day), fx: opts.fx ?? null, fxDate: opts.fxDate ?? null,
+    totals: { stations: stats.stations, places: stats.places, prices: stats.prices ?? 0 },
+    h: { w, say, esc, money, flagOf, FLAG_COUNTRY, layout, BASE },
+  }));
+  urls.push(`${BASE}/stats/`);
+  maps.set('main', [...(maps.get('main') ?? []), `${BASE}/stats/`]);
   const lastmod = now.toISOString().slice(0, 10);
   maps.set('main', [`${SITE_BASE}/`, `${BASE}/`, ...(maps.get('main') ?? [])]);
   const urlset = (list) => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${list.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`;
@@ -2608,12 +2623,12 @@ export function buildSite(meta, byRegion) {
   // prices/sitemap.xml (the address Search Console knows) is the index of them all.
   files.set('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...maps.keys()].map((n) => `<sitemap><loc>${BASE}/sitemaps/${n}.xml</loc><lastmod>${lastmod}</lastmod></sitemap>`).join('\n')}\n</sitemapindex>\n`);
   files.set('places.json', JSON.stringify(idx));
-  files.set('style.css', STYLE);
+  files.set('style.css', STYLE + STATS_STYLE);
   files.set('site.js', siteJs());
   // robots.txt works now that the site has its own domain: it points search engines at the sitemap.
   const robots = `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`;
   const rootFiles = new Map([['index.html', rootPage(cards, total, now, dataBase, appPlace)], ['404.html', notFoundPage(cards, now)], ['robots.txt', robots]]);
   // ads.txt names Google as the only seller of the site's ad space (AdSense asks for it).
   if (ADSENSE_CLIENT) rootFiles.set('ads.txt', `google.com, ${ADSENSE_CLIENT.replace(/^ca-/, '')}, DIRECT, f08c47fec0942fa0\n`);
-  return { files, rootFiles, urls, stats: { ...stats, pages: urls.length } };
+  return { files, rootFiles, urls, stats: { ...stats, pages: urls.length }, day };
 }

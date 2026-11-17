@@ -323,3 +323,30 @@ test('Directions buttons carry the station position and default to driving direc
   const js = files.get('site.js') ?? '';
   for (const part of ['pw-maps', 'maps.apple.com/?daddr=', 'waze.com/ul?ll=', 'mapsPick']) assert.ok(js.includes(part), part);
 });
+
+test('Stats page: countries compared in euros, a trend from the saved days, and today handed back', () => {
+  const mk = (id, lat, lng, base, n) => {
+    const list = [];
+    for (let t = 0; t < 3; t++) for (let i = 0; i < n; i++) list.push(st(id, `Town ${id}${t}`, lat + t / 4 + i / 1000, lng, { regular: base + i + t, diesel: base + 20 + i }));
+    return list;
+  };
+  const by = { es: mk('es', 40.4, -3.7, 150, 8), dk: mk('dk', 55.6, 9.5, 1600, 8) };
+  const history = [{ d: '2026-11-15', r: { es: { p: [149, 140, 160, 20], d: [171, 160, 180, 20] } } }, { d: '2026-11-16', r: { es: { p: [151, 141, 161, 20] } } }];
+  const { files, day, urls } = buildSite(meta(['es', 'dk']), by, { history, fx: { USD: 1.06, AUD: 1.7, MXN: 19.6, DKK: 7.46, ISK: 146, GBP: 0.85 }, fxDate: '2026-11-16' });
+  const page = files.get('stats/index.html');
+  assert.ok(page, 'the page exists');
+  assert.ok(urls.some((u) => u.endsWith('/prices/stats/')), 'and is in the sitemap');
+  assert.equal(day.d, NOW.slice(0, 10));
+  assert.deepEqual(Object.keys(day.r).sort(), ['dk', 'es']);
+  assert.equal(day.r.es.p.length, 4);
+  // Denmark's kroner are put into euros: about 16.1 kr. is about 2.16 euros.
+  assert.match(page, /2,1\d\d €/);
+  assert.match(page, /data-k="rankH"/);
+  // Spain has three days on record (two saved and today), so its trend is a line.
+  assert.match(page, /<path class="p1" d="M/);
+  assert.match(page, /class="statlink" href="[^"]*\/prices\/stats\/"/);
+  // Without exchange rates the comparison is left out and said so; the rest stands.
+  const bare = buildSite(meta(['es', 'dk']), by).files.get('stats/index.html');
+  assert.match(bare, /data-k="noFx"/);
+  assert.match(bare, /data-k="distH"/);
+});
