@@ -925,6 +925,21 @@ const NEAR_DEFAULT = 10;
 const NEAR_FUELS = ['regular', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg'];
 const capital = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
+/**
+ * A short mark of the current script and styles, added to their addresses so a browser never pairs a new
+ * page with the old script it kept from an earlier visit.
+ */
+let assetMark = null;
+function assetV() {
+  if (assetMark === null) {
+    let h = 5381;
+    const text = STYLE + siteJs();
+    for (let i = 0; i < text.length; i++) h = ((h * 33) ^ text.charCodeAt(i)) >>> 0;
+    assetMark = h.toString(36);
+  }
+  return assetMark;
+}
+
 function nearBox(L, dataBase) {
   const fuelOpts = NEAR_FUELS.map((k) => `<option value="${k}">${esc(capital(FUEL_WORDS[L][k]))}</option>`).join('');
   const radii = NEAR_RADII.map((r) => `<button type="button" data-r="${r}" aria-pressed="${r === NEAR_DEFAULT}">${r} km</button>`).join('');
@@ -1733,9 +1748,9 @@ ${noindex ? '' : `<meta property="og:url" content="${esc(canonical)}">\n`}<meta 
 <meta name="theme-color" content="#101820" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/png" sizes="192x192" href="${SITE_BASE}/favicon.png">
 <link rel="apple-touch-icon" href="${SITE_BASE}/apple-touch-icon.png">
-<link rel="stylesheet" href="${BASE}/style.css">
+<link rel="stylesheet" href="${BASE}/style.css?v=${assetV()}">
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script>
-<script src="${BASE}/site.js" defer></script>
+<script src="${BASE}/site.js?v=${assetV()}" defer></script>
 ${ADSENSE_CLIENT && ads ? `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>\n` : ''}</head>
 <body>
 ${w(L, 'skip', null, 'a', ' class="skip" href="#main"')}
@@ -2401,7 +2416,8 @@ a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2
 .rank{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
 .rank a{display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--fg)}
 .rank a:hover,.rows a:hover{border-color:var(--amber)}
-.flag{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-weight:400}
+@font-face{font-family:"Pumpwise Flags";src:url("https://pumpwiseapp.com/flags.woff2") format("woff2");unicode-range:U+1F1E6-1F1FF;font-display:swap}
+.flag{font-family:"Apple Color Emoji","Pumpwise Flags","Noto Color Emoji",sans-serif;font-weight:400}
 .rank .rk{flex:none;width:28px;height:28px;border-radius:50%;background:var(--sign);color:var(--green);font-weight:800;font-size:14px;display:grid;place-items:center}
 .nm{flex:1;min-width:0;font-weight:700;line-height:1.25}
 .nm small{display:block;font-weight:500;font-size:13px}
