@@ -76,6 +76,17 @@ export interface RegionInfo {
 /** UK clocks change on the same dates as the rest of Europe. */
 export const isBritishSummerTime = isEuropeanSummerTime;
 
+/** Daylight time in Canada and the United States: from the second Sunday of March to the first Sunday of November, changing at 2am Eastern (close enough for showing a time). */
+export function isNorthAmericanSummerTime(date: Date): boolean {
+  const year = date.getUTCFullYear();
+  const sunday = (month: number, nth: number): number => {
+    const first = new Date(Date.UTC(year, month, 1)).getUTCDay();
+    return Date.UTC(year, month, 1 + ((7 - first) % 7) + (nth - 1) * 7, 7);
+  };
+  const t = date.getTime();
+  return t >= sunday(2, 2) && t < sunday(10, 1);
+}
+
 /** Spain is on Central European Time, except the Canary Islands (west of 13°W), an hour behind. */
 export function spainOffsetMinutes(date: Date, lng?: number): number {
   const base = lng !== undefined && lng < -12 ? 0 : 60;
@@ -728,6 +739,93 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Ísafjörður', detail: 'Iceland', lat: 66.075, lng: -23.135 },
     ],
   },
+  qc: {
+    id: 'qc',
+    name: 'Quebec',
+    currency: '$',
+    currencyCode: 'CAD',
+    numberLocale: 'fr-CA',
+    priceUnit: '¢',
+    priceDecimals: 1,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Ordinaire', pumpCode: '87', description: 'Regular unleaded', common: true },
+      { kind: 'premium', label: 'Super', pumpCode: '91', description: 'Premium unleaded', common: true },
+      { kind: 'diesel', label: 'Diesel', pumpCode: 'D', description: 'Standard diesel', common: true },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [5, 6, 7, 8, 9, 10, 12, 14],
+    // The Régie's file lists the prices in force without the time each was set.
+    priceMode: 'current',
+    utcOffsetMinutes: (date) => (isNorthAmericanSummerTime(date) ? -240 : -300),
+    source: {
+      name: 'Régie essence Québec',
+      url: 'https://regieessencequebec.ca',
+      credit: 'Source: Régie essence Québec, Régie de l’énergie. Pumpwise is independent and has no mandate from the Régie',
+    },
+    report: {
+      label: 'Tell the Régie de l’énergie',
+      url: 'https://www.regie-energie.qc.ca',
+      note: 'Stations in Quebec must report a new price to the Régie within five minutes.',
+    },
+    about:
+      'Since April 2026 every station in Quebec must report its prices to the Régie de l’énergie within five minutes of a change. Pumpwise shows those prices unchanged, as published on Régie essence Québec. Pumpwise is independent and has no mandate from the Régie.',
+    cities: [
+      { name: 'Montréal', detail: 'Quebec', lat: 45.5019, lng: -73.5674 },
+      { name: 'Québec', detail: 'Quebec', lat: 46.8131, lng: -71.2075 },
+      { name: 'Laval', detail: 'Quebec', lat: 45.6066, lng: -73.7124 },
+      { name: 'Gatineau', detail: 'Quebec', lat: 45.4765, lng: -75.7013 },
+      { name: 'Longueuil', detail: 'Quebec', lat: 45.5312, lng: -73.5181 },
+      { name: 'Sherbrooke', detail: 'Quebec', lat: 45.4042, lng: -71.8929 },
+      { name: 'Saguenay', detail: 'Quebec', lat: 48.4284, lng: -71.0685 },
+      { name: 'Trois-Rivières', detail: 'Quebec', lat: 46.343, lng: -72.5479 },
+    ],
+  },
+  tw: {
+    id: 'tw',
+    name: 'Taiwan',
+    currency: 'NT$',
+    currencyCode: 'TWD',
+    numberLocale: 'en-US',
+    priceUnit: 'NT$',
+    priceDecimals: 1,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'premium', label: '95 無鉛', pumpCode: '95', description: 'Unleaded 95', common: true },
+      { kind: 'regular', label: '92 無鉛', pumpCode: '92', description: 'Unleaded 92', common: true },
+      { kind: 'super', label: '98 無鉛', pumpCode: '98', description: 'Unleaded 98', common: true },
+      { kind: 'diesel', label: '超級柴油', pumpCode: 'D', description: 'Standard diesel', common: true },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    // CPC's list price is the price in force at its own stations until the next change.
+    priceMode: 'current',
+    utcOffsetMinutes: () => 480,
+    source: {
+      name: 'CPC Corporation, Taiwan',
+      url: 'https://data.gov.tw/dataset/6065',
+      credit: 'Station list and list prices from CPC Corporation, Taiwan (data.gov.tw, Open Government Data License, version 1.0)',
+    },
+    report: {
+      label: 'Check it on cpc.com.tw',
+      url: 'https://www.cpc.com.tw',
+      note: 'CPC sets one list price for the stations it runs itself, usually every Monday.',
+    },
+    about:
+      'Pumpwise shows the stations that CPC Corporation, Taiwan’s state oil company, runs itself, each at CPC’s list price for the fuels it sells. CPC publishes both as open data. Franchised CPC stations and other companies’ stations are not shown.',
+    cities: [
+      { name: 'Taipei', detail: 'Taiwan', lat: 25.033, lng: 121.5654 },
+      { name: 'New Taipei', detail: 'Taiwan', lat: 25.012, lng: 121.4657 },
+      { name: 'Taoyuan', detail: 'Taiwan', lat: 24.9936, lng: 121.301 },
+      { name: 'Taichung', detail: 'Taiwan', lat: 24.1477, lng: 120.6736 },
+      { name: 'Tainan', detail: 'Taiwan', lat: 22.9999, lng: 120.227 },
+      { name: 'Kaohsiung', detail: 'Taiwan', lat: 22.6273, lng: 120.3014 },
+      { name: 'Hsinchu', detail: 'Taiwan', lat: 24.8138, lng: 120.9675 },
+      { name: 'Hualien', detail: 'Taiwan', lat: 23.9872, lng: 121.6016 },
+    ],
+  },
 };
 
 /** Every region, with its names and explanations in the phone's language. */
@@ -739,7 +837,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 export const DEFAULT_REGION: RegionId = 'wa';
 
 /** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
-export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS'> = {
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS' | 'CA' | 'TW'> = {
   wa: 'AU',
   nsw: 'AU',
   tas: 'AU',
@@ -753,6 +851,8 @@ export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' |
   hr: 'HR',
   dk: 'DK',
   is: 'IS',
+  qc: 'CA',
+  tw: 'TW',
 };
 
 /** "Western Australia · Australia", or just "Spain" where the region is the whole country. */
@@ -771,7 +871,7 @@ export function regionsHereFirst(live: readonly RegionId[], here: RegionId | nul
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];

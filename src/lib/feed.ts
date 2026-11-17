@@ -26,12 +26,12 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is';
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is' | 'qc' | 'tw';
 /**
  * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
  * Slovenia before Croatia).
  */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw'];
 /** The regions Pumpwise 1.2 was built with; only these go into the version 4 feed. */
 // No 'uk': like 1.3, the 1.2 app calls its UK prices the government's Fuel Finder, which these are not.
 export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
@@ -136,6 +136,21 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 54.95, maxLat: 55.35, minLng: 14.6, maxLng: 15.25 }, // Bornholm
   ],
   is: [{ minLat: 63.2, maxLat: 66.6, minLng: -24.6, maxLng: -13.4 }],
+  // Quebec in boxes that stay north of the United States border and east of Ontario (Ottawa is out,
+  // Gatineau is in because the Ottawa river bends north there) and west of Labrador and New Brunswick.
+  qc: [
+    { minLat: 45.0, maxLat: 62.6, minLng: -79.6, maxLng: -74.4 }, // the west: Abitibi, Outaouais, the Laurentians, Montreal
+    { minLat: 45.0, maxLat: 62.6, minLng: -74.4, maxLng: -69.0 }, // the centre: the Eastern Townships, Quebec City, Saguenay
+    { minLat: 47.3, maxLat: 60.5, minLng: -69.0, maxLng: -64.0 }, // Bas-Saint-Laurent, the North Shore, the Gaspé peninsula's north
+    { minLat: 47.9, maxLat: 52.0, minLng: -67.5, maxLng: -57.0 }, // the Gaspé peninsula, Anticosti and the Lower North Shore
+    { minLat: 47.1, maxLat: 47.9, minLng: -62.3, maxLng: -61.3 }, // the Magdalen Islands
+  ],
+  // Taiwan with Penghu, Kinmen and the Matsu islands.
+  tw: [
+    { minLat: 21.8, maxLat: 25.4, minLng: 119.3, maxLng: 122.1 },
+    { minLat: 24.3, maxLat: 24.6, minLng: 118.1, maxLng: 118.6 }, // Kinmen
+    { minLat: 25.9, maxLat: 26.4, minLng: 119.8, maxLng: 120.6 }, // Matsu
+  ],
 };
 
 /** Who owns each region's prices and what their licence asks for; written into every feed's meta.json. */
@@ -232,6 +247,20 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     url: 'https://kfst.dk',
     attribution: 'Prices published by the fuel companies in their own public price APIs (OK, Shell, Circle K, Q8), as Danish law requires; each price carries the time the company last changed it. Circle K and Q8 station positions are found from their addresses with OpenStreetMap data (© OpenStreetMap contributors, ODbL). Not government data, and Pumpwise is not connected to these companies',
     reuse: 'owner-terms',
+  },
+  qc: {
+    owner: 'Régie de l’énergie du Québec (Régie essence Québec)',
+    licence: 'Written answer from the Régie to Pumpwise, 17 November 2026: no objection to an app reading the platform, with no limit on access, frequency or redistribution, provided the data is not changed, the source is named and visible at all times, and nothing suggests a mandate from the Régie',
+    url: 'https://regieessencequebec.ca',
+    attribution: 'Source: Régie essence Québec, Régie de l’énergie. Prices as the stations reported them to the Régie, unchanged, in force when the feed last collected them. Pumpwise is independent and has no mandate from the Régie',
+    reuse: 'owner-terms',
+  },
+  tw: {
+    owner: 'CPC Corporation, Taiwan (台灣中油股份有限公司)',
+    licence: 'Open Government Data License, version 1.0 (data.gov.tw/license): free reuse, commercial use included, with the source named',
+    url: 'https://data.gov.tw/dataset/6065',
+    attribution: 'Station list and list prices from CPC Corporation, Taiwan, through data.gov.tw, under the Open Government Data License, version 1.0. Only stations CPC runs itself are shown, at CPC’s list price',
+    reuse: 'open',
   },
   is: {
     owner: 'The Icelandic fuel companies (Atlantsolía, Costco, N1, Olís, ÓB, Orkan), collected by the Gasvaktin project',

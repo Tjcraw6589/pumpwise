@@ -126,6 +126,22 @@ const ES: Record<RegionId, RegionText> = {
     reportLabel: 'Consultarlo en gasvaktin.is',
     reportNote: 'Los precios islandeses proceden de la web de cada compañía de carburantes.',
   },
+  qc: {
+    name: 'Quebec',
+    about:
+      'Desde abril de 2026 todas las gasolineras de Quebec deben comunicar sus precios a la Régie de l’énergie en los cinco minutos siguientes a cada cambio. Pumpwise muestra esos precios sin modificarlos, tal como se publican en Régie essence Québec. Pumpwise es independiente y no tiene ningún mandato de la Régie.',
+    credit: 'Fuente: Régie essence Québec, Régie de l’énergie. Pumpwise es independiente y no tiene ningún mandato de la Régie',
+    reportLabel: 'Avisar a la Régie de l’énergie',
+    reportNote: 'Las gasolineras de Quebec deben comunicar un precio nuevo a la Régie en cinco minutos.',
+  },
+  tw: {
+    name: 'Taiwán',
+    about:
+      'Pumpwise muestra las gasolineras que gestiona directamente CPC Corporation, la petrolera estatal de Taiwán, cada una con el precio de lista de CPC para los carburantes que vende. CPC publica ambos datos como datos abiertos. No aparecen las gasolineras franquiciadas de CPC ni las de otras compañías.',
+    credit: 'Lista de gasolineras y precios de lista de CPC Corporation, Taiwán (data.gov.tw, Open Government Data License, versión 1.0)',
+    reportLabel: 'Consultarlo en cpc.com.tw',
+    reportNote: 'CPC fija un único precio de lista para sus gasolineras propias, normalmente cada lunes.',
+  },
 };
 
 const FR: Record<RegionId, RegionText> = {
@@ -248,6 +264,24 @@ const FR: Record<RegionId, RegionText> = {
     reportLabel: 'Vérifier sur gasvaktin.is',
     reportNote: 'Les prix islandais viennent du site de chaque compagnie pétrolière.',
   },
+  qc: {
+    name: 'Québec',
+    nameInSentence: 'le Québec',
+    about:
+      'Depuis avril 2026, chaque station-service du Québec doit déclarer ses prix à la Régie de l’énergie dans les cinq minutes suivant un changement. Pumpwise affiche ces prix sans les modifier, tels que publiés sur Régie essence Québec. Pumpwise est indépendant et n’a aucun mandat de la Régie.',
+    credit: 'Source : Régie essence Québec, Régie de l’énergie. Pumpwise est indépendant et n’a aucun mandat de la Régie',
+    reportLabel: 'Le signaler à la Régie de l’énergie',
+    reportNote: 'Les stations du Québec doivent déclarer un nouveau prix à la Régie dans les cinq minutes.',
+  },
+  tw: {
+    name: 'Taïwan',
+    nameInSentence: 'Taïwan',
+    about:
+      'Pumpwise affiche les stations exploitées directement par CPC Corporation, la compagnie pétrolière publique de Taïwan, chacune au prix de liste de CPC pour les carburants qu’elle vend. CPC publie ces deux jeux de données en données ouvertes. Les stations franchisées de CPC et celles des autres compagnies ne sont pas affichées.',
+    credit: 'Liste des stations et prix de liste de CPC Corporation, Taïwan (data.gov.tw, Open Government Data License, version 1.0)',
+    reportLabel: 'Vérifier sur cpc.com.tw',
+    reportNote: 'CPC fixe un prix de liste unique pour ses propres stations, en général chaque lundi.',
+  },
 };
 
 const PT: Record<RegionId, RegionText> = {
@@ -366,6 +400,24 @@ const PT: Record<RegionId, RegionText> = {
     reportLabel: 'Verificar em gasvaktin.is',
     reportNote: 'Os preços islandeses vêm do site de cada empresa de combustíveis.',
   },
+  qc: {
+    name: 'Quebeque',
+    nameInSentence: 'o Quebeque',
+    about:
+      'Desde abril de 2026, todos os postos do Quebeque têm de comunicar os seus preços à Régie de l’énergie nos cinco minutos seguintes a cada alteração. O Pumpwise mostra esses preços sem os alterar, tal como são publicados na Régie essence Québec. O Pumpwise é independente e não tem qualquer mandato da Régie.',
+    credit: 'Fonte: Régie essence Québec, Régie de l’énergie. O Pumpwise é independente e não tem qualquer mandato da Régie',
+    reportLabel: 'Avisar a Régie de l’énergie',
+    reportNote: 'Os postos do Quebeque têm de comunicar um novo preço à Régie em cinco minutos.',
+  },
+  tw: {
+    name: 'Taiwan',
+    nameInSentence: 'Taiwan',
+    about:
+      'O Pumpwise mostra os postos geridos diretamente pela CPC Corporation, a petrolífera estatal de Taiwan, cada um com o preço de tabela da CPC para os combustíveis que vende. A CPC publica ambos como dados abertos. Não aparecem os postos franquiados da CPC nem os de outras empresas.',
+    credit: 'Lista de postos e preços de tabela da CPC Corporation, Taiwan (data.gov.tw, Open Government Data License, versão 1.0)',
+    reportLabel: 'Consultar em cpc.com.tw',
+    reportNote: 'A CPC fixa um único preço de tabela para os seus próprios postos, normalmente à segunda-feira.',
+  },
 };
 
 const TEXTS: Record<Exclude<Lang, 'en'>, Record<RegionId, RegionText>> = { es: ES, fr: FR, pt: PT };
@@ -399,6 +451,7 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Liquefied petroleum gas': 'Gas licuado del petróleo',
     'Unleaded 95 with up to 10% ethanol': 'Sin plomo 95 con hasta 10 % de etanol',
     'Unleaded 95': 'Sin plomo 95',
+    'Unleaded 92': 'Sin plomo 92',
     Superethanol: 'Superetanol',
     'Regular unleaded': 'Gasolina regular',
     Diesel: 'Diésel',
@@ -430,6 +483,7 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Liquefied petroleum gas': 'Gaz de pétrole liquéfié',
     'Unleaded 95 with up to 10% ethanol': 'Sans plomb 95 avec jusqu’à 10 % d’éthanol',
     'Unleaded 95': 'Sans plomb 95',
+    'Unleaded 92': 'Sans plomb 92',
     Superethanol: 'Superéthanol',
     'Regular unleaded': 'Sans plomb ordinaire',
     Diesel: 'Gazole',
@@ -461,6 +515,7 @@ const FUEL_DESCRIPTIONS: Record<Exclude<Lang, 'en'>, Record<string, string>> = {
     'Liquefied petroleum gas': 'Gás de petróleo liquefeito',
     'Unleaded 95 with up to 10% ethanol': 'Sem chumbo 95 com até 10 % de etanol',
     'Unleaded 95': 'Sem chumbo 95',
+    'Unleaded 92': 'Sem chumbo 92',
     Superethanol: 'Superetanol',
     'Regular unleaded': 'Gasolina regular',
     Diesel: 'Gasóleo',

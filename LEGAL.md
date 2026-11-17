@@ -183,6 +183,24 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | Victoria (Servo Saver API, CC BY 4.0) | Requires an application to Service Victoria and the prices are 24 hours old. Possible if the owner wants a "yesterday's prices" region. |
 | South Australia, Northern Territory | SA gives data to approved publishers only (application required); the NT has no confirmed live feed. |
 
+## Added 17 November 2026: Quebec and Taiwan
+
+- **Quebec (Régie essence Québec):** the Régie de l'énergie answered Pumpwise's request by email on 17 November 2026 (Véronique Larivière, technicienne aux produits pétroliers; the message is in the pumpwiseapp@gmail.com inbox, subject "Réutilisation des données de Régie essence Québec dans une application gratuite"). The Régie plans no partnership with any app developer but does not object to Pumpwise reading the platform, "sans limite d'accès, de fréquence ou de redistribution". Conditions: the data must not be changed; the source (Régie essence Québec, Régie de l'énergie) must be named and visible at all times; the developer must never claim or suggest a mandate from the Régie. The Régie takes no position on how the data is read; Pumpwise reads the platform's public GeoJSON file (https://regieessencequebec.ca/stations.geojson.gz). The Régie does not publish price history per station, so Pumpwise keeps none per station either (the Stats page keeps only daily averages for the province). If the Régie objects, switch `qc` off in `scripts/feed/build.ts`.
+- **Taiwan (CPC Corporation):** station list (data.gov.tw dataset 6065) and list prices (CPC open data, `MainProdListPrice`), both under the Open Government Data License, version 1.0 (https://data.gov.tw/license), which allows reuse, commercial use included, with attribution. Only stations CPC runs itself (類別 自營站) are shown, because the list price is defined for those (交貨地點 中油自營站); franchised stations may discount. Formosa Petrochemical and other companies publish no open data.
+
+## Permission requests sent 17 November 2026 (from pumpwiseapp@gmail.com)
+
+| To | About | Status |
+|---|---|---|
+| info@ena.lt (Lithuanian Energy Agency) | Reuse of degalukainos.ena.lt station prices | Sent, no answer yet |
+| osservaprezzi@mise.gov.it (Italy, MIMIT) | Permission to read Osservaprezzi, or another way to fetch the IODL files | Sent, no answer yet |
+| stheologou@meci.gov.cy (Cyprus, Consumer Protection Service) | Whether station prices are open and may be reused | Sent, no answer yet |
+| Northern Territory Consumer Affairs | MyFuel NT | Sent 16 November, automatic reply only (5 business days) |
+| Service Victoria | Servo Saver API application | Received 16 November, under review |
+| South Australia (Fuel Pricing Information Scheme) | Publisher sign up | They asked on 16 November for the full street address; the owner must answer |
+
+Asia, looked at on 17 November 2026: South Korea (Opinet) needs KNOC's prior agreement and has no public contact address for it, only member sign in; Japan has no official station prices; Malaysia (data.gov.my, CC BY 4.0) and Hong Kong (Consumer Council on data.gov.hk) publish one price per fuel or per company, not per station, and no station list; Thailand, India and the Philippines publish company or city prices only.
+
 ## Sweep of 16 November 2026 (nothing added)
 
 | Place | Finding |

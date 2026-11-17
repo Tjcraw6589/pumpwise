@@ -24,6 +24,8 @@ import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
 import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
 import { fetchHr, HR_MIN_STATIONS } from './sources/hr.ts';
 import { fetchIs, IS_MIN_STATIONS } from './sources/is.ts';
+import { fetchQc, QC_MIN_STATIONS } from './sources/qc.ts';
+import { fetchTw, TW_MIN_STATIONS } from './sources/tw.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
 import { fetchNsw, NSW_MIN_STATIONS, nswCredentials } from './sources/nsw.ts';
 import { fetchPt, PT_MIN_STATIONS } from './sources/pt.ts';
@@ -107,6 +109,10 @@ const SOURCES: Source[] = [
   // cached for two minutes; prices change a few times a day, so every other run.
   { id: 'dk', regions: ['dk'], everyMinutes: 25, minStations: DK_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchDk(now), tomorrow: false }) },
   // Iceland: one 45 KB file Gasvaktin rebuilds every 15 minutes from the fuel companies' websites.
+  // Quebec: one 2 MB file from the Régie de l'énergie, rebuilt every five minutes. Stations must report within five minutes.
+  { id: 'qc', regions: ['qc'], everyMinutes: 10, minStations: QC_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchQc(now), tomorrow: false }) },
+  // Taiwan: CPC's station list and list prices. The price changes about once a week, so every three hours is plenty.
+  { id: 'tw', regions: ['tw'], everyMinutes: 170, minStations: TW_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchTw(now), tomorrow: false }) },
   { id: 'is', regions: ['is'], everyMinutes: 25, minStations: IS_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIs(now), tomorrow: false }) },
   // The United Kingdom from the retailers' own price files, for as long as the government service (below)
   // cannot be reached from where this job runs.
