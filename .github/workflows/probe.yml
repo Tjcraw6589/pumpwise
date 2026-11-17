@@ -1,0 +1,38 @@
+name: Probe a price source
+on:
+  push:
+    branches: [probe-ar]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Argentina current prices
+        run: |
+          U='datos.energia.gob.ar/dataset/1c181390-5045-475e-94dc-410429be4b17/resource/80ac25de-a44a-4445-9215-090cf55cfda5/download/precios-en-surtidor-resolucin-3142016.csv'
+          curl -sS -L -m 120 -A 'Pumpwise feed (pumpwiseapp@gmail.com)' -o ar.csv -w 'https %{http_code} %{size_download} %{content_type}\n' "https://$U" || curl -sS -L -m 120 -A 'Pumpwise feed (pumpwiseapp@gmail.com)' -o ar.csv -w 'http %{http_code} %{size_download} %{content_type}\n' "http://$U"
+          file ar.csv; wc -l ar.csv; head -c 300 ar.csv | xxd | head -3
+          head -4 ar.csv
+          python3 - <<'P'
+          import csv, collections, io
+          raw = open('ar.csv','rb').read()
+          for enc in ('utf-8-sig','latin-1'):
+              try: text = raw.decode(enc); print('encoding', enc); break
+              except Exception as e: print(enc, 'failed')
+          rows = list(csv.DictReader(io.StringIO(text)))
+          print(len(rows), 'rows', list(rows[0].keys()))
+          for k in ('producto','idproducto','tipohorario','empresabandera','provincia'):
+              if k in rows[0]: print(k, collections.Counter(r[k] for r in rows).most_common(14))
+          ids = {r.get('idempresa') for r in rows}; print('stations', len(ids))
+          yrs = collections.Counter(r.get('fecha_vigencia','')[:7] for r in rows); print(sorted(yrs.items())[-14:]); print('old', sum(v for k,v in yrs.items() if k < '2026-08'))
+          nogeo = sum(1 for r in rows if not r.get('latitud') or not r.get('longitud')); print('no coords', nogeo)
+          import random; random.seed(1)
+          for r in random.sample(rows, 6): print(r)
+          recent = [r for r in rows if r.get('fecha_vigencia','') >= '2026-09']
+          print('recent rows', len(recent), 'recent stations', len({r['idempresa'] for r in recent}))
+          for p in set(r['producto'] for r in recent):
+              v = sorted(float(r['precio']) for r in recent if r['producto']==p and r['precio'])
+              if v: print(p, len(v), v[len(v)//20], v[len(v)//2], v[-len(v)//20])
+          P
