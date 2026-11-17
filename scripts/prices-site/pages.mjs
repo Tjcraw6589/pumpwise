@@ -219,7 +219,7 @@ export const U = {
     tmrH1: "Fuel prices tomorrow in {r}", tmrLead: "Prices for {d}. Stations tell FuelWatch by 2pm and must sell at that price for 24 hours from 6am, so these are the prices you will pay tomorrow.", tmrNotYet: "Tomorrow's prices come out at 2:30pm Perth time. Until then, this page shows today's prices.", tmrPlaces: "Cheapest places tomorrow", tmrLink: "Tomorrow's prices in {r}", tmrToday: "today {v}",
     searchLabel: 'Search for a town, postcode or address', searchPh: 'Town, postcode or address', noMatch: 'No town or postcode with that name. Press Go to look it up as an address.', go: 'Go',
     nearPlace: '{a}, near {p}',
-    bestNow: 'Cheapest right now', bestTie: 'Lowest price, the same at {n} stations', leadTie: 'The lowest price for {f} in {p} today is {price}, at {n} stations.', directions: 'Directions', directionsTo: 'Directions to {s}',
+    bestNow: 'Cheapest right now', bestTie: 'Lowest price, the same at {n} stations', leadTie: 'The lowest price for {f} in {p} today is {price}, at {n} stations.', directions: 'Directions', directionsTo: 'Directions to {s}', mapsPick: 'Open directions in', mapsChange: 'Maps app', mapsApple: 'Apple Maps', mapsNote: 'We will remember your choice. Change it any time with Maps app at the bottom of the page.', mapsCancel: 'Cancel',
     cheapestFuel: 'Cheapest price of each fuel', fuelPick: 'Fuel',
     showAll: 'Show all {n} stations', capped: 'Showing the {k} cheapest.', aToZ: 'All places A to Z', jump: 'Jump to a letter',
     licences: 'Data licences', privacy: 'Privacy', popular: 'Popular places', regions: 'Countries and states', perLitreAvg: 'average, per litre',
@@ -301,7 +301,7 @@ export const U = {
     tmrH1: "Precios del combustible mañana en {r}", tmrLead: "Precios para el {d}. Las gasolineras los comunican a FuelWatch antes de las 14:00 y deben mantenerlos 24 horas desde las 6:00, así que son los precios que pagarás mañana.", tmrNotYet: "Los precios de mañana se publican a las 14:30, hora de Perth. Hasta entonces, esta página muestra los de hoy.", tmrPlaces: "Los lugares más baratos mañana", tmrLink: "Precios de mañana en {r}", tmrToday: "hoy {v}",
     searchLabel: 'Buscar un municipio, código postal o dirección', searchPh: 'Lugar, código postal o dirección', noMatch: 'Ningún lugar ni código postal con ese nombre. Pulsa Ir para buscarlo como dirección.', go: 'Ir',
     nearPlace: '{a}, cerca de {p}',
-    bestNow: 'Lo más barato ahora', bestTie: 'El precio más bajo, igual en {n} gasolineras', leadTie: 'Hoy en {p} el precio más bajo de {f} es {price}, en {n} gasolineras.', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}',
+    bestNow: 'Lo más barato ahora', bestTie: 'El precio más bajo, igual en {n} gasolineras', leadTie: 'Hoy en {p} el precio más bajo de {f} es {price}, en {n} gasolineras.', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}', mapsPick: 'Abrir la ruta en', mapsChange: 'App de mapas', mapsApple: 'Apple Maps', mapsNote: 'Recordaremos tu elección. Cámbiala cuando quieras con App de mapas, al final de la página.', mapsCancel: 'Cancelar',
     cheapestFuel: 'Precio más bajo de cada combustible', fuelPick: 'Combustible',
     showAll: 'Ver las {n} gasolineras', capped: 'Se muestran las {k} más baratas.', aToZ: 'Todos los lugares de la A a la Z', jump: 'Ir a una letra',
     licences: 'Licencias de datos', privacy: 'Privacidad', popular: 'Lugares populares', regions: 'Países y estados', perLitreAvg: 'media, por litro',
@@ -383,7 +383,7 @@ export const U = {
     tmrH1: "Prix des carburants demain : {r}", tmrLead: "Prix pour le {d}. Les stations les déclarent à FuelWatch avant 14 h et doivent les appliquer 24 heures à partir de 6 h : ce sont les prix que vous paierez demain.", tmrNotYet: "Les prix de demain sont publiés à 14 h 30, heure de Perth. En attendant, cette page montre ceux du jour.", tmrPlaces: "Les endroits les moins chers demain", tmrLink: "Les prix de demain : {r}", tmrToday: "aujourd'hui {v}",
     searchLabel: 'Rechercher une commune, un code postal ou une adresse', searchPh: 'Commune, code postal ou adresse', noMatch: 'Aucune commune ni code postal de ce nom. Appuyez sur OK pour la chercher comme adresse.', go: 'OK',
     nearPlace: '{a}, près de {p}',
-    bestNow: 'Le moins cher maintenant', bestTie: 'Le prix le plus bas, identique dans {n} stations', leadTie: "Aujourd'hui à {p}, le prix le plus bas ({f}) est de {price}, dans {n} stations.", directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}',
+    bestNow: 'Le moins cher maintenant', bestTie: 'Le prix le plus bas, identique dans {n} stations', leadTie: "Aujourd'hui à {p}, le prix le plus bas ({f}) est de {price}, dans {n} stations.", directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}', mapsPick: 'Ouvrir l’itinéraire dans', mapsChange: 'App de cartes', mapsApple: 'Plans (Apple)', mapsNote: 'Nous retiendrons votre choix. Changez le quand vous voulez avec App de cartes, en bas de la page.', mapsCancel: 'Annuler',
     cheapestFuel: 'Prix le plus bas de chaque carburant', fuelPick: 'Carburant',
     showAll: 'Voir les {n} stations', capped: 'Les {k} moins chères sont affichées.', aToZ: 'Toutes les communes de A à Z', jump: 'Aller à une lettre',
     licences: 'Licences des données', privacy: 'Confidentialité', popular: 'Lieux populaires', regions: 'Pays et États', perLitreAvg: 'moyenne, le litre',
@@ -465,7 +465,7 @@ export const U = {
     tmrH1: "Preços dos combustíveis amanhã: {r}", tmrLead: "Preços para {d}. Os postos comunicam-nos à FuelWatch até às 14h e têm de os manter 24 horas a partir das 6h, por isso são os preços que vai pagar amanhã.", tmrNotYet: "Os preços de amanhã saem às 14h30, hora de Perth. Até lá, esta página mostra os de hoje.", tmrPlaces: "Os locais mais baratos amanhã", tmrLink: "Preços de amanhã: {r}", tmrToday: "hoje {v}",
     searchLabel: 'Procurar uma localidade, código postal ou morada', searchPh: 'Local, código postal ou morada', noMatch: 'Nenhum local ou código postal com esse nome. Carregue em Ir para o procurar como morada.', go: 'Ir',
     nearPlace: '{a}, perto de {p}',
-    bestNow: 'O mais barato agora', bestTie: 'O preço mais baixo, igual em {n} postos', leadTie: 'Hoje em {p}, o preço mais baixo de {f} é {price}, em {n} postos.', directions: 'Direções', directionsTo: 'Direções para {s}',
+    bestNow: 'O mais barato agora', bestTie: 'O preço mais baixo, igual em {n} postos', leadTie: 'Hoje em {p}, o preço mais baixo de {f} é {price}, em {n} postos.', directions: 'Direções', directionsTo: 'Direções para {s}', mapsPick: 'Abrir o trajeto em', mapsChange: 'App de mapas', mapsApple: 'Mapas da Apple', mapsNote: 'Vamos lembrar a sua escolha. Pode mudar quando quiser em App de mapas, no fim da página.', mapsCancel: 'Cancelar',
     cheapestFuel: 'Preço mais baixo de cada combustível', fuelPick: 'Combustível',
     showAll: 'Ver os {n} postos', capped: 'São mostrados os {k} mais baratos.', aToZ: 'Todos os locais de A a Z', jump: 'Ir para uma letra',
     licences: 'Licenças dos dados', privacy: 'Privacidade', popular: 'Locais populares', regions: 'Países e estados', perLitreAvg: 'média, por litro',
@@ -876,7 +876,7 @@ const ICON_MAIL = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="
 const ICON_ARROW = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function mapsUrl(s) {
-  return `https://www.google.com/maps/search/?api=1&amp;query=${s.lat},${s.lng}`;
+  return `https://www.google.com/maps/dir/?api=1&amp;destination=${s.lat},${s.lng}&amp;travelmode=driving`;
 }
 
 /**
@@ -970,6 +970,91 @@ function siteMain(D) {
       }
     },
   };
+  // Directions: the first tap asks which maps app the visitor uses and remembers it; after that every
+  // Directions button opens that app with the route to the station already set. Without this script the
+  // links are plain Google Maps directions.
+  const MAPS = {
+    apple: (ll) => 'https://maps.apple.com/?daddr=' + ll + '&dirflg=d',
+    google: (ll) => 'https://www.google.com/maps/dir/?api=1&destination=' + ll + '&travelmode=driving',
+    waze: (ll) => 'https://waze.com/ul?ll=' + ll + '&navigate=yes',
+  };
+  const mapsNames = () => ({ apple: word('mapsApple'), google: 'Google Maps', waze: 'Waze' });
+  function mapsPick(ll) {
+    const old = document.getElementById('maps-pick');
+    if (old) old.remove();
+    const box = document.createElement('div');
+    box.id = 'maps-pick';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', word(ll ? 'mapsPick' : 'mapsChange'));
+    const card = document.createElement('div');
+    card.className = 'card';
+    const h = document.createElement('p');
+    h.className = 'h';
+    h.textContent = word(ll ? 'mapsPick' : 'mapsChange');
+    card.appendChild(h);
+    const names = mapsNames();
+    const now = store.get('pw-maps');
+    Object.keys(MAPS).forEach((k) => {
+      const a = document.createElement(ll ? 'a' : 'button');
+      if (ll) {
+        a.href = MAPS[k](ll);
+        a.rel = 'nofollow noopener';
+      } else {
+        a.type = 'button';
+      }
+      a.className = 'opt' + (now === k ? ' on' : '');
+      a.textContent = names[k];
+      a.addEventListener('click', () => {
+        store.set('pw-maps', k);
+        box.remove();
+      });
+      card.appendChild(a);
+    });
+    const note = document.createElement('p');
+    note.className = 'n';
+    note.textContent = word('mapsNote');
+    card.appendChild(note);
+    const x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'x';
+    x.textContent = word('mapsCancel');
+    x.addEventListener('click', () => box.remove());
+    card.appendChild(x);
+    box.appendChild(card);
+    box.addEventListener('click', (ev) => {
+      if (ev.target === box) box.remove();
+    });
+    box.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') box.remove();
+    });
+    document.body.appendChild(box);
+    card.querySelector('.opt').focus();
+  }
+  document.addEventListener('click', (ev) => {
+    const a = ev.target && ev.target.closest ? ev.target.closest('a.dir[data-ll]') : null;
+    if (!a) return;
+    const ll = a.getAttribute('data-ll');
+    const pick = store.get('pw-maps');
+    if (pick && MAPS[pick]) {
+      a.href = MAPS[pick](ll);
+      return;
+    }
+    ev.preventDefault();
+    mapsPick(ll);
+  });
+  const footNav = document.querySelector('footer.site nav');
+  if (footNav) {
+    const c = document.createElement('a');
+    c.href = '#';
+    c.setAttribute('data-k', 'mapsChange');
+    c.textContent = word('mapsChange');
+    c.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      mapsPick(null);
+    });
+    footNav.appendChild(c);
+  }
   function fuelText(label, kind, lang) {
     const g = lang !== L && G[L] && G[L][kind];
     // "Avtoplin (LPG)" already says it in every language (LPG, GLP and GPL are the same letters).
@@ -1413,7 +1498,7 @@ function siteMain(D) {
           + `<span class="addr">${e(km)}${addr ? ` · ${e(addr)}` : ''}</span>${when ? `<span class="when">${e(when)}</span>` : ''}${cheap ? `<span class="when cheap" data-k="cheapestHere">${e(word('cheapestHere'))}</span>` : ''}`;
         return `<li class="st${cheap ? ' first' : ''}"><span class="rk" aria-hidden="true">${i + 1}</span>${page ? `<a class="who" href="${e(page.url)}">${who}</a>` : `<div class="who">${who}</div>`}`
           + `<span class="pp">${e(money(r.p, r.x.g.m))}</span>`
-          + `<a class="dir" href="https://www.google.com/maps/search/?api=1&amp;query=${s.lat},${s.lng}" rel="nofollow noopener" data-kl="directionsTo" aria-label="${e(word('directionsTo', { s: name }))}"><span class="i-pin"></span><span class="dw" data-k="directions">${e(word('directions'))}</span></a></li>`;
+          + `<a class="dir" href="https://www.google.com/maps/dir/?api=1&amp;destination=${s.lat},${s.lng}&amp;travelmode=driving" data-ll="${s.lat},${s.lng}" rel="nofollow noopener" data-kl="directionsTo" aria-label="${e(word('directionsTo', { s: name }))}"><span class="i-pin"></span><span class="dw" data-k="directions">${e(word('directions'))}</span></a></li>`;
       })
       .join('');
     moreWrap.hidden = shown.length >= sorted.length;
@@ -1656,7 +1741,7 @@ function stationRow(r, rank, cfg, now, best, ties = 1) {
   // When several stations share the lowest price (the rule where prices are capped), the first row says so
   // instead of naming one station as the cheapest.
   const kick = !best ? '' : ties > 1 ? w(L, 'bestTie', { n: ties.toLocaleString(cfg.locale) }, 'span', ' class="kick"') : w(L, 'bestNow', null, 'span', ' class="kick"');
-  return `<li class="st${best ? ' first' : ''}"><span class="rk" aria-hidden="true">${rank}</span><div class="who">${kick}<strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" rel="nofollow noopener" aria-label="${esc(say(L, 'directionsTo', { s: name }))}" data-kl="directionsTo"><span class="i-pin"></span>${w(L, 'directions', null, 'span', ' class="dw"')}</a></li>`;
+  return `<li class="st${best ? ' first' : ''}"><span class="rk" aria-hidden="true">${rank}</span><div class="who">${kick}<strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" data-ll="${r.s.lat},${r.s.lng}" rel="nofollow noopener" aria-label="${esc(say(L, 'directionsTo', { s: name }))}" data-kl="directionsTo"><span class="i-pin"></span>${w(L, 'directions', null, 'span', ' class="dw"')}</a></li>`;
 }
 
 function placePage(id, place, ctx) {
@@ -2165,6 +2250,14 @@ a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2
 .st.first .pp{color:var(--cheap);font-size:19px}
 .dir{min-width:44px;height:44px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;color:var(--link);border:1px solid var(--border);text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap}
 .dir:hover{background:var(--card2)}
+#maps-pick{position:fixed;inset:0;z-index:50;background:rgba(8,14,22,.55);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+#maps-pick .card{width:100%;max-width:420px;background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:16px;padding:16px;display:grid;gap:8px}
+#maps-pick .h{margin:0 0 4px;font-weight:800;font-size:17px}
+#maps-pick .opt{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--fg);font:inherit;font-weight:700;font-size:16px;text-decoration:none;cursor:pointer}
+#maps-pick .opt.on{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+#maps-pick .n{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.4}
+#maps-pick .x{min-height:44px;border:0;background:none;color:var(--link);font:inherit;font-weight:600;cursor:pointer}
+@media (min-width:600px){#maps-pick{align-items:center}}
 .st.first .dir{background:var(--amber);color:#101820;border-color:transparent}
 @media (max-width:399px){.dir{padding:0}.dir .dw{display:none}.st.first .dir{grid-column:2/-1;justify-self:start;padding:0 14px}.st.first .dir .dw{display:inline}}
 .i-pin{flex:none;width:20px;height:20px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5c-3.9 0-7 3-7 6.9 0 5 6 10.1 6.3 10.4.4.3.9.3 1.3 0 .3-.3 6.4-5.4 6.4-10.4 0-3.9-3.1-6.9-7-6.9z' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='9.5' r='2.4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5c-3.9 0-7 3-7 6.9 0 5 6 10.1 6.3 10.4.4.3.9.3 1.3 0 .3-.3 6.4-5.4 6.4-10.4 0-3.9-3.1-6.9-7-6.9z' fill='none' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='12' cy='9.5' r='2.4'/%3E%3C/svg%3E") center/contain no-repeat}

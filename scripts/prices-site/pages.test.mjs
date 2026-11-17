@@ -313,3 +313,13 @@ test('Denmark and Iceland: kroner the local way, and prices credited to the comp
   assert.match(dkPage, /data-k="dkOnly"/);
   assert.ok(!isPage.includes('data-k="dkOnly"'));
 });
+
+test('Directions buttons carry the station position and default to driving directions', () => {
+  const es = [];
+  for (let i = 0; i < 4; i++) es.push(st('es', 'Madrid', 40.4 + i / 1000, -3.7, { regular: 150 + i }));
+  const { files } = buildSite(meta(['es']), { es });
+  const page = files.get('spain/madrid/index.html');
+  assert.match(page, /class="dir" href="https:\/\/www\.google\.com\/maps\/dir\/\?api=1&amp;destination=40\.4\d*,-3\.7&amp;travelmode=driving" data-ll="40\.4\d*,-3\.7"/);
+  const js = files.get('site.js') ?? '';
+  for (const part of ['pw-maps', 'maps.apple.com/?daddr=', 'waze.com/ul?ll=', 'mapsPick']) assert.ok(js.includes(part), part);
+});
