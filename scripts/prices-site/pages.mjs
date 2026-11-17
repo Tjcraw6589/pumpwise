@@ -1551,12 +1551,12 @@ function siteMain(D) {
         const page = pageOf(ix, s);
         const when = reported(r.at, r.x.g);
         const cc = r.x.g.c || '';
-        const flag = cc.length === 2 ? `<span class="flag" aria-hidden="true">${String.fromCodePoint(0x1f1e6 + cc.charCodeAt(0) - 65, 0x1f1e6 + cc.charCodeAt(1) - 65)}</span> ` : '';
+        const flag = cc.length === 2 ? String.fromCodePoint(0x1f1e6 + cc.charCodeAt(0) - 65, 0x1f1e6 + cc.charCodeAt(1) - 65) : '';
         // A station with no town of its own is placed by the nearest town that has a page.
         const nearTo = !s.town && page ? word('nearOnly', { p: page.n }) : '';
-        const who = `<strong>${flag}${e(name)}</strong>${lim ? `<span class="tag" data-k="${lim}">${e(word(lim))}</span>` : ''}${r.doubt ? `<span class="tag warn" data-k="checkPrice">${e(word('checkPrice'))}</span>` : ''}`
+        const who = `<strong>${e(name)}</strong>${lim ? `<span class="tag" data-k="${lim}">${e(word(lim))}</span>` : ''}${r.doubt ? `<span class="tag warn" data-k="checkPrice">${e(word('checkPrice'))}</span>` : ''}`
           + `<span class="addr">${e(km)}${addr ? ` · ${e(addr)}` : ''}${nearTo ? ` · ${e(nearTo)}` : ''}</span>${when ? `<span class="when">${e(when)}</span>` : ''}${cheap ? `<span class="when cheap" data-k="cheapestHere">${e(word('cheapestHere'))}</span>` : ''}`;
-        return `<li class="st${cheap ? ' first' : ''}"><span class="rk" aria-hidden="true">${i + 1}</span>${page ? `<a class="who" href="${e(page.url)}">${who}</a>` : `<div class="who">${who}</div>`}`
+        return `<li class="st${cheap ? ' first' : ''}"><span class="rk" aria-hidden="true">${i + 1}</span><span class="fl flag" aria-hidden="true">${flag}</span>${page ? `<a class="who" href="${e(page.url)}">${who}</a>` : `<div class="who">${who}</div>`}`
           + `<span class="pp">${e(money(r.p, r.x.g.m))}</span>`
           + `<a class="dir" href="https://www.google.com/maps/dir/?api=1&amp;destination=${s.lat},${s.lng}&amp;travelmode=driving" data-ll="${s.lat},${s.lng}" rel="nofollow noopener" data-kl="directionsTo" aria-label="${e(word('directionsTo', { s: name }))}"><span class="i-pin"></span><span class="dw" data-k="directions">${e(word('directions'))}</span></a></li>`;
       })
@@ -1810,7 +1810,7 @@ function stationRow(r, rank, cfg, now, best, ties = 1) {
   // When several stations share the lowest price (the rule where prices are capped), the first row says so
   // instead of naming one station as the cheapest.
   const kick = !best ? '' : ties > 1 ? w(L, 'bestTie', { n: ties.toLocaleString(cfg.locale) }, 'span', ' class="kick"') : w(L, 'bestNow', null, 'span', ' class="kick"');
-  return `<li class="st${best ? ' first' : ''}"><span class="rk" aria-hidden="true">${rank}</span><div class="who">${kick}<strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" data-ll="${r.s.lat},${r.s.lng}" rel="nofollow noopener" aria-label="${esc(say(L, 'directionsTo', { s: name }))}" data-kl="directionsTo"><span class="i-pin"></span>${w(L, 'directions', null, 'span', ' class="dw"')}</a></li>`;
+  return `<li class="st${best ? ' first' : ''}"><span class="rk" aria-hidden="true">${rank}</span><span class="fl flag" aria-hidden="true">${flagOf(FLAG_COUNTRY[r.s.region] || '')}</span><div class="who">${kick}<strong>${esc(name)}</strong>${tag}<span class="addr">${esc(stationAddress(r.s))}</span>${time}</div><span class="pp">${esc(money(r.p, cfg.money))}</span><a class="dir" href="${mapsUrl(r.s)}" data-ll="${r.s.lat},${r.s.lng}" rel="nofollow noopener" aria-label="${esc(say(L, 'directionsTo', { s: name }))}" data-kl="directionsTo"><span class="i-pin"></span>${w(L, 'directions', null, 'span', ' class="dw"')}</a></li>`;
 }
 
 function placePage(id, place, ctx) {
@@ -2304,12 +2304,16 @@ h3{font-size:15px;margin:20px 0 8px;color:var(--muted);letter-spacing:.5px}
 .btn.ghost:hover{background:var(--card)}
 /* Station lists: a fixed price column; the cheapest row carries a labelled Directions button */
 .fuel h2{margin:16px 0 8px}
-.list{list-style:none;margin:0;padding:0;color:var(--fg);background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
-.st{display:grid;grid-template-columns:26px minmax(0,1fr) 5.6em auto;gap:4px 10px;align-items:center;padding:10px 8px 10px 12px;border-bottom:1px solid var(--border)}
-.st:last-child{border-bottom:0}
-.st .rk{width:26px;height:26px;border-radius:50%;background:var(--card2);color:var(--muted);font-size:13px;font-weight:700;display:grid;place-items:center}
+/* The rank numbers stand in the margin to the left of the card; the flag takes the first column of each row */
+.list{list-style:none;margin:0 0 0 30px;padding:0;color:var(--fg);background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.st{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr) 5.6em auto;gap:4px 10px;align-items:center;padding:10px 8px 10px 12px;border-bottom:1px solid var(--border)}
+.st:first-child{border-radius:13px 13px 0 0}
+.st:last-child{border-bottom:0;border-radius:0 0 13px 13px}
+.st:only-child{border-radius:13px}
+.st .rk{position:absolute;left:-31px;top:50%;transform:translateY(-50%);width:28px;text-align:center;color:var(--muted);font-size:13px;font-weight:800}
+.st .fl{font-size:22px;line-height:1;text-align:center}
 .st.first{background:var(--cheapbg)}
-.st.first .rk{background:var(--cheap);color:var(--card)}
+.st.first .rk{color:var(--cheap)}
 .who{min-width:0;color:inherit;text-decoration:none}
 a.who{display:block;min-height:44px}
 a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2px}
