@@ -12,32 +12,16 @@ jobs:
       - name: Danish chains and address lookups
         run: |
           python3 - <<'P'
-          import json, urllib.request, urllib.parse, collections
-          def get(u, h={}):
-              req = urllib.request.Request(u, headers={'User-Agent': 'Pumpwise feed (pumpwiseapp@gmail.com)', 'Accept': 'application/json', **h})
-              return urllib.request.urlopen(req, timeout=30).read()
-          try:
-              d = json.loads(get('https://api.circlek.com/eu/prices/v1/fuel/countries/DK', {'X-App-Name': 'PRICES'}))
-              print('CK top', type(d).__name__, list(d.keys())[:12] if isinstance(d, dict) else len(d))
-              arr = d if isinstance(d, list) else next((v for v in d.values() if isinstance(v, list)), [])
-              print('CK n', len(arr)); print('CK sample', json.dumps(arr[0])[:1500]); print('CK sample2', json.dumps(arr[len(arr)//2])[:900])
-              print('CK brands', collections.Counter(str(x.get('brand') or x.get('brandName') or x.get('siteBrand')) for x in arr).most_common(6))
-              print('CK keys', collections.Counter(k for x in arr for k in x.keys()).most_common(30))
-          except Exception as e: print('CK FAILED', type(e).__name__, str(e)[:200])
-          try:
-              d = json.loads(get('https://beta.q8.dk/Station/GetStationPrices?page=1&pageSize=2000'))
-              arr = d['data']['stationsPrices']
-              print('Q8 n', len(arr), 'keys', list(d['data'].keys())); print('Q8 sample', json.dumps(arr[0])[:900]); print('Q8 sample2', json.dumps(arr[len(arr)//2])[:500])
-              print('Q8 products', collections.Counter(p['productName'] for x in arr for p in x.get('products', [])).most_common(20))
-              a = arr[0].get('address'); a2 = arr[len(arr)//2].get('address')
-          except Exception as e: print('Q8 FAILED', type(e).__name__, str(e)[:200]); a = 'Bramhalevej 2, 6100 Haderslev'; a2 = 'Østergade 1, 4171 Glumsø'
-          for addr in [a, a2]:
-              s = addr if isinstance(addr, str) else json.dumps(addr)
-              print('ADDR', s)
-              for name, u in [('dawa', 'https://api.dataforsyningen.dk/adgangsadresser?struktur=mini&per_side=1&q=' + urllib.parse.quote(s)),
-                              ('dawa-vask', 'https://api.dataforsyningen.dk/datavask/adgangsadresser?betegnelse=' + urllib.parse.quote(s)),
-                              ('nominatim', 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=dk&q=' + urllib.parse.quote(s)),
-                              ('photon', 'https://photon.komoot.io/api/?limit=1&q=' + urllib.parse.quote(s + ', Danmark'))]:
-                  try: print(' ', name, get(u)[:420].decode('utf8', 'replace'))
-                  except Exception as e: print(' ', name, 'FAILED', type(e).__name__, str(e)[:120])
+          import json, urllib.request, gzip, collections
+          req = urllib.request.Request('https://api.circlek.com/eu/prices/v1/fuel/countries/DK', headers={'User-Agent': 'Pumpwise feed (pumpwiseapp@gmail.com)', 'Accept': 'application/json', 'X-App-Name': 'PRICES'})
+          raw = urllib.request.urlopen(req, timeout=40).read()
+          if raw[:2] == b'\x1f\x8b': raw = gzip.decompress(raw)
+          d = json.loads(raw)
+          print('CK top', type(d).__name__, list(d.keys())[:12] if isinstance(d, dict) else len(d), len(raw))
+          arr = d if isinstance(d, list) else next((v for v in d.values() if isinstance(v, list)), [])
+          print('CK n', len(arr)); print('CK sample', json.dumps(arr[0])[:1800]); print('CK sample2', json.dumps(arr[len(arr)//2])[:1200])
+          print('CK keys', collections.Counter(k for x in arr for k in x.keys()).most_common(30))
+          for k in ('brand','brandName','siteBrand','stationBrand','type','country'):
+              c = collections.Counter(str(x.get(k)) for x in arr)
+              if len(c) > 1 or None not in [x.get(k) for x in arr[:1]]: print('CK', k, c.most_common(8))
           P
