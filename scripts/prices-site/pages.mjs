@@ -2032,7 +2032,7 @@ ${credit(id, cfg, licence, now)}`;
 
 function regionGrid(cards, L) {
   return cards.map((c) => `<li><a class="region" href="${c.regionUrl}">
-<span class="code">${CODES[c.id] ?? esc(c.id.toUpperCase())}</span>
+${FLAG_COUNTRY[c.id] ? `<span class="code flag" aria-hidden="true">${flagOf(FLAG_COUNTRY[c.id])}</span>` : `<span class="code">${CODES[c.id] ?? esc(c.id.toUpperCase())}</span>`}
 <span class="rname">${w(L, `rn_${c.id}`)}<small>${w(L, 'nStations', { n: c.stations.toLocaleString('en-US') })} · ${w(L, 'placesCount', { k: c.places.toLocaleString('en-US') })}</small></span>
 <span class="board">${c.fuels.slice(0, 2).map((f) => `<span class="line"><span class="fuel" data-fuel="${f.kind}" data-lang="${c.cfg.lang}">${esc(f.label)}</span><span class="digits">${esc(money(f.avg, c.cfg.money))}</span></span>`).join('')}</span>
 <span class="go">${ICON_ARROW}</span>
@@ -2402,6 +2402,7 @@ a.who strong{color:var(--link);text-decoration:underline;text-underline-offset:2
 .region{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"code name go" "board board board";gap:10px 12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;text-decoration:none;color:var(--fg);box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
 .region:hover{transform:translateY(-2px);border-color:var(--amber)}
 .region .code{grid-area:code;min-width:44px;height:44px;padding:0 8px;border-radius:12px;background:var(--amber);color:#101820;font-weight:800;font-size:15px;display:grid;place-items:center}
+.region .code.flag{background:none;padding:0;font-size:36px;line-height:1}
 .region .rname{grid-area:name;font-weight:800;font-size:18px;line-height:1.2}
 .region .rname small{display:block;font-weight:500;margin-top:2px}
 .region .go{grid-area:go;color:var(--muted)}
