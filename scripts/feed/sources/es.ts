@@ -7,7 +7,7 @@ import {
   cleanPrice,
   type FeedStation,
   type FuelKind,
-  inRegion,
+  stationInRegion,
   isEuropeanSummerTime,
   type Raw,
   roundCoord,
@@ -114,7 +114,7 @@ export function buildEsStations(response: unknown): FeedStation[] {
     const id = asString(s.IDEESS);
     const lat = esNumber(s.Latitud);
     const lng = esNumber(s['Longitud (WGS84)']);
-    if (!id || lat === null || lng === null || !inRegion('es', lat, lng)) continue;
+    if (!id || lat === null || lng === null || !stationInRegion('es', lat, lng)) continue;
     const prices: FeedStation['prices'] = {};
     for (const { field, kind } of FUELS) {
       if (prices[kind]) continue;

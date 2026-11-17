@@ -120,7 +120,12 @@ export async function fetchUkRetail(now: Date): Promise<FeedStation[]> {
   const stations: FeedStation[] = [];
   for (const retailer of UK_RETAILERS) {
     try {
-      const response = await request(retailer.url);
+      // Some retailers' sites refuse a request now and then (SGN answered 403 once in the audit of 17 Nov 2026): try twice more.
+      let response = await request(retailer.url);
+      for (let attempt = 0; attempt < 2 && !response.ok; attempt += 1) {
+        await new Promise((done) => setTimeout(done, 4000));
+        response = await request(retailer.url);
+      }
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const built = buildUkRetailStations(await response.json(), retailer.key, retailer.name, now);
       // The same forecourt can be in two files (a motorway site in its operator's and its fuel brand's).

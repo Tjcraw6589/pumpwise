@@ -270,6 +270,28 @@ export function inRegion(id: RegionId, lat: number, lng: number): boolean {
   return REGION_BOUNDS[id].some((b) => inBounds(b, lat, lng));
 }
 
+/**
+ * Wider boxes for placing a country's own stations. The region boxes above follow the borders tightly
+ * so the app can tell which country a driver is in, and that cuts off real stations in border towns
+ * (Cádiz and Jerez, Badajoz, Tui, Irun, the Pyrenees; Vilar Formoso in Portugal). A station in a
+ * country's official file belongs to that country, so here the box only has to catch broken
+ * coordinates (0,0 or swapped numbers). Found by the audit of 17 November 2026: 250 Spanish and 5
+ * Portuguese stations with road fuel were being left out.
+ */
+export const STATION_BOUNDS: Partial<Record<RegionId, readonly Bounds[]>> = {
+  es: [
+    { minLat: 41.8, maxLat: 43.85, minLng: -9.35, maxLng: 4.4 }, // Galicia and the north, to the Pyrenees
+    { minLat: 35.2, maxLat: 41.8, minLng: -7.55, maxLng: 4.4 }, // the rest of the mainland, the Balearics, Ceuta and Melilla
+    { minLat: 27.6, maxLat: 29.5, minLng: -18.2, maxLng: -13.3 }, // Canary Islands
+  ],
+  pt: [{ minLat: 36.9, maxLat: 42.2, minLng: -9.6, maxLng: -6.18 }],
+};
+
+/** True when a station from a region's own source may be kept: inside the region, or inside its wider station box. */
+export function stationInRegion(id: RegionId, lat: number, lng: number): boolean {
+  return inRegion(id, lat, lng) || (STATION_BOUNDS[id] ?? []).some((b) => inBounds(b, lat, lng));
+}
+
 export function regionAt(lat: number, lng: number): RegionId | null {
   return REGION_IDS.find((id) => inRegion(id, lat, lng)) ?? null;
 }
