@@ -220,7 +220,7 @@ export const U = {
     tomorrowSame: '{f}: average {avg} tomorrow, the same as today. Cheapest tomorrow: {min} at {s}.',
     tmrH1: "Fuel prices tomorrow in {r}", tmrLead: "Prices for {d}. Stations tell FuelWatch by 2pm and must sell at that price for 24 hours from 6am, so these are the prices you will pay tomorrow.", tmrNotYet: "Tomorrow's prices come out at 2:30pm Perth time. Until then, this page shows today's prices.", tmrPlaces: "Cheapest places tomorrow", tmrLink: "Tomorrow's prices in {r}", tmrToday: "today {v}",
     searchLabel: 'Search for a town, postcode or address', searchPh: 'Town, postcode or address', noMatch: 'No town or postcode with that name. Press Go to look it up as an address.', go: 'Go',
-    nearPlace: '{a}, near {p}', nearOnly: 'Near {p}',
+    nearPlace: '{a}, near {p}', nearOnly: 'Near {p}', chkMin: 'Pumpwise checks these prices every {n} minutes', chkHour: 'Pumpwise checks these prices every hour', chkHours: 'Pumpwise checks these prices every {n} hours',
     bestNow: 'Cheapest right now', bestTie: 'Lowest price, the same at {n} stations', leadTie: 'The lowest price for {f} in {p} today is {price}, at {n} stations.', directions: 'Directions', directionsTo: 'Directions to {s}', mapsPick: 'Open directions in', mapsChange: 'Maps app', mapsApple: 'Apple Maps', mapsNote: 'We will remember your choice. Change it any time with Maps app at the bottom of the page.', mapsCancel: 'Cancel',
     cheapestFuel: 'Cheapest price of each fuel', fuelPick: 'Fuel',
     showAll: 'Show all {n} stations', capped: 'Showing the {k} cheapest.', aToZ: 'All places A to Z', jump: 'Jump to a letter',
@@ -302,7 +302,7 @@ export const U = {
     tomorrowSame: '{f}: media de {avg} mañana, igual que hoy. Lo más barato mañana: {min} en {s}.',
     tmrH1: "Precios del combustible mañana en {r}", tmrLead: "Precios para el {d}. Las gasolineras los comunican a FuelWatch antes de las 14:00 y deben mantenerlos 24 horas desde las 6:00, así que son los precios que pagarás mañana.", tmrNotYet: "Los precios de mañana se publican a las 14:30, hora de Perth. Hasta entonces, esta página muestra los de hoy.", tmrPlaces: "Los lugares más baratos mañana", tmrLink: "Precios de mañana en {r}", tmrToday: "hoy {v}",
     searchLabel: 'Buscar un municipio, código postal o dirección', searchPh: 'Lugar, código postal o dirección', noMatch: 'Ningún lugar ni código postal con ese nombre. Pulsa Ir para buscarlo como dirección.', go: 'Ir',
-    nearPlace: '{a}, cerca de {p}', nearOnly: 'Cerca de {p}',
+    nearPlace: '{a}, cerca de {p}', nearOnly: 'Cerca de {p}', chkMin: 'Pumpwise comprueba estos precios cada {n} minutos', chkHour: 'Pumpwise comprueba estos precios cada hora', chkHours: 'Pumpwise comprueba estos precios cada {n} horas',
     bestNow: 'Lo más barato ahora', bestTie: 'El precio más bajo, igual en {n} gasolineras', leadTie: 'Hoy en {p} el precio más bajo de {f} es {price}, en {n} gasolineras.', directions: 'Cómo llegar', directionsTo: 'Cómo llegar a {s}', mapsPick: 'Abrir la ruta en', mapsChange: 'App de mapas', mapsApple: 'Apple Maps', mapsNote: 'Recordaremos tu elección. Cámbiala cuando quieras con App de mapas, al final de la página.', mapsCancel: 'Cancelar',
     cheapestFuel: 'Precio más bajo de cada combustible', fuelPick: 'Combustible',
     showAll: 'Ver las {n} gasolineras', capped: 'Se muestran las {k} más baratas.', aToZ: 'Todos los lugares de la A a la Z', jump: 'Ir a una letra',
@@ -384,7 +384,7 @@ export const U = {
     tomorrowSame: '{f} : moyenne de {avg} demain, sans changement. Le moins cher demain : {min} chez {s}.',
     tmrH1: "Prix des carburants demain : {r}", tmrLead: "Prix pour le {d}. Les stations les déclarent à FuelWatch avant 14 h et doivent les appliquer 24 heures à partir de 6 h : ce sont les prix que vous paierez demain.", tmrNotYet: "Les prix de demain sont publiés à 14 h 30, heure de Perth. En attendant, cette page montre ceux du jour.", tmrPlaces: "Les endroits les moins chers demain", tmrLink: "Les prix de demain : {r}", tmrToday: "aujourd'hui {v}",
     searchLabel: 'Rechercher une commune, un code postal ou une adresse', searchPh: 'Commune, code postal ou adresse', noMatch: 'Aucune commune ni code postal de ce nom. Appuyez sur OK pour la chercher comme adresse.', go: 'OK',
-    nearPlace: '{a}, près de {p}', nearOnly: 'Près de {p}',
+    nearPlace: '{a}, près de {p}', nearOnly: 'Près de {p}', chkMin: 'Pumpwise vérifie ces prix toutes les {n} minutes', chkHour: 'Pumpwise vérifie ces prix toutes les heures', chkHours: 'Pumpwise vérifie ces prix toutes les {n} heures',
     bestNow: 'Le moins cher maintenant', bestTie: 'Le prix le plus bas, identique dans {n} stations', leadTie: "Aujourd'hui à {p}, le prix le plus bas ({f}) est de {price}, dans {n} stations.", directions: 'Itinéraire', directionsTo: 'Itinéraire vers {s}', mapsPick: 'Ouvrir l’itinéraire dans', mapsChange: 'App de cartes', mapsApple: 'Plans (Apple)', mapsNote: 'Nous retiendrons votre choix. Changez le quand vous voulez avec App de cartes, en bas de la page.', mapsCancel: 'Annuler',
     cheapestFuel: 'Prix le plus bas de chaque carburant', fuelPick: 'Carburant',
     showAll: 'Voir les {n} stations', capped: 'Les {k} moins chères sont affichées.', aToZ: 'Toutes les communes de A à Z', jump: 'Aller à une lettre',
@@ -466,7 +466,7 @@ export const U = {
     tomorrowSame: '{f}: média de {avg} amanhã, igual a hoje. O mais barato amanhã: {min} em {s}.',
     tmrH1: "Preços dos combustíveis amanhã: {r}", tmrLead: "Preços para {d}. Os postos comunicam-nos à FuelWatch até às 14h e têm de os manter 24 horas a partir das 6h, por isso são os preços que vai pagar amanhã.", tmrNotYet: "Os preços de amanhã saem às 14h30, hora de Perth. Até lá, esta página mostra os de hoje.", tmrPlaces: "Os locais mais baratos amanhã", tmrLink: "Preços de amanhã: {r}", tmrToday: "hoje {v}",
     searchLabel: 'Procurar uma localidade, código postal ou morada', searchPh: 'Local, código postal ou morada', noMatch: 'Nenhum local ou código postal com esse nome. Carregue em Ir para o procurar como morada.', go: 'Ir',
-    nearPlace: '{a}, perto de {p}', nearOnly: 'Perto de {p}',
+    nearPlace: '{a}, perto de {p}', nearOnly: 'Perto de {p}', chkMin: 'O Pumpwise verifica estes preços a cada {n} minutos', chkHour: 'O Pumpwise verifica estes preços a cada hora', chkHours: 'O Pumpwise verifica estes preços a cada {n} horas',
     bestNow: 'O mais barato agora', bestTie: 'O preço mais baixo, igual em {n} postos', leadTie: 'Hoje em {p}, o preço mais baixo de {f} é {price}, em {n} postos.', directions: 'Direções', directionsTo: 'Direções para {s}', mapsPick: 'Abrir o trajeto em', mapsChange: 'App de mapas', mapsApple: 'Mapas da Apple', mapsNote: 'Vamos lembrar a sua escolha. Pode mudar quando quiser em App de mapas, no fim da página.', mapsCancel: 'Cancelar',
     cheapestFuel: 'Preço mais baixo de cada combustível', fuelPick: 'Combustível',
     showAll: 'Ver os {n} postos', capped: 'São mostrados os {k} mais baratos.', aToZ: 'Todos os locais de A a Z', jump: 'Ir para uma letra',
@@ -707,6 +707,17 @@ export function updatedText(lang, now, tz, zone) {
   const d = new Intl.DateTimeFormat(loc, { timeZone: tz, day: 'numeric', month: 'long' }).format(now);
   const t = new Intl.DateTimeFormat(loc, { timeZone: tz, hour: 'numeric', minute: '2-digit' }).format(now);
   return zone === 'local' ? say(lang, 'updatedUtc', { d, t }) : say(lang, 'updatedAt', { d, t, z: { k: `z_${zone}` } });
+}
+
+/**
+ * How often Pumpwise collects each region's prices, in minutes: the feed's own schedule (the everyMinutes of
+ * SOURCES in scripts/feed/build.ts), rounded up to the feed's 15 minute runs. Keep the two in step.
+ */
+export const CHECK_MINUTES = { wa: 60, nsw: 45, tas: 45, es: 30, fr: 15, mx: 180, pt: 30, si: 180, hr: 60, dk: 30, is: 30 };
+/** "Pumpwise checks these prices every 30 minutes", for the lines under a page's heading. */
+function checkedTag(lang, id) {
+  const m = CHECK_MINUTES[id];
+  return m ? ` · ${w(lang, m >= 60 ? (m === 60 ? 'chkHour' : 'chkHours') : 'chkMin', { n: m >= 60 ? m / 60 : m })}` : '';
 }
 
 function updatedTag(lang, now, cfg) {
@@ -1863,7 +1874,7 @@ function credit(id, cfg, licence, now) {
   const L = cfg.lang;
   const reuse = licence.reuse === 'cc' || licence.reuse === 'open' ? ` ${w(L, 'reuse')}` : '';
   return `<section class="credit">
-<p>${updatedTag(L, now, cfg)}</p>
+<p>${updatedTag(L, now, cfg)}${checkedTag(L, id)}</p>
 <p><strong>${w(L, 'source')}:</strong> ${esc(licence.attribution)}. <strong>${w(L, 'licence')}:</strong> <a href="${esc(licence.url)}" rel="nofollow">${esc(licence.licence)}</a>.${reuse}</p>
 ${id === 'mx' ? w(L, 'mxPlaces', null, 'p') : id === 'si' ? w(L, 'siPlaces', null, 'p') : ''}
 ${w(L, cfg.company ? 'disclaimerCompany' : 'disclaimer', null, 'p')}
@@ -1959,7 +1970,7 @@ ${more}
   const body = `<div class="head">
 <h1>${flagTag(id)}${w(L, 'h1', { p: place.name })}</h1>
 <p class="meta">${w(L, 'countSell', countVars(place, main, cfg), 'span', ' id="cnt"')}</p>
-<p class="meta">${updatedTag(L, now, cfg)}</p>
+<p class="meta">${updatedTag(L, now, cfg)}${checkedTag(L, id)}</p>
 </div>
 ${searchBox(L, '', true)}
 <nav class="fuels" aria-label="${esc(say(L, 'cheapestFuel'))}" data-kl="cheapestFuel">${chips}</nav>
@@ -2047,7 +2058,7 @@ function tomorrowPage(id, places, all, ctx) {
   const body = `<div class="head">
 ${w(L, 'tmrH1', { r: { k: `rn_${id}` } }, 'h1')}
 ${ready ? w(L, 'tmrLead', { d: day }, 'p', ' class="lead"') : w(L, 'tmrNotYet', null, 'p', ' class="lead"')}
-<p class="meta">${updatedTag(L, now, cfg)}</p>
+<p class="meta">${updatedTag(L, now, cfg)}${checkedTag(L, id)}</p>
 </div>
 <div class="cols">
 <div class="lists">
@@ -2096,7 +2107,7 @@ function regionPage(id, places, total, ctx) {
   const body = `<div class="head">
 <h1>${flagTag(id)}${w(L, 'regionH1', { r: { k: `rn_${id}` } })}</h1>
 ${w(L, 'regionLead', { n: total.toLocaleString(cfg.locale), k: places.length.toLocaleString(cfg.locale) }, 'p', ' class="lead"')}
-<p class="meta">${updatedTag(L, now, cfg)}</p>
+<p class="meta">${updatedTag(L, now, cfg)}${checkedTag(L, id)}</p>
 ${cfg.fixedDaily ? `<p><a class="btn ghost" href="tomorrow/">${w(L, 'tmrLink', { r: { k: `rn_${id}` } })}${ICON_ARROW}</a></p>` : ''}
 </div>
 ${searchBox(L, id)}
