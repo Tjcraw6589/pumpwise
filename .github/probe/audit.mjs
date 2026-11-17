@@ -34,14 +34,14 @@ const safe = async (name, fn) => { try { await fn(); } catch (e) { console.log(`
 
 await safe('es', async () => {
   const body = await (await get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/', { Accept: 'application/json' })).json();
-  const rows = body.ListaEESSPrecios; const map = byId('es');
+  console.log('ES keys', Object.keys(body), JSON.stringify(body).slice(0, 300)); const rows = body.ListaEESSPrecios ?? body.listaEESSPrecios; const map = byId('es');
   const num = (t) => (t ? Number(String(t).replace(',', '.')) : null);
   let withPrice = 0, inFeed = 0, match = 0, differ = 0, compared = 0, noCoord = 0; const missing = []; const diffs = [];
   const fields = Object.keys(rows[0]).filter((k) => k.startsWith('Precio'));
   for (const r of rows) {
     const any = fields.some((f) => r[f]); if (any) withPrice++;
     const s = map.get(`es-${r.IDEESS}`);
-    if (!s) { if (any) { if (!r.Latitud || !r['Longitud (WGS84)']) noCoord++; if (missing.length < 8) missing.push(`${r.IDEESS} ${r['Rótulo']} ${r.Municipio} lat=${r.Latitud} lng=${r['Longitud (WGS84)']} tipo=${r['Tipo Venta']}`); } continue; }
+    if (!s) { if (any) { if (!r.Latitud || !r['Longitud (WGS84)']) noCoord++; if (missing.length < 40) missing.push(`${r.IDEESS} ${r['Rótulo']} ${r.Municipio} lat=${r.Latitud} lng=${r['Longitud (WGS84)']} tipo=${r['Tipo Venta']}`); } continue; }
     inFeed++;
     for (const [f, k] of [['Precio Gasoleo A', 'diesel'], ['Precio Gasolina 95 E5', 'regular']]) {
       const raw = num(r[f]); if (raw === null || !s.prices[k]) continue; compared++;
@@ -51,7 +51,7 @@ await safe('es', async () => {
   report('es', { date: body.Fecha, rawRows: rows.length, rawWithPrice: withPrice, feed: feed.es.length, rawInFeed: inFeed, rawMissingNoCoord: noCoord, compared, match, differ, missing, diffs });
 });
 
-await safe('fr', async () => {
+if (0) await safe('fr', async () => {
   execSync('curl -sL -A "Pumpwise audit" -o /tmp/fr.zip https://donnees.roulez-eco.fr/opendata/instantane && cd /tmp && unzip -o -q fr.zip');
   const file = execSync('ls /tmp/*.xml | head -1').toString().trim();
   const xml = new TextDecoder('latin1').decode(execSync(`cat ${file}`, { maxBuffer: 1e9 }));
@@ -80,10 +80,12 @@ await safe('pt', async () => {
     const raw = Number(String(r.Preco).replace(/[^\d,.]/g, '').replace(',', '.')); compared++;
     if (Math.abs(raw * 100 - s.prices[k].p) < 0.05) match++; else { differ++; if (diffs.length < 6) diffs.push(`${r.Id} ${k} raw=${r.Preco} ${r.DataAtualizacao} feed=${s.prices[k].p} at=${s.prices[k].at}`); }
   }
+  const gone = new Map(); for (const r of rows) if (!map.has(`pt-${r.Id}`)) { const g = gone.get(r.Id) ?? { n: r.Nome, m: r.Municipio, lat: r.Latitude, lng: r.Longitude, f: [] }; g.f.push(`${r.Combustivel}=${r.Preco}@${r.DataAtualizacao}`); gone.set(r.Id, g); }
+  for (const [id, g] of gone) console.log(`PTMISS ${id} ${g.n} | ${g.m} | ${g.lat},${g.lng} | ${g.f.join('; ')}`);
   report('pt', { rawRows: rows.length, rawStations: ids.size, feed: feed.pt.length, missingFromFeed: [...ids].filter((i) => !map.has(`pt-${i}`)).length, compared, match, differ, missing, diffs });
 });
 
-await safe('mx', async () => {
+if (0) await safe('mx', async () => {
   const places = await (await get('https://publicacionexterna.azurewebsites.net/publicaciones/places')).text();
   const prices = await (await get('https://publicacionexterna.azurewebsites.net/publicaciones/prices')).text();
   const placeIds = new Set([...places.matchAll(/<place place_id="(\d+)"/g)].map((m) => m[1]));
@@ -93,14 +95,14 @@ await safe('mx', async () => {
   report('mx', { rawPlaces: placeIds.size, rawPriced: priced.size, pricedWithPlace: [...priced.keys()].filter((i) => placeIds.has(i)).length, feed: feed.mx.length, pricedInFeed, compared, match, differ, diffs, sampleFeedPrices: JSON.stringify(feed.mx[0].prices) });
 });
 
-await safe('dk-ok', async () => {
+if (0) await safe('dk-ok', async () => {
   const body = await (await get('https://mobility-prices.ok.dk/api/v1/fuel-prices', { Accept: 'application/json' })).json();
   const map = byId('dk'); let compared = 0, match = 0, differ = 0, missing = 0; const diffs = [];
   for (const r of body.items) { const s = map.get(`dk-ok-${r.facility_number ?? r.stationId ?? r.id}`); if (!s) { missing++; continue; } const vals = Object.values(s.prices).map((p) => p.p); for (const p of r.prices ?? []) { if (!/diesel|95/i.test(p.product_name ?? p.productName ?? '')) continue; compared++; if (vals.some((v) => Math.abs(v - Number(p.price) * 100) < 0.05)) match++; else { differ++; if (diffs.length < 6) diffs.push(`${s.id} ${p.product_name ?? p.productName}=${p.price} feed=${JSON.stringify(s.prices)}`); } } }
   report('dk-ok', { rawStations: body.items.length, missingFromFeed: missing, compared, match, differ, diffs, dkBrands: Object.entries(feed.dk.reduce((a, s) => ((a[s.brand] = (a[s.brand] ?? 0) + 1), a), {})) });
 });
 
-await safe('uk', async () => {
+if (0) await safe('uk', async () => {
   const urls = { asda: 'https://storelocator.asda.com/fuel_prices_data.json', sgn: 'https://www.sgnretail.uk/files/data/SGN_daily_fuel_prices.json', moto: 'https://moto-way.com/fuel-price/fuel_prices.json', tesco: 'https://www.tesco.com/fuel_prices/fuel_prices_data.json', rontec: 'https://www.rontec-servicestations.co.uk/fuel-prices/data/fuel_prices_data.json', applegreen: 'https://applegreenstores.com/fuel-prices/data.json', esso: 'https://fuelprices.esso.co.uk/latestdata.json', jet: 'https://jetlocal.co.uk/fuel_prices_data.json', mfg: 'https://fuel.motorfuelgroup.com/fuel_prices_data.json', bp: 'https://www.bp.com/en_gb/united-kingdom/home/fuelprices/fuel_prices_data.json', shell: 'https://www.shell.co.uk/fuel-prices-data.html', morrisons: 'https://www.morrisons.com/fuel-prices/fuel.json', sainsburys: 'https://api.sainsburys.co.uk/v1/exports/latest/fuel_prices_data.json', ascona: 'https://fuelprices.asconagroup.co.uk/newfuel.json', karan: 'https://devapi.krlpos.com/integration/live_price/krl' };
   for (const [k, u] of Object.entries(urls)) { try { const r = await fetch(u, { headers: UA, signal: AbortSignal.timeout(30000) }); const t = await r.text(); let n = '-', upd = '-'; try { const j = JSON.parse(t); n = j.stations?.length; upd = j.last_updated; } catch {} console.log(`RAW uk ${k} http=${r.status} bytes=${t.length} stations=${n} last_updated=${upd}`); } catch (e) { console.log(`RAW uk ${k} failed ${e.message}`); } }
   console.log('RAW uk feed brands', JSON.stringify(Object.entries(feed.uk.reduce((a, s) => ((a[s.brand] = (a[s.brand] ?? 0) + 1), a), {})).sort((a, b) => b[1] - a[1]).slice(0, 15)));
