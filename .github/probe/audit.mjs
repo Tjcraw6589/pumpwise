@@ -2,7 +2,7 @@
 import { execSync } from 'node:child_process';
 const BASE = 'https://pumpwiseapp.com/data/v6';
 const UA = { 'User-Agent': 'Pumpwise audit (pumpwiseapp@gmail.com)', Accept: '*/*' };
-const get = async (url, headers = {}) => { const r = await fetch(url, { headers: { ...UA, ...headers }, signal: AbortSignal.timeout(90000) }); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r; };
+const get = async (url, headers = {}, n = 1) => { const r = await fetch(url, { headers: { ...UA, ...headers }, signal: AbortSignal.timeout(90000) }); if (!r.ok) { if (n < 5) { await new Promise((ok) => setTimeout(ok, 8000)); return get(url, headers, n + 1); } throw new Error(`HTTP ${r.status}`); } return r; };
 const now = Date.now();
 const meta = await (await get(`${BASE}/meta.json?t=${now}`)).json();
 console.log('META', meta.generatedAt, Object.keys(meta.regions).join(','));
