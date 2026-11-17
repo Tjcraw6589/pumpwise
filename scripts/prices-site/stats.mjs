@@ -40,7 +40,7 @@ export const STATS_WORDS = {
     brandsH: 'Average price by brand', brandsSub: '{f}, brands with {n} stations or more',
     jump: 'Jump to a country',
     methodH: 'How these are worked out',
-    methodP: 'Every figure comes from the station prices Pumpwise already shows, counted once per station. Prices that look like mistakes (far below the rest of their area) are left out of the cheapest and dearest figures. The daily averages are saved once a day and never changed afterwards.',
+    methodP: 'Every figure comes from the station prices Pumpwise already shows, counted once per station. Prices that look like mistakes (far below the rest of their area, or far above every other price) are left out. The daily averages are saved once a day and never changed afterwards.',
   },
   es: {
     statsNav: 'Estadísticas', statsH1: 'Estadísticas de precios de carburantes',
@@ -61,7 +61,7 @@ export const STATS_WORDS = {
     brandsH: 'Precio medio por marca', brandsSub: '{f}, marcas con {n} gasolineras o más',
     jump: 'Ir a un país',
     methodH: 'Cómo se calculan',
-    methodP: 'Todas las cifras salen de los precios de gasolinera que Pumpwise ya muestra, contando cada gasolinera una vez. Los precios que parecen errores (muy por debajo del resto de su zona) no cuentan para la más barata ni la más cara. Las medias diarias se guardan una vez al día y no se cambian después.',
+    methodP: 'Todas las cifras salen de los precios de gasolinera que Pumpwise ya muestra, contando cada gasolinera una vez. Los precios que parecen errores (muy por debajo del resto de su zona, o muy por encima de todos los demás) no se cuentan. Las medias diarias se guardan una vez al día y no se cambian después.',
   },
   fr: {
     statsNav: 'Statistiques', statsH1: 'Statistiques des prix des carburants',
@@ -82,7 +82,7 @@ export const STATS_WORDS = {
     brandsH: 'Prix moyen par enseigne', brandsSub: '{f}, enseignes d’au moins {n} stations',
     jump: 'Aller à un pays',
     methodH: 'Comment c’est calculé',
-    methodP: 'Tous les chiffres viennent des prix en station que Pumpwise affiche déjà, chaque station comptant une fois. Les prix qui ressemblent à des erreurs (très en dessous du reste de leur secteur) sont écartés des stations la moins chère et la plus chère. Les moyennes quotidiennes sont enregistrées une fois par jour et ne changent plus ensuite.',
+    methodP: 'Tous les chiffres viennent des prix en station que Pumpwise affiche déjà, chaque station comptant une fois. Les prix qui ressemblent à des erreurs (très en dessous du reste de leur secteur, ou très au-dessus de tous les autres) sont écartés. Les moyennes quotidiennes sont enregistrées une fois par jour et ne changent plus ensuite.',
   },
   pt: {
     statsNav: 'Estatísticas', statsH1: 'Estatísticas dos preços dos combustíveis',
@@ -103,7 +103,7 @@ export const STATS_WORDS = {
     brandsH: 'Preço médio por marca', brandsSub: '{f}, marcas com {n} postos ou mais',
     jump: 'Ir para um país',
     methodH: 'Como são calculados',
-    methodP: 'Todos os números vêm dos preços dos postos que o Pumpwise já mostra, contando cada posto uma vez. Os preços que parecem erros (muito abaixo do resto da sua zona) ficam fora do mais barato e do mais caro. As médias diárias são guardadas uma vez por dia e não mudam depois.',
+    methodP: 'Todos os números vêm dos preços dos postos que o Pumpwise já mostra, contando cada posto uma vez. Os preços que parecem erros (muito abaixo do resto da sua zona, ou muito acima de todos os outros) ficam de fora. As médias diárias são guardadas uma vez por dia e não mudam depois.',
   },
 };
 
@@ -170,7 +170,12 @@ const pick = (fuels, kinds) => kinds.map((k) => fuels.find((f) => f.kind === k))
 function fuelFigures(f) {
   if (!f) return null;
   const good = f.good.filter((r) => !r.doubt);
-  const use = good.length >= 2 ? good : f.good;
+  const kept = good.length >= 2 ? good : f.good;
+  // A price far above everything else (450.0c in a state averaging 216c) is a placeholder a station typed
+  // in, not a price anyone pays: anything over one and a half times the middle price is left out.
+  const mid = kept.map((r) => r.p).sort((x, y) => x - y)[Math.floor(kept.length / 2)];
+  const sane = kept.filter((r) => r.p <= mid * 1.5);
+  const use = sane.length >= 2 ? sane : kept;
   const ps = use.map((r) => r.p);
   return { kind: f.kind, label: f.label, avg: mean(ps), min: Math.min(...ps), max: Math.max(...ps), n: ps.length, rows: use };
 }
