@@ -33,7 +33,7 @@ const report = (name, r) => console.log(`RAW ${name} ${JSON.stringify(r)}`);
 const safe = async (name, fn) => { try { await fn(); } catch (e) { console.log(`RAW ${name} FAILED ${e.message}`); } };
 
 await safe('es', async () => {
-  const { inRegion } = await import('../../src/lib/feed.ts');
+  const { stationInRegion: inRegion } = await import('../../src/lib/feed.ts');
   const body = await (await get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/', { Accept: 'application/json' })).json();
   const rows = body.ListaEESSPrecio; const map = byId('es');
   const num = (t) => (t ? Number(String(t).replace(',', '.')) : null);
@@ -73,7 +73,7 @@ if (0) await safe('fr', async () => {
   report('fr', { rawStations: pdvs.length, rawWithPrice: withPrice, rawPriceWithin30d: recent, feed: feed.fr.length, rawInFeed: inFeed, recentMissing, compared, match, differ, missing, diffs });
 });
 
-if (0) await safe('pt', async () => {
+await safe('pt', async () => {
   const body = await (await get('https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb/PesquisarPostos?idsTiposComb=&idMarca=&idTipoPosto=&idDistrito=&idsMunicipios=&qtdPorPagina=20000&pagina=1', { Accept: 'application/json' })).json();
   const rows = body.resultado ?? body; const ids = new Set(rows.map((r) => r.Id)); const map = byId('pt');
   let compared = 0, match = 0, differ = 0; const diffs = []; const missing = [];
@@ -105,7 +105,7 @@ if (0) await safe('dk-ok', async () => {
   report('dk-ok', { rawStations: body.items.length, missingFromFeed: missing, compared, match, differ, diffs, dkBrands: Object.entries(feed.dk.reduce((a, s) => ((a[s.brand] = (a[s.brand] ?? 0) + 1), a), {})) });
 });
 
-if (0) await safe('uk', async () => {
+await safe('uk', async () => {
   const urls = { asda: 'https://storelocator.asda.com/fuel_prices_data.json', sgn: 'https://www.sgnretail.uk/files/data/SGN_daily_fuel_prices.json', moto: 'https://moto-way.com/fuel-price/fuel_prices.json', tesco: 'https://www.tesco.com/fuel_prices/fuel_prices_data.json', rontec: 'https://www.rontec-servicestations.co.uk/fuel-prices/data/fuel_prices_data.json', applegreen: 'https://applegreenstores.com/fuel-prices/data.json', esso: 'https://fuelprices.esso.co.uk/latestdata.json', jet: 'https://jetlocal.co.uk/fuel_prices_data.json', mfg: 'https://fuel.motorfuelgroup.com/fuel_prices_data.json', bp: 'https://www.bp.com/en_gb/united-kingdom/home/fuelprices/fuel_prices_data.json', shell: 'https://www.shell.co.uk/fuel-prices-data.html', morrisons: 'https://www.morrisons.com/fuel-prices/fuel.json', sainsburys: 'https://api.sainsburys.co.uk/v1/exports/latest/fuel_prices_data.json', ascona: 'https://fuelprices.asconagroup.co.uk/newfuel.json', karan: 'https://devapi.krlpos.com/integration/live_price/krl' };
   for (const [k, u] of Object.entries(urls)) { try { const r = await fetch(u, { headers: UA, signal: AbortSignal.timeout(30000) }); const t = await r.text(); let n = '-', upd = '-'; try { const j = JSON.parse(t); n = j.stations?.length; upd = j.last_updated; } catch {} console.log(`RAW uk ${k} http=${r.status} bytes=${t.length} stations=${n} last_updated=${upd}`); } catch (e) { console.log(`RAW uk ${k} failed ${e.message}`); } }
   console.log('RAW uk feed brands', JSON.stringify(Object.entries(feed.uk.reduce((a, s) => ((a[s.brand] = (a[s.brand] ?? 0) + 1), a), {})).sort((a, b) => b[1] - a[1]).slice(0, 15)));
