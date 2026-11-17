@@ -1127,6 +1127,27 @@ function siteMain(D) {
     return nm ? nm.textContent : '';
   }
   const onLanguage = [];
+  // Stats page: one country at a time, chosen from a list. Without this script every country is shown.
+  const regSel = document.getElementById('regsel');
+  if (regSel) {
+    const statsRoot = document.querySelector('.stats');
+    const showReg = (id, jump) => {
+      const sec = document.getElementById('s-' + id);
+      if (!sec) return;
+      all('.rstat', statsRoot).forEach((x) => x.classList.toggle('on', x === sec));
+      regSel.value = id;
+      store.set('pw-statreg', id);
+      if (jump) document.getElementById('regs').scrollIntoView();
+    };
+    const fromHash = () => (/^#s-[a-z]+$/.test(location.hash) ? location.hash.slice(3) : '');
+    statsRoot.classList.add('js');
+    showReg(fromHash() || store.get('pw-statreg') || regSel.value, false);
+    if (!statsRoot.querySelector('.rstat.on')) showReg(regSel.options[0].value, false);
+    regSel.addEventListener('change', () => showReg(regSel.value, false));
+    window.addEventListener('hashchange', () => {
+      if (fromHash()) showReg(fromHash(), true);
+    });
+  }
   // Stats page: the country comparison in the visitor's choice of currency, per litre or per US gallon.
   // Every figure carries its value in euro cents a litre (data-e); the rates travel with the section.
   const rankBox = document.getElementById('rank');

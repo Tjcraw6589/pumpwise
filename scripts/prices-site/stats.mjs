@@ -38,7 +38,7 @@ export const STATS_WORDS = {
     distH: 'How many stations charge what', distSub: '{f}, stations in each price band', distBar: '{a} to {b}: {n} stations',
     townsCheap: 'Cheapest towns', townsDear: 'Dearest towns', townsSub: 'average {f}',
     brandsH: 'Average price by brand', brandsSub: '{f}, brands with {n} stations or more',
-    jump: 'Jump to a country',
+    jump: 'Jump to a country', regH: 'Country by country',
     methodH: 'How these are worked out',
     methodP: 'Every figure comes from the station prices Pumpwise already shows, counted once per station. Prices that look like mistakes (far below the rest of their area, or far above every other price) are left out. The daily averages are saved once a day and never changed afterwards.',
   },
@@ -60,7 +60,7 @@ export const STATS_WORDS = {
     distH: 'Cuántas gasolineras cobran cada precio', distSub: '{f}, gasolineras en cada tramo de precio', distBar: 'De {a} a {b}: {n} gasolineras',
     townsCheap: 'Lugares más baratos', townsDear: 'Lugares más caros', townsSub: 'media de {f}',
     brandsH: 'Precio medio por marca', brandsSub: '{f}, marcas con {n} gasolineras o más',
-    jump: 'Ir a un país',
+    jump: 'Ir a un país', regH: 'País por país',
     methodH: 'Cómo se calculan',
     methodP: 'Todas las cifras salen de los precios de gasolinera que Pumpwise ya muestra, contando cada gasolinera una vez. Los precios que parecen errores (muy por debajo del resto de su zona, o muy por encima de todos los demás) no se cuentan. Las medias diarias se guardan una vez al día y no se cambian después.',
   },
@@ -82,7 +82,7 @@ export const STATS_WORDS = {
     distH: 'Combien de stations pratiquent quel prix', distSub: '{f}, stations par tranche de prix', distBar: 'De {a} à {b} : {n} stations',
     townsCheap: 'Communes les moins chères', townsDear: 'Communes les plus chères', townsSub: 'moyenne {f}',
     brandsH: 'Prix moyen par enseigne', brandsSub: '{f}, enseignes d’au moins {n} stations',
-    jump: 'Aller à un pays',
+    jump: 'Aller à un pays', regH: 'Pays par pays',
     methodH: 'Comment c’est calculé',
     methodP: 'Tous les chiffres viennent des prix en station que Pumpwise affiche déjà, chaque station comptant une fois. Les prix qui ressemblent à des erreurs (très en dessous du reste de leur secteur, ou très au-dessus de tous les autres) sont écartés. Les moyennes quotidiennes sont enregistrées une fois par jour et ne changent plus ensuite.',
   },
@@ -104,7 +104,7 @@ export const STATS_WORDS = {
     distH: 'Quantos postos cobram cada preço', distSub: '{f}, postos em cada intervalo de preço', distBar: 'De {a} a {b}: {n} postos',
     townsCheap: 'Locais mais baratos', townsDear: 'Locais mais caros', townsSub: 'média de {f}',
     brandsH: 'Preço médio por marca', brandsSub: '{f}, marcas com {n} postos ou mais',
-    jump: 'Ir para um país',
+    jump: 'Ir para um país', regH: 'País a país',
     methodH: 'Como são calculados',
     methodP: 'Todos os números vêm dos preços dos postos que o Pumpwise já mostra, contando cada posto uma vez. Os preços que parecem erros (muito abaixo do resto da sua zona, ou muito acima de todos os outros) ficam de fora. As médias diárias são guardadas uma vez por dia e não mudam depois.',
   },
@@ -164,6 +164,9 @@ a.hb-l{color:var(--link);text-decoration:underline;text-underline-offset:2px}
 .stats .nums th,.stats .nums td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--border)}
 .stats .nums th:first-child,.stats .nums td:first-child{text-align:left}
 .stats .note{color:var(--muted);font-size:13px}
+.stats.js .jump,.stats.js .rstat,.stats:not(.js) .regpick{display:none}
+.stats.js .rstat.on{display:block}
+.stats.js .rstat{margin-top:8px}
 .stats .curbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px;font-size:14px;font-weight:700}
 .stats .curbar select{min-height:44px;max-width:100%;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--fg);font:inherit;font-size:15px;font-weight:600}
 `;
@@ -355,8 +358,10 @@ ${w(L, 'statsLead', { n: totals.stations.toLocaleString('en-US'), k: cards.lengt
 <ul class="tiles"><li><b>${totals.stations.toLocaleString('en-US')}</b>${w(L, 'tileStations')}</li><li><b>${totals.places.toLocaleString('en-US')}</b>${w(L, 'tilePlaces')}</li><li><b>${cards.length}</b>${w(L, 'tileRegions')}</li><li><b>${totals.prices.toLocaleString('en-US')}</b>${w(L, 'tilePrices')}</li></ul>
 <nav class="jump" aria-label="${esc(say(L, 'jump'))}" data-kl="jump">${cards.map((c) => `<a href="#s-${c.id}">${flag(c.id)} ${name(c.id)}</a>`).join('')}</nav>
 ${rankBlock}
+<section id="regs"><h2>${w(L, 'regH')}</h2>
+<p class="curbar regpick"><label for="regsel" data-k="thPlace">${esc(say(L, 'thPlace'))}</label><select id="regsel">${cards.map((c) => `<option value="${c.id}" data-k="rn_${c.id}">${esc(say(L, `rn_${c.id}`))}</option>`).join('')}</select></p>
 ${w(L, 'trendStart', { d: dayLabel(first) }, 'p', ' class="note"')}
-${cards.map(region).join('\n')}
+${cards.map(region).join('\n')}</section>
 <section><h2>${w(L, 'methodH')}</h2>${w(L, 'methodP', null, 'p', ' class="note"')}</section></div>`;
   return layout({
     lang: L,
