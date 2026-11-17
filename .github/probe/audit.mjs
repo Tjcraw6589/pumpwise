@@ -33,22 +33,25 @@ const report = (name, r) => console.log(`RAW ${name} ${JSON.stringify(r)}`);
 const safe = async (name, fn) => { try { await fn(); } catch (e) { console.log(`RAW ${name} FAILED ${e.message}`); } };
 
 await safe('es', async () => {
+  const { inRegion } = await import('../../src/lib/feed.ts');
   const body = await (await get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/', { Accept: 'application/json' })).json();
-  console.log('ES keys', Object.keys(body), JSON.stringify(body).slice(0, 300)); const rows = body.ListaEESSPrecio; const map = byId('es');
+  const rows = body.ListaEESSPrecio; const map = byId('es');
   const num = (t) => (t ? Number(String(t).replace(',', '.')) : null);
-  let withPrice = 0, inFeed = 0, match = 0, differ = 0, compared = 0, noCoord = 0; const missing = []; const diffs = [];
-  const fields = Object.keys(rows[0]).filter((k) => k.startsWith('Precio'));
+  const road = ['Precio Gasolina 95 E5', 'Precio Gasolina 95 E10', 'Precio Gasolina 95 E5 Premium', 'Precio Gasolina 98 E5', 'Precio Gasolina 98 E10', 'Precio Gasoleo A', 'Precio Gasoleo Premium', 'Precio Gases licuados del petróleo', 'Precio Gasolina 95 E85'];
+  let noRoad = 0, outside = 0, inside = 0, compared = 0, match = 0, differ = 0;
   for (const r of rows) {
-    const any = fields.some((f) => r[f]); if (any) withPrice++;
     const s = map.get(`es-${r.IDEESS}`);
-    if (!s) { if (any) { if (!r.Latitud || !r['Longitud (WGS84)']) noCoord++; if (missing.length < 40) missing.push(`${r.IDEESS} ${r['Rótulo']} ${r.Municipio} lat=${r.Latitud} lng=${r['Longitud (WGS84)']} tipo=${r['Tipo Venta']}`); } continue; }
-    inFeed++;
-    for (const [f, k] of [['Precio Gasoleo A', 'diesel'], ['Precio Gasolina 95 E5', 'regular']]) {
-      const raw = num(r[f]); if (raw === null || !s.prices[k]) continue; compared++;
-      if (Math.abs(raw * 100 - s.prices[k].p) < 0.05) match++; else { differ++; if (diffs.length < 6) diffs.push(`${r.IDEESS} ${k} raw=${raw} feed=${s.prices[k].p} at=${s.prices[k].at}`); }
+    if (!s) {
+      if (!road.some((f) => r[f])) { noRoad++; continue; }
+      const lat = num(r.Latitud), lng = num(r['Longitud (WGS84)']);
+      const ok = lat !== null && lng !== null && inRegion('es', lat, lng);
+      if (ok) inside++; else outside++;
+      console.log(`ESMISS ${ok ? 'INSIDE' : 'OUTSIDE'} ${r.IDEESS} ${r['Rótulo']} | ${r.Municipio} | ${lat},${lng} | venta=${r['Tipo Venta']} | ${road.filter((f) => r[f]).map((f) => f.replace('Precio ', '') + '=' + r[f]).join('; ')}`);
+      continue;
     }
+    for (const [f, k] of [['Precio Gasoleo A', 'diesel'], ['Precio Gasolina 95 E5', 'regular']]) { const raw = num(r[f]); if (raw === null || !s.prices[k]) continue; compared++; if (Math.abs(raw * 100 - s.prices[k].p) < 0.05) match++; else differ++; }
   }
-  report('es', { date: body.Fecha, rawRows: rows.length, rawWithPrice: withPrice, feed: feed.es.length, rawInFeed: inFeed, rawMissingNoCoord: noCoord, compared, match, differ, missing, diffs });
+  report('es', { rawDate: body.Fecha, feedUpdated: meta.regions.es.updatedAt, feedGenerated: meta.generatedAt, rawRows: rows.length, feed: feed.es.length, missingNoRoadFuel: noRoad, missingOutsideBounds: outside, missingInside: inside, compared, match, differ });
 });
 
 if (0) await safe('fr', async () => {
