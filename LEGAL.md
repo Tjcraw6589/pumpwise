@@ -175,4 +175,19 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | Victoria (Servo Saver API, CC BY 4.0) | Requires an application to Service Victoria and the prices are 24 hours old. Possible if the owner wants a "yesterday's prices" region. |
 | South Australia, Northern Territory | SA gives data to approved publishers only (application required); the NT has no confirmed live feed. |
 
+## Sweep of 16 November 2026 (nothing added)
+
+| Place | Finding |
+|---|---|
+| Argentina (Secretaría de Energía, "Precios en Surtidor") | The best match found: station prices with positions, CC BY 4.0, refreshed hourly, still published after Resolution 314/2016 was repealed in 2025 (file last changed 14 November 2026). Not added because the Secretariat's server (datos.energia.gob.ar) does not answer GitHub's servers, where the feed runs: both tries timed out. It could be added if the feed were collected from somewhere that server answers, such as the owner's own computer. |
+| Lithuania (Lietuvos energetikos agentūra, degalukainos.ena.lt) | Official map of about 760 stations, refreshed each working day at 10:00. The data service behind it refuses requests without the site's own key, the agency's open data page says "information is being prepared", and another publisher withdrew Lithuania on 1 October 2026 because the terms do not allow republication. Needs written permission (info@ena.lt). |
+| Greece (fuelprices.gr through data.gov.gr) | CC BY 4.0, but daily averages per prefecture, not station prices. |
+| Romania (Monitorul Prețurilor) | Station prices, no open licence. |
+| Austria (E-Control) | E-Control states the data may not be reused by third parties. |
+| Netherlands | The competition authority recommended a duty to share prices (5 November 2026). Not law yet. |
+| Ireland | No official feed; a proposal only. |
+| Belgium, Luxembourg, Czechia, Norway, Finland, Sweden | National maximum or average prices, or chain list prices. No station prices. |
+
+**Portugal needs a second look.** The same publisher (fuel-prices.eu) withdrew Portugal on 1 October 2026, saying its terms do not allow republication. That disagrees with the DGEG notice quoted above. Pumpwise shows Portugal today; the DGEG's current terms should be read again and, if they have changed, Portugal switched off.
+
 Citations in this document were gathered by an AI assistant and have not been verified against a legal research service. Before relying on any licence term, statute or authority named here, check it against the linked official page.
