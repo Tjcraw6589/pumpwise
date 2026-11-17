@@ -54,7 +54,7 @@ await safe('es', async () => {
   report('es', { rawDate: body.Fecha, feedUpdated: meta.regions.es.updatedAt, feedGenerated: meta.generatedAt, rawRows: rows.length, feed: feed.es.length, missingNoRoadFuel: noRoad, missingOutsideBounds: outside, missingInside: inside, compared, match, differ });
 });
 
-if (0) await safe('fr', async () => {
+await safe('fr', async () => {
   execSync('curl -sL -A "Pumpwise audit" -o /tmp/fr.zip https://donnees.roulez-eco.fr/opendata/instantane && cd /tmp && unzip -o -q fr.zip');
   const file = execSync('ls /tmp/*.xml | head -1').toString().trim();
   const xml = new TextDecoder('latin1').decode(execSync(`cat ${file}`, { maxBuffer: 1e9 }));
@@ -88,7 +88,7 @@ await safe('pt', async () => {
   report('pt', { rawRows: rows.length, rawStations: ids.size, feed: feed.pt.length, missingFromFeed: [...ids].filter((i) => !map.has(`pt-${i}`)).length, compared, match, differ, missing, diffs });
 });
 
-if (0) await safe('mx', async () => {
+await safe('mx', async () => {
   const places = await (await get('https://publicacionexterna.azurewebsites.net/publicaciones/places')).text();
   const prices = await (await get('https://publicacionexterna.azurewebsites.net/publicaciones/prices')).text();
   const placeIds = new Set([...places.matchAll(/<place place_id="(\d+)"/g)].map((m) => m[1]));
@@ -98,7 +98,7 @@ if (0) await safe('mx', async () => {
   report('mx', { rawPlaces: placeIds.size, rawPriced: priced.size, pricedWithPlace: [...priced.keys()].filter((i) => placeIds.has(i)).length, feed: feed.mx.length, pricedInFeed, compared, match, differ, diffs, sampleFeedPrices: JSON.stringify(feed.mx[0].prices) });
 });
 
-if (0) await safe('dk-ok', async () => {
+await safe('dk-ok', async () => {
   const body = await (await get('https://mobility-prices.ok.dk/api/v1/fuel-prices', { Accept: 'application/json' })).json();
   const map = byId('dk'); let compared = 0, match = 0, differ = 0, missing = 0; const diffs = [];
   for (const r of body.items) { const s = map.get(`dk-ok-${r.facility_number ?? r.stationId ?? r.id}`); if (!s) { missing++; continue; } const vals = Object.values(s.prices).map((p) => p.p); for (const p of r.prices ?? []) { if (!/diesel|95/i.test(p.product_name ?? p.productName ?? '')) continue; compared++; if (vals.some((v) => Math.abs(v - Number(p.price) * 100) < 0.05)) match++; else { differ++; if (diffs.length < 6) diffs.push(`${s.id} ${p.product_name ?? p.productName}=${p.price} feed=${JSON.stringify(s.prices)}`); } } }
