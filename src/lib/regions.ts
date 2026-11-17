@@ -307,17 +307,17 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
     priceMode: 'reported',
     utcOffsetMinutes: (date) => (isBritishSummerTime(date) ? 60 : 0),
     source: {
-      name: 'Fuel Finder',
-      url: 'https://www.gov.uk/government/collections/fuel-finder',
-      credit: 'Prices from the UK Government Fuel Finder scheme (Open Government Licence v3.0)',
+      name: 'the fuel retailers',
+      url: 'https://www.gov.uk/guidance/access-fuel-price-data',
+      credit: 'Prices published by the fuel retailers in their own price files (Asda, Esso, SGN, JET and others). Not government data',
     },
     report: {
-      label: 'Report it to GOV.UK',
-      url: 'https://www.gov.uk/guidance/report-an-error-in-fuel-prices-or-forecourt-details',
-      note: 'Forecourts must report price changes within 30 minutes.',
+      label: 'Read about the retailers\' price files',
+      url: 'https://www.gov.uk/guidance/access-fuel-price-data',
+      note: 'Each retailer keeps its own file; tell the retailer if its price is wrong.',
     },
     about:
-      'Since February 2026 every UK forecourt must report its prices to the Fuel Finder scheme, and report any change within 30 minutes.',
+      'Several large retailers publish their own pump prices for apps to use. Pumpwise shows the ones still kept up to date, so not every UK station appears.',
     cities: [
       { name: 'London', detail: 'United Kingdom', lat: 51.5072, lng: -0.1276 },
       { name: 'Manchester', detail: 'United Kingdom', lat: 53.4808, lng: -2.2426 },
@@ -771,7 +771,7 @@ export function regionsHereFirst(live: readonly RegionId[], here: RegionId | nul
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];

@@ -360,3 +360,16 @@ test('Pages say how often their prices are checked', () => {
   assert.match(files.get('france/lyon/index.html'), /data-k="chkMin" data-v="\{&quot;n&quot;:15\}"/);
   assert.match(files.get('mexico/index.html'), /data-k="chkHours" data-v="\{&quot;n&quot;:3\}"/);
 });
+
+test('United Kingdom: pence, pounds saved, and the retailers credited rather than a government', () => {
+  const uk = [];
+  for (let i = 0; i < 5; i++) uk.push(st('uk', 'Coventry', 52.39 + i / 1000, -1.48, { regular: 155.9 + i, diesel: 187.9 }));
+  const { files } = buildSite(meta(['uk']), { uk });
+  const page = files.get('united-kingdom/coventry/index.html');
+  assert.ok(page);
+  assert.match(page, /155\.9p/);
+  assert.match(page, /£\d+\.\d\d/);
+  assert.match(page, /data-k="ukOnly"/);
+  assert.match(page, /not government data/);
+  assert.match(page, /London time/);
+});

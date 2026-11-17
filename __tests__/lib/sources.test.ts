@@ -285,16 +285,20 @@ describe('published feed versions', () => {
     tags: [],
     prices: { regular: { p: 170, at: NOW.toISOString() } },
   });
-  const stations = [station('wa-1', 'wa', -31.95, 115.86), station('nsw-1', 'nsw', -33.87, 151.21), station('es-1', 'es', 40.42, -3.7), station('mx-1', 'mx', 19.43, -99.13), station('dk-1', 'dk', 55.68, 12.57)];
+  const stations = [station('wa-1', 'wa', -31.95, 115.86), station('nsw-1', 'nsw', -33.87, 151.21), station('es-1', 'es', 40.42, -3.7), station('mx-1', 'mx', 19.43, -99.13), station('dk-1', 'dk', 55.68, 12.57), station('uk-1', 'uk', 51.5, -0.12)];
   const live: RegionStatus = { status: 'live', updatedAt: NOW.toISOString(), stationCount: 1, tomorrow: false };
-  const regions = { wa: live, nsw: live, es: live, mx: live, dk: live };
+  const regions = { wa: live, nsw: live, es: live, mx: live, dk: live, uk: live };
 
   test('the newest version carries every region; older versions only the regions their apps know', () => {
-    expect(PUBLISHED_FEEDS.map((p) => p.version)).toEqual([LATEST_FEED_VERSION, 4, 3, 2]);
-    const [v5, v4, v3, v2] = PUBLISHED_FEEDS.map((p) => feedForVersion(stations, regions, NOW, p));
+    expect(PUBLISHED_FEEDS.map((p) => p.version)).toEqual([LATEST_FEED_VERSION, 5, 4, 3, 2]);
+    const [v6, v5, v4, v3, v2] = PUBLISHED_FEEDS.map((p) => feedForVersion(stations, regions, NOW, p));
+    expect(v6?.meta.v).toBe(6);
+    expect(Object.keys(v6?.meta.regions ?? {}).sort()).toEqual(['dk', 'es', 'mx', 'nsw', 'uk', 'wa']);
+    expect(v6?.meta.stationCount).toBe(6);
+    // Pumpwise 1.3 (v5) describes UK prices as the government's, so the retailers' prices stay out of it.
     expect(v5?.meta.v).toBe(5);
     expect(Object.keys(v5?.meta.regions ?? {}).sort()).toEqual(['dk', 'es', 'mx', 'nsw', 'wa']);
-    expect(v5?.meta.stationCount).toBe(5);
+    expect(v5?.tiles.flatMap((t) => t.stations).some((s) => s.region === 'uk')).toBe(false);
     expect(v4?.meta.v).toBe(4);
     expect(Object.keys(v4?.meta.regions ?? {}).sort()).toEqual(['es', 'mx', 'nsw', 'wa']);
     expect(v4?.meta.stationCount).toBe(4);

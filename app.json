@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pumpwise",
     "slug": "pumpwise",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "orientation": "portrait",
     "scheme": "pumpwise",
     "platforms": [
@@ -169,7 +169,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "feedUrl": "https://pumpwiseapp.com/data/v5",
+      "feedUrl": "https://pumpwiseapp.com/data/v6",
       "support": {
         "email": "pumpwiseapp@gmail.com",
         "siteUrl": "https://pumpwiseapp.com/",

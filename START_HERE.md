@@ -70,6 +70,10 @@ If that is fine with you, follow the checklist page's Queensland task. If not, Q
 
 Both are on the website now and in the app from version 1.3 (feed v5). They are company prices, not government prices, and the app and website say so. Denmark has OK and Shell stations only for now; other Danish companies publish prices without map positions, so they come later. The store text for 1.3 is in STORE_LISTING.md under "Version 1.3.0". Build 1.3 with the "iPhone build" workflow, branch **main**. Do not submit it until 1.2 is released.
 
+## United Kingdom (added 17 November 2026: website now, app from 1.4)
+
+The UK is on the website from the retailers' own price files (Asda, Esso, SGN, JET): about 1,100 stations, company prices, not government data, and not every station. The app shows it from version **1.4** (feed v6); versions 1.0 to 1.3 do not, because they would call these prices the government's. app.json is already at 1.4.0 and reads feed v6. Build 1.4 with the "iPhone build" workflow, branch **main**, after 1.3 is approved and released. Store text for 1.4 still has to be written.
+
 ## The Stats page (added 17 November 2026, website only)
 
 https://pumpwiseapp.com/prices/stats/ compares countries in euros a litre, and for each country shows the average, the spread, the cheapest and dearest towns, prices by brand and a line of the daily average. The line starts on 17 November 2026 because no averages were saved before then; it gains a point a day. The saved days live on the repository's **stats** branch (history.json, one line per day), written by the price feed job. Do not delete that branch: it is the only copy of the history. Exchange rates come from the European Central Bank's free daily file. The code is scripts/prices-site/stats.mjs.

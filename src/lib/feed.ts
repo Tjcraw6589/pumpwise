@@ -7,14 +7,14 @@
  */
 
 /** The feed version this build of the app reads (its app.json `extra.feedUrl` must match). */
-export const FEED_VERSION = 5;
+export const FEED_VERSION = 6;
 /**
  * Version 2 of the feed (Western Australia only) stays online for Pumpwise 1.0, which can't read
  * the regions added since. It is published alongside the newer versions at data/v2.
  */
 export const LEGACY_VERSION = 2;
 /** The newest feed version, with every region. The feed job reads the previous run's prices from it. */
-export const LATEST_FEED_VERSION = 5;
+export const LATEST_FEED_VERSION = 6;
 /** Stations are grouped into square tiles of this many degrees, so the app downloads only its area. */
 export const TILE_DEG = 0.5;
 
@@ -33,19 +33,31 @@ export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' 
  */
 export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
 /** The regions Pumpwise 1.2 was built with; only these go into the version 4 feed. */
-export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
-/** The regions Pumpwise 1.0 knows; only these go into the version 2 feed. */
-export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa', 'uk'];
+// No 'uk': like 1.3, the 1.2 app calls its UK prices the government's Fuel Finder, which these are not.
+export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
+/**
+ * The regions of the version 2 feed (Pumpwise 1.0). That app also knows a 'uk' region, but as the government's
+ * Fuel Finder: the retailers' own UK prices (feed v6 on) must not appear under that name, so 'uk' is left out
+ * of every version before 6.
+ */
+export const LEGACY_REGION_IDS: readonly RegionId[] = ['wa'];
 
 /**
  * Every feed version the job publishes, and the regions each may carry. Apps look up every station's
  * region, so an older app would fail on a region it was not built with: each older version keeps
  * only the regions its app knows, and new regions appear only in the newest.
  */
+/**
+ * What Pumpwise 1.3 was built with (feed v5). The United Kingdom is left out on purpose: 1.3 describes its UK
+ * prices as the government's Fuel Finder, and the UK prices in the feed since v6 are the retailers' own.
+ */
+export const V5_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is'];
+
 export const PUBLISHED_FEEDS: readonly { version: number; regions: readonly RegionId[] | 'all' }[] = [
   { version: LATEST_FEED_VERSION, regions: 'all' },
+  { version: 5, regions: V5_REGION_IDS },
   { version: 4, regions: V4_REGION_IDS },
-  { version: 3, regions: ['wa', 'nsw', 'tas', 'uk'] },
+  { version: 3, regions: ['wa', 'nsw', 'tas'] },
   { version: LEGACY_VERSION, regions: LEGACY_REGION_IDS },
 ];
 
@@ -166,11 +178,11 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     reuse: 'no-republish',
   },
   uk: {
-    owner: 'UK Government (Department for Energy Security and Net Zero, Fuel Finder)',
-    licence: 'Open Government Licence v3.0',
-    url: 'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/',
-    attribution: 'Contains public sector information licensed under the Open Government Licence v3.0.',
-    reuse: 'open',
+    owner: 'The fuel retailers (Asda, Esso, SGN, JET and others), each for its own stations',
+    licence: 'No written licence. The retailers publish these files under the Competition and Markets Authority road fuel open data scheme of 2023, which asked for prices to be published in a way open to third party developers',
+    url: 'https://www.gov.uk/guidance/access-fuel-price-data',
+    attribution: 'Prices published by the fuel retailers in their own price files (Asda, Esso, SGN, JET and others still keeping theirs up to date), with the time each file was last updated. Not government data, not every UK station, and Pumpwise is not connected to these companies',
+    reuse: 'owner-terms',
   },
   es: {
     owner: 'Ministerio para la Transición Ecológica y el Reto Demográfico (MITECO), Government of Spain',

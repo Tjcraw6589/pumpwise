@@ -91,6 +91,14 @@ How to read the tags on sources: `[retrieved 2026-11-08]` means the text was rea
 - **Terms** (the site's privacy and security notice, `[retrieved 2026-11-08]`): "A informação disponível neste sítio é gratuita, podendo ser utilizada livremente. A reutilização desta informação deverá assegurar a adequada identificação da Direção-Geral de Energia e Geologia enquanto fonte dos dados, bem como a indicação da data-hora da última atualização dos preços e a reprodução fiel de toda a informação." In English: the information is free and may be used freely; reuse must identify the DGEG as the source, give the date and time the prices were last updated, and reproduce the information faithfully.
 - **Where Pumpwise complies:** the credit names the DGEG; every Portuguese price carries its own last-update time and the app shows "Updated … ago"; prices are reproduced exactly as published (euro prices to the tenth of a cent). The feed stores the DGEG's time for each price.
 
+## United Kingdom (retailers' own price files, added 17 November 2026 in feed v6)
+
+The government's Fuel Finder service only answers from inside the UK, so it cannot be used from GitHub. The UK prices Pumpwise shows are the retailers' own files from the Competition and Markets Authority's 2023 "temporary road fuel price open data scheme" (https://www.gov.uk/guidance/access-fuel-price-data), which the CMA describes as open to third party developers. On 17 November 2026 the files of Asda (790 stations), Esso (194), SGN (112) and JET (11) were updated that day; Moto's was 11 days old; Tesco's, Rontec's and Applegreen's had stopped in spring 2026 or earlier; bp, Shell, MFG and Sainsbury's refused or no longer served a file. Any file older than two days is left out automatically, and a retailer that starts updating again comes back by itself.
+
+The retailers publish no licence text. Credit: "Prices published by the fuel retailers in their own price files". If a retailer objects, remove it from `UK_RETAILERS` in `scripts/feed/sources/uk-retail.ts`. The scheme was meant to end once Fuel Finder took over, so these files may stop without notice; the feed then drops the UK by itself when fewer than 300 stations remain.
+
+**Older apps never see these prices.** Pumpwise 1.0 to 1.3 describe UK prices as the government's Fuel Finder, so the UK is left out of feed versions 2 to 5 and appears only in v6 (app 1.4 on) and on the website.
+
 ## Denmark and Iceland (company prices, not government data)
 
 Added 16 November 2026 in feed v5. Neither is an official government source, and the app and website say so wherever these prices appear.

@@ -387,8 +387,10 @@ describe('NSW, ACT and Tasmania (NSW Fuel API)', () => {
     const stations = full.tiles.flatMap((t) => t.stations);
     const legacy = legacyFeed(stations, full.meta.regions, NOW);
     expect(legacy.meta.v).toBe(LEGACY_VERSION);
-    expect(Object.keys(legacy.meta.regions).sort()).toEqual(['uk', 'wa']);
-    expect(legacy.tiles.every((t) => t.v === LEGACY_VERSION && t.stations.every((s) => s.region === 'wa' || s.region === 'uk'))).toBe(true);
-    expect(legacy.meta.stationCount).toBe(100);
+    // Not 'uk' either: 1.0 would show the retailers' UK prices as the government's Fuel Finder.
+    expect(Object.keys(legacy.meta.regions).sort()).toEqual(['wa']);
+    expect(legacy.tiles.every((t) => t.v === LEGACY_VERSION && t.stations.every((s) => s.region === 'wa'))).toBe(true);
+    expect(legacy.meta.stationCount).toBe(full.meta.regions.wa?.stationCount);
+    expect(legacy.meta.stationCount).toBeGreaterThan(0);
   });
 });

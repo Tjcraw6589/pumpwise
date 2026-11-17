@@ -56,10 +56,10 @@ const ES: Record<RegionId, RegionText> = {
     name: 'Reino Unido',
     nameInSentence: 'el Reino Unido',
     about:
-      'Desde febrero de 2026 todas las gasolineras del Reino Unido deben comunicar sus precios al programa Fuel Finder, y cualquier cambio en un plazo de 30 minutos.',
-    credit: 'Precios del programa Fuel Finder del Gobierno del Reino Unido (Open Government Licence v3.0)',
-    reportLabel: 'Avisar en GOV.UK',
-    reportNote: 'Las gasolineras deben comunicar los cambios de precio en 30 minutos.',
+      'Varias grandes cadenas publican sus propios precios para que los usen las apps. Pumpwise muestra las que siguen al día, así que no aparecen todas las gasolineras del Reino Unido.',
+    credit: 'Precios publicados por las propias cadenas en sus archivos de precios (Asda, Esso, SGN, JET y otras). No son datos del Gobierno',
+    reportLabel: 'Sobre los archivos de precios de las cadenas',
+    reportNote: 'Cada cadena mantiene su propio archivo; avisa a la cadena si su precio está mal.',
   },
   es: {
     name: 'España',
@@ -170,10 +170,10 @@ const FR: Record<RegionId, RegionText> = {
     name: 'Royaume-Uni',
     nameInSentence: 'le Royaume-Uni',
     about:
-      'Depuis février 2026, chaque station-service du Royaume-Uni doit déclarer ses prix au dispositif Fuel Finder, et tout changement sous 30 minutes.',
-    credit: 'Prix du dispositif Fuel Finder du gouvernement britannique (Open Government Licence v3.0)',
-    reportLabel: 'Le signaler sur GOV.UK',
-    reportNote: 'Les stations doivent déclarer les changements de prix sous 30 minutes.',
+      'Plusieurs grandes enseignes publient leurs propres prix pour les applications. Pumpwise affiche celles qui restent à jour ; toutes les stations du Royaume-Uni n’y figurent donc pas.',
+    credit: 'Prix publiés par les enseignes dans leurs propres fichiers de prix (Asda, Esso, SGN, JET et d’autres). Ce ne sont pas des données de l’État',
+    reportLabel: 'À propos des fichiers de prix des enseignes',
+    reportNote: 'Chaque enseigne tient son propre fichier ; signalez lui un prix erroné.',
   },
   es: {
     name: 'Espagne',
@@ -289,10 +289,10 @@ const PT: Record<RegionId, RegionText> = {
   uk: {
     name: 'Reino Unido',
     nameInSentence: 'o Reino Unido',
-    about: 'Desde fevereiro de 2026 todos os postos do Reino Unido têm de comunicar os seus preços ao programa Fuel Finder e qualquer alteração em 30 minutos.',
-    credit: 'Preços do programa Fuel Finder do Governo do Reino Unido (Open Government Licence v3.0)',
-    reportLabel: 'Comunicar no GOV.UK',
-    reportNote: 'Os postos têm de comunicar as alterações em 30 minutos; o GOV.UK recebe as queixas.',
+    about: 'Várias grandes cadeias publicam os seus próprios preços para as apps usarem. O Pumpwise mostra as que continuam atualizadas, por isso nem todos os postos do Reino Unido aparecem.',
+    credit: 'Preços publicados pelas próprias cadeias nos seus ficheiros de preços (Asda, Esso, SGN, JET e outras). Não são dados do Governo',
+    reportLabel: 'Sobre os ficheiros de preços das cadeias',
+    reportNote: 'Cada cadeia mantém o seu próprio ficheiro; avise a cadeia se o preço estiver errado.',
   },
   es: {
     name: 'Espanha',

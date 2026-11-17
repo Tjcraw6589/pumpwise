@@ -340,7 +340,7 @@ ${numbers([w(L, 'thLocal'), w(L, 'tileStations')], counts.map((n, i) => [esc(`${
     for (const v of [f.petrol, f.diesel].filter(Boolean)) facts.push(`<li><b>${esc(money(Math.round(v.avg * 10) / 10, c.cfg.money))}</b>${w(L, 'statAvg')} ${esc(v.label)}</li>`);
     facts.push(`<li><b>${esc(money(main.min, c.cfg.money))}</b>${w(L, 'statCheapest')}</li>`, `<li><b>${esc(money(main.max, c.cfg.money))}</b>${w(L, 'statDearest')}</li>`);
     const saved = ((main.avg - main.min) * FILL) / 100;
-    const unit = c.cfg.money === 'cents' || c.cfg.money === 'peso' ? `$${saved.toFixed(2)}` : c.cfg.money === 'isk' ? `${Math.round(saved)} kr.` : c.cfg.money === 'dkk' ? `${saved.toFixed(2).replace('.', ',')} kr.` : `${saved.toFixed(2).replace('.', ',')} €`;
+    const unit = c.cfg.money === 'cents' || c.cfg.money === 'peso' ? `$${saved.toFixed(2)}` : c.cfg.money === 'pence' ? `£${saved.toFixed(2)}` : c.cfg.money === 'isk' ? `${Math.round(saved)} kr.` : c.cfg.money === 'dkk' ? `${saved.toFixed(2).replace('.', ',')} kr.` : `${saved.toFixed(2).replace('.', ',')} €`;
     facts.push(`<li><b>${esc(unit)}</b>${w(L, 'statSave')}</li>`);
     const gap = f.petrol && f.diesel ? f.diesel.avg - f.petrol.avg : null;
     const gapLine = gap === null || Math.abs(gap) < 0.05 ? '' : w(L, gap > 0 ? 'dieselMore' : 'dieselLess', { v: money(Math.round(Math.abs(gap) * 10) / 10, c.cfg.money) }, 'p', ' class="note"');

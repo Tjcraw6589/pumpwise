@@ -30,6 +30,7 @@ import { fetchPt, PT_MIN_STATIONS } from './sources/pt.ts';
 import { fetchQld, QLD_MIN_STATIONS, qldToken } from './sources/qld.ts';
 import { fetchSi, SI_MIN_STATIONS } from './sources/si.ts';
 import { fetchUk, UK_MIN_STATIONS, ukCredentials } from './sources/uk.ts';
+import { fetchUkRetail, UK_RETAIL_MIN_STATIONS } from './sources/uk-retail.ts';
 import { fetchWa, WA_MIN_STATIONS, waRefetchMoments } from './sources/wa.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -107,6 +108,9 @@ const SOURCES: Source[] = [
   { id: 'dk', regions: ['dk'], everyMinutes: 25, minStations: DK_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchDk(now), tomorrow: false }) },
   // Iceland: one 45 KB file Gasvaktin rebuilds every 15 minutes from the fuel companies' websites.
   { id: 'is', regions: ['is'], everyMinutes: 25, minStations: IS_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIs(now), tomorrow: false }) },
+  // The United Kingdom from the retailers' own price files, for as long as the government service (below)
+  // cannot be reached from where this job runs.
+  { id: 'uk-retail', regions: ['uk'], everyMinutes: 25, minStations: UK_RETAIL_MIN_STATIONS, enabled: () => ukCredentials() === null, fetch: async (now) => ({ stations: await fetchUkRetail(now), tomorrow: false }) },
   {
     id: 'uk',
     regions: ['uk'],
