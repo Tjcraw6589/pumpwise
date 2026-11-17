@@ -34,7 +34,7 @@ const safe = async (name, fn) => { try { await fn(); } catch (e) { console.log(`
 
 await safe('es', async () => {
   const body = await (await get('https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/', { Accept: 'application/json' })).json();
-  console.log('ES keys', Object.keys(body), JSON.stringify(body).slice(0, 300)); const rows = body.ListaEESSPrecios ?? body.listaEESSPrecios; const map = byId('es');
+  console.log('ES keys', Object.keys(body), JSON.stringify(body).slice(0, 300)); const rows = body.ListaEESSPrecio; const map = byId('es');
   const num = (t) => (t ? Number(String(t).replace(',', '.')) : null);
   let withPrice = 0, inFeed = 0, match = 0, differ = 0, compared = 0, noCoord = 0; const missing = []; const diffs = [];
   const fields = Object.keys(rows[0]).filter((k) => k.startsWith('Precio'));
@@ -70,7 +70,7 @@ if (0) await safe('fr', async () => {
   report('fr', { rawStations: pdvs.length, rawWithPrice: withPrice, rawPriceWithin30d: recent, feed: feed.fr.length, rawInFeed: inFeed, recentMissing, compared, match, differ, missing, diffs });
 });
 
-await safe('pt', async () => {
+if (0) await safe('pt', async () => {
   const body = await (await get('https://precoscombustiveis.dgeg.gov.pt/api/PrecoComb/PesquisarPostos?idsTiposComb=&idMarca=&idTipoPosto=&idDistrito=&idsMunicipios=&qtdPorPagina=20000&pagina=1', { Accept: 'application/json' })).json();
   const rows = body.resultado ?? body; const ids = new Set(rows.map((r) => r.Id)); const map = byId('pt');
   let compared = 0, match = 0, differ = 0; const diffs = []; const missing = [];
