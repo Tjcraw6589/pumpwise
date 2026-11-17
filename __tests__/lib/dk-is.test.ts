@@ -200,3 +200,18 @@ describe('Denmark, companies that publish an address only', () => {
     expect(dkLookupResult([])).toBeNull();
   });
 });
+
+describe('station boxes are wider than the region boxes', () => {
+  const { stationInRegion, inRegion } = require('../../src/lib/feed.ts');
+  it('keeps border towns that the tight region boxes cut off', () => {
+    expect(inRegion('es', 36.53, -6.29)).toBe(false); // Cádiz
+    expect(stationInRegion('es', 36.53, -6.29)).toBe(true);
+    expect(stationInRegion('es', 38.88, -7.02)).toBe(true); // Badajoz
+    expect(stationInRegion('es', 42.05, -8.64)).toBe(true); // Tui
+    expect(stationInRegion('es', 42.7, 0.8)).toBe(true); // Vielha
+    expect(stationInRegion('pt', 40.61, -6.83)).toBe(true); // Vilar Formoso
+    expect(stationInRegion('es', 0, 0)).toBe(false);
+    expect(stationInRegion('es', -8.66, 42.04)).toBe(false); // swapped numbers
+    expect(stationInRegion('fr', 36.53, -6.29)).toBe(false);
+  });
+});

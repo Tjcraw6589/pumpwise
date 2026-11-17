@@ -4,7 +4,7 @@
  * DGEG is named as the source, each price's last-update time is shown and the data is reproduced
  * faithfully (see LEGAL.md). One request returns every station and fuel (about 14,000 rows, 5 MB).
  */
-import { cleanPrice, type FeedStation, type FuelKind, inRegion, isEuropeanSummerTime, roundCoord, tidyName } from '../../../src/lib/feed.ts';
+import { cleanPrice, type FeedStation, type FuelKind, stationInRegion, isEuropeanSummerTime, roundCoord, tidyName } from '../../../src/lib/feed.ts';
 import { politeRequester } from '../http.ts';
 
 export const PT_URL =
@@ -84,7 +84,7 @@ export function buildPtStations(rows: PtRow[], now: Date): FeedStation[] {
     const id = row.Id;
     const lat = row.Latitude;
     const lng = row.Longitude;
-    if (typeof id !== 'number' || typeof lat !== 'number' || typeof lng !== 'number' || !inRegion('pt', lat, lng)) continue;
+    if (typeof id !== 'number' || typeof lat !== 'number' || typeof lng !== 'number' || !stationInRegion('pt', lat, lng)) continue;
     const kind = FUEL_KINDS[row.Combustivel ?? ''];
     if (!kind) continue;
     const price = ptPrice(row.Preco);
