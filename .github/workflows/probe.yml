@@ -11,21 +11,11 @@ jobs:
     steps:
       - run: |
           set +e
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36'
-          curl -s https://ipinfo.io/json | head -12
-          for host in www.mimit.gov.it mimit.gov.it www.mise.gov.it carburanti.mise.gov.it; do echo "== dns $host"; getent ahosts $host | head -3; done
-          try() { echo "== $1"; shift; curl -sS -o /tmp/out -w 'http=%{http_code} ip=%{remote_ip} time=%{time_total} size=%{size_download} ver=%{http_version}\n' --max-time 40 "$@" 2>&1 | tail -2; head -c 300 /tmp/out 2>/dev/null | tr '\n' ' '; echo; rm -f /tmp/out; }
-          B=https://www.mimit.gov.it/images/exportCSV
-          try "plain prezzo" "$B/prezzo_alle_8.csv"
-          try "browser ua http1.1 ipv4" -4 --http1.1 -A "$UA" -H 'Accept: text/csv,*/*' -H 'Accept-Language: it-IT,it;q=0.9' "$B/prezzo_alle_8.csv"
-          try "browser ua anagrafica" -4 --http1.1 -A "$UA" "$B/anagrafica_impianti_attivi.csv"
-          try "no www" -A "$UA" https://mimit.gov.it/images/exportCSV/prezzo_alle_8.csv
-          try "http plain" -A "$UA" -L http://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv
-          try "mise host" -A "$UA" -L https://www.mise.gov.it/images/exportCSV/prezzo_alle_8.csv
-          try "mimit home" -A "$UA" https://www.mimit.gov.it/it/
-          try "open data page" -A "$UA" https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti
-          try "carburanti portal" -A "$UA" https://carburanti.mise.gov.it/ospzSearch/home
-          try "dati.gov.it search" "https://www.dati.gov.it/opendata/api/3/action/package_search?q=prezzi+carburanti+impianti&rows=5"
-          try "data.europa search" "https://data.europa.eu/api/hub/search/search?q=prezzo_alle_8&limit=5"
-          try "web archive latest" -L "https://web.archive.org/web/2026id_/https://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv"
-          echo "== traceroute-ish"; timeout 20 bash -c 'exec 3<>/dev/tcp/www.mimit.gov.it/443 && echo tcp443 open' || echo "tcp443 no connect"
+          for f in prezzo_alle_8 anagrafica_impianti_attivi; do
+            echo "== save $f"
+            curl -sS -L -o /tmp/$f.csv -w 'http=%{http_code} url=%{url_effective} time=%{time_total} size=%{size_download}\n' --max-time 240 -A 'Pumpwise (pumpwiseapp@gmail.com; https://pumpwiseapp.com)' "https://web.archive.org/save/https://www.mimit.gov.it/images/exportCSV/$f.csv"
+            head -c 400 /tmp/$f.csv | tr '\n' ' '; echo; wc -l /tmp/$f.csv
+            echo "== latest id_ $f"
+            curl -sS -L -o /tmp/l.csv -w 'http=%{http_code} url=%{url_effective} size=%{size_download}\n' --max-time 120 "https://web.archive.org/web/2026id_/https://www.mimit.gov.it/images/exportCSV/$f.csv"; head -c 200 /tmp/l.csv | tr '\n' ' '; echo
+            sleep 8
+          done
