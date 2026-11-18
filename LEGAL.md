@@ -199,6 +199,8 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | Service Victoria | Servo Saver API application | Received 16 November, under review |
 | South Australia (Fuel Pricing Information Scheme) | Publisher sign up | They asked on 16 November for the full street address; the owner must answer |
 | atencionalcliente@osinergmin.gob.pe (Peru, Osinergmin) | Whether Facilito's station prices are open data and may be reused | Sent 17 November, no answer yet |
+| kabinet@fmt.gov.ba (Bosnia and Herzegovina, Federal Ministry of Trade) | Reuse of the station prices shown in its "FMT FBiH oil info" app | Sent 17 November, no answer yet |
+| mtt@mtt.vladars.rs (Republika Srpska, Ministry of Trade and Tourism) | Reuse of the station prices shown in its fuel price app | Sent 17 November, no answer yet |
 
 Asia, looked at on 17 November 2026: South Korea (Opinet) needs KNOC's prior agreement and has no public contact address for it, only member sign in; Japan has no official station prices; Malaysia (data.gov.my, CC BY 4.0) and Hong Kong (Consumer Council on data.gov.hk) publish one price per fuel or per company, not per station, and no station list; Thailand, India and the Philippines publish company or city prices only.
 
@@ -211,6 +213,15 @@ Asia, looked at on 17 November 2026: South Korea (Opinet) needs KNOC's prior agr
 - **Colombia (datos.gov.co, "precio mes combustible", CC BY-SA 4.0):** one price per station per month, last updated in May 2026, and no coordinates. Too old to be accurate: not added.
 - **Argentina:** the official file still times out from GitHub's servers. **Italy** (IODL 2.0, about 22,800 stations) has the same problem. Both are allowed; they need the file to be fetched from somewhere else, for example the owner's own PC.
 - **Romania (Monitorul Prețurilor):** official station prices, no published terms or contact address found for reuse. **Chile:** needs the owner's free registration. **South Korea:** needs a key and the oil company's agreement. **Brazil:** weekly sample without coordinates. **Greece:** averages by prefecture only.
+
+## Third sweep, 17 November 2026: Asia and smaller countries (nothing added)
+
+- **Bosnia and Herzegovina:** both entities run official price apps fed by mandatory reports from every station (the Federation's "FMT FBiH oil info"; Republika Srpska's app with more than 400 stations). No open file or terms found; permission requested from both ministries.
+- **Macau:** the Consumer Council publishes the prices of all 21 or so stations, but the pages are marked all rights reserved (DSEDT) and no contact address for reuse was confirmed. Not added.
+- **Hong Kong:** the Consumer Council's open file gives one pump price per oil company, not per station, and there is no official station list to pair it with.
+- **Thailand:** prices are set per brand and published by the companies; official station lists on data.go.th are partial and yearly.
+- **Jamaica:** the Consumer Affairs Commission's open files stop in 2018. **Norway:** no official station prices (the open sets are driver reports). **Netherlands:** the regulator recommended mandatory price sharing on 5 November 2026; nothing exists yet, look again in 2027.
+- Countries where the state sets one price for everyone (Malaysia, Vietnam, Indonesia, most of the Gulf, much of Africa and Central America) have nothing to compare station by station.
 
 ## Sweep of 16 November 2026 (nothing added)
 
