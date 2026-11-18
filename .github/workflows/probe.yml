@@ -11,13 +11,17 @@ jobs:
     steps:
       - run: |
           set +e
-          R=$(curl -s -H 'Accept: application/json' "https://check-host.net/check-http?host=https://www.mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv&max_nodes=40")
-          echo "$R" | head -c 600; echo
-          ID=$(echo "$R" | python3 -c "import sys,json; print(json.load(sys.stdin)['request_id'])")
-          sleep 25
-          curl -s -H 'Accept: application/json' "https://check-host.net/check-result/$ID" | python3 -c "
-          import sys,json
-          d=json.load(sys.stdin)
-          for k,v in sorted(d.items()):
-              print(k, '->', (str(v[0][:4]) if v and v[0] else str(v))[:110])
-          "
+          U=https://cuxmtbyqffxgsdduhoad.supabase.co/functions/v1/it-open-data
+          for f in prezzo anagrafica; do
+            curl -sS -D /tmp/h -o /tmp/$f.csv -w "== $f http=%{http_code} time=%{time_total} size=%{size_download}\n" --max-time 90 -H 'x-region: eu-central-1' "$U?f=$f"
+            grep -i 'x-pumpwise\|x-sb-edge-region\|content-type' /tmp/h | tr '\r\n' '  '; echo
+            head -4 /tmp/$f.csv; wc -l /tmp/$f.csv
+          done
+          echo "== fuels"; tail -n +3 /tmp/prezzo.csv | cut -d'|' -f2 | sort | uniq -c | sort -rn | head -70
+          echo "== self"; tail -n +3 /tmp/prezzo.csv | cut -d'|' -f4 | sort | uniq -c
+          echo "== dates"; tail -n +3 /tmp/prezzo.csv | cut -d'|' -f5 | cut -c1-10 | sort -t/ -k3,3 -k2,2 -k1,1 | uniq -c | tail -12
+          echo "== tipo"; tail -n +3 /tmp/anagrafica.csv | cut -d'|' -f4 | sort | uniq -c
+          echo "== bandiera"; tail -n +3 /tmp/anagrafica.csv | cut -d'|' -f3 | sort | uniq -c | sort -rn | head -25
+          echo "== fields"; tail -n +3 /tmp/anagrafica.csv | awk -F'|' '{print NF}' | sort | uniq -c; tail -n +3 /tmp/prezzo.csv | awk -F'|' '{print NF}' | sort | uniq -c
+          echo "== sample"; sed -n '2000,2004p' /tmp/anagrafica.csv; grep -c '||$\|NULL' /tmp/anagrafica.csv
+          echo "== without region header"; curl -sS -o /dev/null -D - --max-time 60 "$U?f=anagrafica" | grep -i 'HTTP/\|x-pumpwise\|x-sb-edge-region' | tr '\r\n' '  '
