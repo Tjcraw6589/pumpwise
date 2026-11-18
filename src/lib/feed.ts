@@ -26,12 +26,12 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is' | 'qc' | 'tw';
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is' | 'qc' | 'tw' | 'it';
 /**
  * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
  * Slovenia before Croatia).
  */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw'];
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it'];
 /** The regions Pumpwise 1.2 was built with; only these go into the version 4 feed. */
 // No 'uk': like 1.3, the 1.2 app calls its UK prices the government's Fuel Finder, which these are not.
 export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
@@ -145,6 +145,12 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 47.9, maxLat: 52.0, minLng: -67.5, maxLng: -57.0 }, // the Gaspé peninsula, Anticosti and the Lower North Shore
     { minLat: 47.1, maxLat: 47.9, minLng: -62.3, maxLng: -61.3 }, // the Magdalen Islands
   ],
+  // Italy comes after France, Slovenia and Croatia in the list, so where the boxes meet theirs win.
+  it: [
+    { minLat: 44.0, maxLat: 47.1, minLng: 6.7, maxLng: 13.9 }, // the north, from the Alps to the Po valley and Trieste
+    { minLat: 36.6, maxLat: 44.0, minLng: 7.5, maxLng: 18.6 }, // Liguria, the peninsula, Sardinia and most of Sicily
+    { minLat: 35.4, maxLat: 36.6, minLng: 11.9, maxLng: 15.2 }, // southern Sicily, Pantelleria and Lampedusa
+  ],
   // Taiwan with Penghu, Kinmen and the Matsu islands.
   tw: [
     { minLat: 21.8, maxLat: 25.4, minLng: 119.3, maxLng: 122.1 },
@@ -255,6 +261,13 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     attribution: 'Source: Régie essence Québec, Régie de l’énergie. Prices as the stations reported them to the Régie, unchanged, in force when the feed last collected them. Pumpwise is independent and has no mandate from the Régie',
     reuse: 'owner-terms',
   },
+  it: {
+    owner: 'Ministero delle Imprese e del Made in Italy (MIMIT), Osservaprezzi carburanti',
+    licence: 'Italian Open Data Licence 2.0 (IODL 2.0): free reuse, commercial use included, with the source named. Confirmed to Pumpwise by the Ministry on 18 November 2026',
+    url: 'https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti',
+    attribution: 'Fonte: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0). Prices as stations reported them to the Ministry, in force at 8:00 on the day of the file; the self service price is shown where a station has one',
+    reuse: 'open',
+  },
   tw: {
     owner: 'CPC Corporation, Taiwan (台灣中油股份有限公司)',
     licence: 'Open Government Data License, version 1.0 (data.gov.tw/license): free reuse, commercial use included, with the source named',
@@ -314,6 +327,7 @@ export const STATION_BOUNDS: Partial<Record<RegionId, readonly Bounds[]>> = {
     { minLat: 27.6, maxLat: 29.5, minLng: -18.2, maxLng: -13.3 }, // Canary Islands
   ],
   pt: [{ minLat: 36.9, maxLat: 42.2, minLng: -9.6, maxLng: -6.18 }],
+  it: [{ minLat: 35.4, maxLat: 47.2, minLng: 6.5, maxLng: 18.7 }],
 };
 
 /** True when a station from a region's own source may be kept: inside the region, or inside its wider station box. */

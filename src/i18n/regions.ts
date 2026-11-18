@@ -142,6 +142,14 @@ const ES: Record<RegionId, RegionText> = {
     reportLabel: 'Consultarlo en cpc.com.tw',
     reportNote: 'CPC fija un único precio de lista para sus gasolineras propias, normalmente cada lunes.',
   },
+  it: {
+    name: 'Italia',
+    about:
+      'En Italia cada gasolinera debe comunicar sus precios al Ministerio de Empresas y Made in Italy. El Ministerio los publica cada mañana como datos abiertos, con los precios vigentes a las 8:00, y Pumpwise recoge ese archivo cada día. Cuando una gasolinera tiene precio de autoservicio, se muestra ese.',
+    credit: 'Fuente: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0)',
+    reportLabel: 'Consultarlo en Osservaprezzi',
+    reportNote: 'Las gasolineras italianas deben comunicar sus precios al Ministerio cuando cambian y al menos una vez por semana.',
+  },
 };
 
 const FR: Record<RegionId, RegionText> = {
@@ -282,6 +290,15 @@ const FR: Record<RegionId, RegionText> = {
     reportLabel: 'Vérifier sur cpc.com.tw',
     reportNote: 'CPC fixe un prix de liste unique pour ses propres stations, en général chaque lundi.',
   },
+  it: {
+    name: 'Italie',
+    nameInSentence: 'l’Italie',
+    about:
+      'En Italie, chaque station doit déclarer ses prix au ministère des Entreprises et du Made in Italy. Le ministère les publie chaque matin en données ouvertes, avec les prix en vigueur à 8 h, et Pumpwise récupère ce fichier chaque jour. Quand une station a un prix en libre service, c’est celui qui est affiché.',
+    credit: 'Source : Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0)',
+    reportLabel: 'Vérifier sur Osservaprezzi',
+    reportNote: 'Les stations italiennes doivent déclarer leurs prix au ministère à chaque changement et au moins une fois par semaine.',
+  },
 };
 
 const PT: Record<RegionId, RegionText> = {
@@ -417,6 +434,15 @@ const PT: Record<RegionId, RegionText> = {
     credit: 'Lista de postos e preços de tabela da CPC Corporation, Taiwan (data.gov.tw, Open Government Data License, versão 1.0)',
     reportLabel: 'Consultar em cpc.com.tw',
     reportNote: 'A CPC fixa um único preço de tabela para os seus próprios postos, normalmente à segunda-feira.',
+  },
+  it: {
+    name: 'Itália',
+    nameInSentence: 'a Itália',
+    about:
+      'Em Itália, todos os postos têm de comunicar os seus preços ao Ministério das Empresas e do Made in Italy. O Ministério publica-os todas as manhãs como dados abertos, com os preços em vigor às 8h00, e o Pumpwise recolhe esse ficheiro todos os dias. Quando um posto tem preço de self-service, é esse o que se mostra.',
+    credit: 'Fonte: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0)',
+    reportLabel: 'Consultar no Osservaprezzi',
+    reportNote: 'Os postos italianos têm de comunicar os preços ao Ministério sempre que mudam e pelo menos uma vez por semana.',
   },
 };
 

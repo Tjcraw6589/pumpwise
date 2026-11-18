@@ -24,6 +24,7 @@ import { ES_MIN_STATIONS, fetchEs } from './sources/es.ts';
 import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
 import { fetchHr, HR_MIN_STATIONS } from './sources/hr.ts';
 import { fetchIs, IS_MIN_STATIONS } from './sources/is.ts';
+import { fetchIt, IT_MIN_STATIONS } from './sources/it.ts';
 import { fetchQc, QC_MIN_STATIONS } from './sources/qc.ts';
 import { fetchTw, TW_MIN_STATIONS } from './sources/tw.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
@@ -111,6 +112,8 @@ const SOURCES: Source[] = [
   // Iceland: one 45 KB file Gasvaktin rebuilds every 15 minutes from the fuel companies' websites.
   // Quebec: one 2 MB file from the Régie de l'énergie, rebuilt every five minutes. Stations must report within five minutes.
   { id: 'qc', regions: ['qc'], everyMinutes: 10, minStations: QC_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchQc(now), tomorrow: false }) },
+  // Italy: the Ministry's two open files, published once each morning, through the relay in Frankfurt. Four checks a day are plenty.
+  { id: 'it', regions: ['it'], everyMinutes: 350, minStations: IT_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIt(now), tomorrow: false }) },
   // Taiwan: CPC's station list and list prices. The price changes about once a week, so every three hours is plenty.
   { id: 'tw', regions: ['tw'], everyMinutes: 170, minStations: TW_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchTw(now), tomorrow: false }) },
   { id: 'is', regions: ['is'], everyMinutes: 25, minStations: IS_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIs(now), tomorrow: false }) },

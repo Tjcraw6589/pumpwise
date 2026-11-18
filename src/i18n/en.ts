@@ -143,6 +143,7 @@ export const en = {
   'country.IS': 'Iceland',
   'country.CA': 'Canada',
   'country.TW': 'Taiwan',
+  'country.IT': 'Italy',
   'state.lookAround': (city: string) => `Look around ${city}`,
   'state.regionDownTitle': 'Prices are on their way',
   'state.regionDownBody': (region: string) => `${region} prices couldn't be collected just now. They usually come back within the hour.`,

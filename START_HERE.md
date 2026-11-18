@@ -68,6 +68,8 @@ If that is fine with you, follow the checklist page's Queensland task. If not, Q
 
 ## Denmark and Iceland (added 16 November 2026, app version 1.3)
 
+**Italy was added to the website on 18 November 2026** (about 24,000 stations, feed v6). Its files are fetched through a small free relay in Frankfurt, because the Ministry's site does not answer from outside Europe: see LEGAL.md.
+
 **Quebec and Taiwan were added to the website on 17 November 2026** (feed v6, so the app gets them in 1.4). Quebec is every station, with the Régie de l'énergie's written permission; Taiwan is the stations CPC runs itself, at CPC's list price. See LEGAL.md.
 
 Both are on the website now and in the app from version 1.3 (feed v5). They are company prices, not government prices, and the app and website say so. Denmark has OK, Shell, Circle K with INGO and Q8 with F24 (the last two are placed on the map from their addresses, see LEGAL.md); Uno-X, OIL! and Go'on come later. The store text for 1.3 is in STORE_LISTING.md under "Version 1.3.0". Build 1.3 with the "iPhone build" workflow, branch **main**. Do not submit it until 1.2 is released.

@@ -826,6 +826,53 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Hualien', detail: 'Taiwan', lat: 23.9872, lng: 121.6016 },
     ],
   },
+  it: {
+    id: 'it',
+    name: 'Italy',
+    currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'it-IT',
+    priceUnit: 'c',
+    priceDecimals: 3,
+    decimalComma: true,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: 'Benzina', pumpCode: '95', description: 'Unleaded 95 (E5)', common: true },
+      { kind: 'diesel', label: 'Gasolio', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'super', label: 'Benzina speciale', pumpCode: '98+', description: 'Unleaded 98', common: false },
+      { kind: 'premium-diesel', label: 'Gasolio speciale', pumpCode: 'B7+', description: 'Premium diesel', common: false },
+      { kind: 'lpg', label: 'GPL', pumpCode: 'GPL', description: 'Liquefied petroleum gas', common: true },
+      { kind: 'hvo', label: 'HVO', pumpCode: 'HVO', description: 'Renewable diesel', common: false },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    // Each price carries the time the station reported it to the Ministry.
+    priceMode: 'reported',
+    utcOffsetMinutes: (date) => (isEuropeanSummerTime(date) ? 120 : 60),
+    source: {
+      name: 'Osservaprezzi carburanti',
+      url: 'https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti',
+      credit: 'Fonte: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0)',
+    },
+    report: {
+      label: 'Check it on Osservaprezzi',
+      url: 'https://carburanti.mise.gov.it',
+      note: 'Italian stations must report their prices to the Ministry when they change and at least once a week.',
+    },
+    about:
+      'In Italy every station must report its prices to the Ministry of Enterprise and Made in Italy. The Ministry publishes them as open data each morning with the prices in force at 8:00, and Pumpwise collects that file each day. Where a station has a self service price, that is the one shown.',
+    cities: [
+      { name: 'Roma', detail: 'Italy', lat: 41.9028, lng: 12.4964 },
+      { name: 'Milano', detail: 'Italy', lat: 45.4642, lng: 9.19 },
+      { name: 'Napoli', detail: 'Italy', lat: 40.8518, lng: 14.2681 },
+      { name: 'Torino', detail: 'Italy', lat: 45.0703, lng: 7.6869 },
+      { name: 'Palermo', detail: 'Italy', lat: 38.1157, lng: 13.3615 },
+      { name: 'Bologna', detail: 'Italy', lat: 44.4949, lng: 11.3426 },
+      { name: 'Firenze', detail: 'Italy', lat: 43.7696, lng: 11.2558 },
+      { name: 'Bari', detail: 'Italy', lat: 41.1171, lng: 16.8719 },
+    ],
+  },
 };
 
 /** Every region, with its names and explanations in the phone's language. */
@@ -837,7 +884,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 export const DEFAULT_REGION: RegionId = 'wa';
 
 /** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
-export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS' | 'CA' | 'TW'> = {
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS' | 'CA' | 'TW' | 'IT'> = {
   wa: 'AU',
   nsw: 'AU',
   tas: 'AU',
@@ -853,6 +900,7 @@ export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' |
   is: 'IS',
   qc: 'CA',
   tw: 'TW',
+  it: 'IT',
 };
 
 /** "Western Australia · Australia", or just "Spain" where the region is the whole country. */
@@ -871,7 +919,7 @@ export function regionsHereFirst(live: readonly RegionId[], here: RegionId | nul
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];
