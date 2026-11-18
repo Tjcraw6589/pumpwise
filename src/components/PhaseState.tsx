@@ -131,7 +131,7 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
           body={t('state.permissionBody')}
           testID="state-need-permission"
         >
-          <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void askForLocation()} testID="allow-location" />
+          <Button label={t('action.continue')} size="lg" fullWidth onPress={() => void askForLocation()} testID="allow-location" />
           <Button label={t('state.choosePlaceInstead')} variant="secondary" size="lg" fullWidth onPress={choose} testID="choose-place" />
         </EmptyState>
       );
@@ -148,7 +148,7 @@ export function PhaseState({ phase }: { phase: Exclude<NearbyPhase, 'ready'> }) 
           testID="state-denied"
         >
           {canAskAgain ? (
-            <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void askForLocation()} />
+            <Button label={t('action.continue')} size="lg" fullWidth onPress={() => void askForLocation()} />
           ) : (
             <Button label={t('state.openSettings')} size="lg" fullWidth onPress={openAppSettings} testID="open-settings" />
           )}

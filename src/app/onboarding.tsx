@@ -79,7 +79,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
         {step < 2 ? (
-          <Pressable accessibilityRole="button" onPress={() => void finish(false)} hitSlop={{ left: 14, right: 14 }} style={styles.skip} testID="onboarding-skip">
+          <Pressable accessibilityRole="button" onPress={() => setStep(2)} hitSlop={{ left: 14, right: 14 }} style={styles.skip} testID="onboarding-skip">
             <AppText variant="small" tone="muted">
               {t('onboard.skip')}
             </AppText>
@@ -188,8 +188,10 @@ export default function OnboardingScreen() {
           <Button label={t('action.continue')} size="lg" fullWidth onPress={() => setStep(step + 1)} testID="onboarding-next" />
         ) : (
           <>
-            <Button label={t('action.allowLocation')} size="lg" fullWidth onPress={() => void finish(true)} testID="onboarding-allow" />
-            <Button label={t('onboard.notNow')} variant="ghost" size="lg" fullWidth onPress={() => void finish(false)} testID="onboarding-not-now" />
+            {/* App Review, guideline 5.1.1(iv), 18 November 2026: the button before the system's location question
+                must say "Continue", and there must be no way to put the question off from this screen. The
+                person answers Apple's own prompt; choosing a place by hand is offered afterwards if they decline. */}
+            <Button label={t('action.continue')} size="lg" fullWidth onPress={() => void finish(true)} testID="onboarding-allow" />
           </>
         )}
       </View>
