@@ -1,13 +1,15 @@
 const UA = { 'User-Agent': 'Pumpwise (pumpwiseapp@gmail.com; https://pumpwiseapp.com)', Accept: '*/*' };
 const text = (h) => h.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
-const show = async (name, url, n = 1200, opts = {}) => { try { const r = await fetch(url, { headers: { ...UA, ...(opts.headers ?? {}) }, method: opts.method ?? 'GET', body: opts.body, signal: AbortSignal.timeout(45000) }); const buf = Buffer.from(await r.arrayBuffer()); const ct = r.headers.get('content-type') ?? ''; const t = new TextDecoder(/1252|8859/i.test(ct) ? 'latin1' : 'utf-8').decode(buf); console.log(`== ${name} http=${r.status} type=${ct} len=${t.length}`); if (n) console.log('   ' + (opts.plain ? text(t) : t).slice(opts.from ?? 0, (opts.from ?? 0) + n).replace(/\s+/g, ' ')); return t; } catch (e) { console.log(`== ${name} FAILED ${e.message} ${e.cause?.code ?? ''}`); return ''; } };
-const co = await show('co catalog', 'https://api.us.socrata.com/api/catalog/v1?domains=www.datos.gov.co&q=precios%20combustibles%20estaciones&limit=12', 0);
-try { for (const r of JSON.parse(co).results) console.log('   CO', r.resource.id, '|', r.resource.name, '|', r.resource.updatedAt, '|', (r.resource.columns_name ?? []).join(',').slice(0, 300), '|', r.metadata?.license); } catch (e) { console.log('   CO ERR', e.message, co.slice(0, 300)); }
-const pe = await show('pe buscador', 'https://www.facilito.gob.pe/facilito/pages/facilito/buscadorEESS.jsp', 0);
-console.log('   PE refs', [...new Set([...pe.matchAll(/["'(]([^"'()\s<>]*(?:\.do|\.jsp|\.json|Action|\.js)[^"'()\s<>]*)/g)].map((m) => m[1]))].slice(0, 40).join(' '));
-console.log('   PE text', text(pe).slice(0, 700));
-for (const js of [...new Set([...pe.matchAll(/src="([^"]+\.js[^"]*)"/g)].map((m) => m[1]))].filter((u) => !/jquery|bootstrap|gtm|google/i.test(u)).slice(0, 6)) { const u = new URL(js, 'https://www.facilito.gob.pe/facilito/pages/facilito/').href; const t = await show('pe js ' + u, u, 0); console.log('   refs', [...new Set([...t.matchAll(/["'`]([^"'`\s]*(?:\.do|Action|ajax|method=)[^"'`\s]*)["'`]/g)].map((m) => m[1]))].slice(0, 30).join(' ')); }
-const pt = await show('pt terms', 'https://precoscombustiveis.dgeg.gov.pt/politica-de-privacidade-e-seguranca/', 0);
-const ptt = text(pt); const i = ptt.search(/reutiliza|utilizada livremente|gratuita/i); console.log('   PT', i, ptt.slice(Math.max(0, i - 300), i + 900));
-for (const u of ['https://www.e-control.at/spritpreisrechner', 'https://www.spritpreisrechner.at/', 'https://www.e-control.at/konsumenten/spritpreisrechner-faq']) { const t = text(await show('at ' + u, u, 0)); for (const m of t.matchAll(/.{200}(?:API|Schnittstelle|Weiterverwendung|Nutzungsbedingungen|kommerziell).{400}/g)) { console.log('   AT>> ' + m[0]); } }
-await show('at apidocs', 'https://api.e-control.at/sprit/1.0/api-docs?group=public-api', 1500);
+const show = async (name, url, n = 700, opts = {}) => { try { const r = await fetch(url, { headers: { ...UA, ...(opts.headers ?? {}) }, method: opts.method ?? 'GET', body: opts.body, redirect: 'follow', signal: AbortSignal.timeout(40000) }); const t = await r.text(); console.log(`== ${name} http=${r.status} url=${r.url} type=${r.headers.get('content-type')} len=${t.length}`); if (n) console.log('   ' + (opts.plain ? text(t) : t).slice(opts.from ?? 0, (opts.from ?? 0) + n).replace(/\s+/g, ' ')); return t; } catch (e) { console.log(`== ${name} FAILED ${e.message} ${e.cause?.code ?? ''}`); return ''; } };
+const refs = (t, re = /["'(]([^"'()\s<>]*(?:api|json|ajax|\.php|\.aspx|\.do|geojson)[^"'()\s<>]*)/gi) => [...new Set([...t.matchAll(re)].map((m) => m[1]))].slice(0, 40).join(' ');
+// Macau
+for (const u of ['https://www.consumer.gov.mo/commodity/fuel_price.aspx?lang=en', 'https://www.consumer.gov.mo/News/Fuel.aspx?lang=en', 'https://www.consumer.gov.mo/']) { const t = await show('mo ' + u, u, 500, { plain: true }); console.log('   refs', refs(t, /href="([^"]*(?:fuel|Fuel|oil|Oil|gas|price)[^"]*)"/g)); }
+await show('mo data', 'https://data.gov.mo/Search?keyword=%E7%87%83%E6%96%99', 600, { plain: true });
+await show('mo api', 'https://api.data.gov.mo/document/search?keyword=fuel', 500);
+// Bosnia FBiH and RS
+for (const u of ['https://fmt.gov.ba/', 'https://oilinfo.fmt.gov.ba/', 'https://www.fmt.gov.ba/oil-info', 'https://bps.fmt.gov.ba/', 'https://cijenegoriva.fmt.gov.ba/', 'https://cijene-goriva.vladars.rs/', 'https://gorivo.vladars.rs/', 'https://vladars.rs/sr-SP-Cyrl/Vlada/Ministarstva/MTT/Pages/default.aspx']) { const t = await show('ba ' + u, u, 300, { plain: true }); if (t) console.log('   refs', refs(t, /(?:href|src)="([^"]*(?:oil|gorivo|goriva|cijen|api|play\.google|apps\.apple)[^"]*)"/gi)); }
+// Hong Kong: consumer council oil price open data + station geodata
+await show('hk cc', 'https://www.consumer.org.hk/pricewatch/oilwatch/opendata/oilprice.json', 900);
+await show('hk data', 'https://data.gov.hk/en-datasets/search/oil%20price', 0);
+await show('hk ckan', 'https://data.gov.hk/api/3/action/package_search?q=oil+price&rows=5', 1200);
+await show('hk stations', 'https://data.gov.hk/api/3/action/package_search?q=petrol+filling+station&rows=5', 1200);
