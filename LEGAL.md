@@ -192,14 +192,25 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 
 | To | About | Status |
 |---|---|---|
-| info@ena.lt (Lithuanian Energy Agency) | Reuse of degalukainos.ena.lt station prices | Sent, no answer yet |
+| info@ena.lt (Lithuanian Energy Agency) | Reuse of degalukainos.ena.lt station prices | Sent, automatic reply received |
 | osservaprezzi@mise.gov.it (Italy, MIMIT) | Permission to read Osservaprezzi, or another way to fetch the IODL files | Sent, no answer yet |
 | stheologou@meci.gov.cy (Cyprus, Consumer Protection Service) | Whether station prices are open and may be reused | Sent, no answer yet |
 | Northern Territory Consumer Affairs | MyFuel NT | Sent 16 November, automatic reply only (5 business days) |
 | Service Victoria | Servo Saver API application | Received 16 November, under review |
 | South Australia (Fuel Pricing Information Scheme) | Publisher sign up | They asked on 16 November for the full street address; the owner must answer |
+| atencionalcliente@osinergmin.gob.pe (Peru, Osinergmin) | Whether Facilito's station prices are open data and may be reused | Sent 17 November, no answer yet |
 
 Asia, looked at on 17 November 2026: South Korea (Opinet) needs KNOC's prior agreement and has no public contact address for it, only member sign in; Japan has no official station prices; Malaysia (data.gov.my, CC BY 4.0) and Hong Kong (Consumer Council on data.gov.hk) publish one price per fuel or per company, not per station, and no station list; Thailand, India and the Philippines publish company or city prices only.
+
+## Second sweep, 17 November 2026 (nothing added)
+
+- **Portugal, read again:** the DGEG's notice at precoscombustiveis.dgeg.gov.pt still says the information is free and may be used freely, with the DGEG named as the source, the date and time of each price's last update, and faithful reproduction `[retrieved 2026-11-17]`. Pumpwise does all three, so Portugal stays. Contact: precoscombustiveis@dgeg.gov.pt.
+- **Austria (E-Control Spritpreisrechner):** the interface answers without a key, but E-Control's own page says passing the price information on is allowed only to the two Austrian motoring clubs and that there are "keine Nutzungsbedingungen oder eine offiziell freigegebene Schnittstelle (API)" `[retrieved 2026-11-17]`. By law it also returns prices for only the five cheapest stations of a search. Not allowed: do not add.
+- **Germany (Tankerkönig):** its current terms say datasets obtained through its services may not be passed on, and the federal data itself needs an authorisation as a consumer information service from the Bundeskartellamt. Do not add on a Tankerkönig key alone; the owner would have to apply for the authorisation.
+- **Peru (Osinergmin, Facilito):** every station must report its prices, as a sworn declaration, but the site has no stated reuse terms and sits behind a robot check. Permission requested by email.
+- **Colombia (datos.gov.co, "precio mes combustible", CC BY-SA 4.0):** one price per station per month, last updated in May 2026, and no coordinates. Too old to be accurate: not added.
+- **Argentina:** the official file still times out from GitHub's servers. **Italy** (IODL 2.0, about 22,800 stations) has the same problem. Both are allowed; they need the file to be fetched from somewhere else, for example the owner's own PC.
+- **Romania (Monitorul Prețurilor):** official station prices, no published terms or contact address found for reuse. **Chile:** needs the owner's free registration. **South Korea:** needs a key and the oil company's agreement. **Brazil:** weekly sample without coordinates. **Greece:** averages by prefecture only.
 
 ## Sweep of 16 November 2026 (nothing added)
 
