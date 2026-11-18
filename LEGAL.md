@@ -193,11 +193,12 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | To | About | Status |
 |---|---|---|
 | info@ena.lt (Lithuanian Energy Agency) | Reuse of degalukainos.ena.lt station prices | Sent, automatic reply received |
-| osservaprezzi@mise.gov.it (Italy, MIMIT) | Permission to read Osservaprezzi, or another way to fetch the IODL files | Sent, no answer yet |
+| osservaprezzi@mise.gov.it (Italy, MIMIT) | Permission to read Osservaprezzi, or another way to fetch the IODL files | Answered 18 November (Mario Barone, mario.barone@mise.gov.it): do not query the portal's search service (see its legal notes on automated access); the daily open data is free to reuse under IODL 2.0. He offered to check the download failure with their IT service and asked for our source address, location and frequency; we answered the same day. Use the open files only. |
 | stheologou@meci.gov.cy (Cyprus, Consumer Protection Service) | Whether station prices are open and may be reused | Sent, no answer yet |
 | Northern Territory Consumer Affairs | MyFuel NT | Sent 16 November, automatic reply only (5 business days) |
 | Service Victoria | Servo Saver API application | Received 16 November, under review |
-| South Australia (Fuel Pricing Information Scheme) | Publisher sign up | They asked on 16 November for the full street address; the owner must answer |
+| South Australia (Fuel Pricing Information Scheme) | Publisher sign up | Refused 18 November: "we do not accept overseas application". Closed unless there is an Australian applicant. |
+| Queensland (Fuel Prices Qld) | Data consumer application | Refused 17 November: overseas applications are not accepted without an Australian Business Number (ABN). Closed unless there is an ABN. |
 | atencionalcliente@osinergmin.gob.pe (Peru, Osinergmin) | Whether Facilito's station prices are open data and may be reused | Sent 17 November, no answer yet |
 | kabinet@fmt.gov.ba (Bosnia and Herzegovina, Federal Ministry of Trade) | Reuse of the station prices shown in its "FMT FBiH oil info" app | Sent 17 November, no answer yet |
 | mtt@mtt.vladars.rs (Republika Srpska, Ministry of Trade and Tourism) | Reuse of the station prices shown in its fuel price app | Sent 17 November, no answer yet |
