@@ -143,6 +143,14 @@ jobs:
           echo "Waiting $wait seconds"
           sleep "$wait"
       - name: Start the next run
-        run: gh workflow run feed.yml --ref main -R "${{ github.repository }}"
+        # GitHub sometimes answers with a server error (HTTP 500 on 25 November 2026 stopped the chain for an
+        # hour until the backup schedule would have caught it). Try up to five times, a minute apart.
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if gh workflow run feed.yml --ref main -R "${{ github.repository }}"; then exit 0; fi
+            echo "Attempt $attempt failed, trying again in a minute"
+            sleep 60
+          done
+          exit 1
         env:
           GH_TOKEN: ${{ github.token }}
