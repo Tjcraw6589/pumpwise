@@ -1931,7 +1931,7 @@ function credit(id, cfg, licence, now) {
   const reuse = licence.reuse === 'cc' || licence.reuse === 'open' ? ` ${w(L, 'reuse')}` : '';
   return `<section class="credit">
 <p>${updatedTag(L, now, cfg)}${checkedTag(L, id)}</p>
-<p><strong>${w(L, 'source')}:</strong> ${esc(licence.attribution)}. <strong>${w(L, 'licence')}:</strong> <a href="${esc(licence.url)}" rel="nofollow">${esc(licence.licence)}</a>.${reuse}</p>
+<p>${/^(Data source|Source|Fonte|Fuente)\s?:/.test(licence.attribution) ? '' : `<strong>${w(L, 'source')}:</strong> `}${esc(licence.attribution)}. <strong>${w(L, 'licence')}:</strong> <a href="${esc(licence.url)}" rel="nofollow">${esc(licence.licence)}</a>.${reuse}</p>
 ${id === 'mx' ? w(L, 'mxPlaces', null, 'p') : id === 'si' ? w(L, 'siPlaces', null, 'p') : ''}
 ${w(L, cfg.company ? 'disclaimerCompany' : 'disclaimer', null, 'p')}
 </section>`;
