@@ -33,10 +33,6 @@ export const LT_GEOCODE_URL = 'https://nominatim.openstreetmap.org/search';
 export const LT_LOOKUPS_PER_RUN = 60;
 /** An address that was not found is tried again after this many days. */
 export const LT_RETRY_DAYS = 30;
-/** Nominatim's rank for a street; 30 is a house or a named place. */
-export const LT_MIN_RANK = 26;
-/** Nominatim's rank for a village; accepted only for an address that names a village and no street. */
-export const LT_VILLAGE_RANK = 19;
 /** About 740 stations report; far fewer placed means the workbook or the saved positions are missing. */
 export const LT_MIN_STATIONS = 400;
 /** Euro cents a litre outside this range is a reporting mistake. */
@@ -62,8 +58,21 @@ export interface LtDraft {
   station: Omit<FeedStation, 'lat' | 'lng'>;
   /** The address as published, the key the saved position is checked against. */
   query: string;
-  /** What to ask the map, most exact first. */
-  lookups: { q: string; minRank: number }[];
+  /** What to ask the map, most exact first. Every answer is checked against `where` before it is believed. */
+  lookups: string[];
+  where: LtWhere;
+}
+
+/** The parts of a published address that an answer from the map must agree with. */
+export interface LtWhere {
+  /** "Kauno rajono savivaldybė", as OpenStreetMap writes it. */
+  municipality: string;
+  /** The town or village without "k.", in the form the operator wrote (often the genitive: "Sudmantų"). */
+  place: string;
+  /** "Vilniaus pl." without the house number; empty when the address has no street. */
+  road: string;
+  house: string;
+  postcode: string;
 }
 
 export type LtPlaces = Record<string, { a: string; lat?: number; lng?: number; r?: number; miss?: string }>;
@@ -155,7 +164,7 @@ export function ltShortName(company: string): string {
 }
 
 const LT_VILLAGE = /\s(k|mstl|vs|apyl)\.$/i;
-const LT_STREET = /\s(g|pl|pr|al|kel|aplinkl|tak|skg|a)\.\s?\d/i;
+const LT_STREET_NAME = /\s(g|pl|pr|al|kel|kl|aplinkl|tak|skg|a)\.?(\s|$)/i;
 
 /**
  * "Vilnius, Subačiaus g. 64, 11342" as town, street and postcode. Operators write village addresses
@@ -177,16 +186,65 @@ export function ltAddress(text: string): { town: string; street: string; postcod
   }
   const first = parts[0] ?? '';
   const last = parts[parts.length - 1] ?? '';
-  if (parts.length === 2 && LT_VILLAGE.test(last) && LT_STREET.test(first)) return { town: last, street: first, postcode };
+  if (parts.length === 2 && LT_VILLAGE.test(last) && LT_STREET_NAME.test(first)) return { town: last, street: first, postcode };
+  // "Rietavas, Lėgų k. 1": the town the village belongs to, then the village and a house number.
+  if (parts.length === 2 && /\s(k|vs)\.?\s*\d+\s?[A-Za-z]?$/i.test(last)) return { town: last.replace(/\s+\d+\s?[A-Za-z]?$/, ''), street: '', postcode };
   if (parts.length > 1) return { town: first, street: parts.slice(1).join(', '), postcode };
   // "Kuosiškių k. 4": a village and a house number, no street.
   return { town: first.replace(/\s+\d+\s?[A-Za-z]?$/, ''), street: '', postcode };
 }
 
-/** A village as the map knows it: "Sudmantų k." is the village of Sudmantai, written here without the "k.". */
+/** A village without its "k.": "Sudmantų k." is the village of Sudmantai, written here as "Sudmantų". */
 function villageName(town: string): string {
   return town.replace(/\s+(k|mstl|vs|glž\. st|apyl)\.?$/i, '').trim();
 }
+
+/** "Kauno r. sav." as OpenStreetMap writes it: "Kauno rajono savivaldybė". */
+export function ltMunicipality(short: string): string {
+  return short
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\sr\.\s?sav\.?$/i, ' rajono savivaldybė')
+    .replace(/\sm\.\s?sav\.?$/i, ' miesto savivaldybė')
+    .replace(/\ssav\.?$/i, ' savivaldybė');
+}
+
+/** "Vilniaus pl. 6" as the road and the house number. A part that names the village itself is not a road. */
+export function ltRoad(part: string): { road: string; house: string } {
+  const text = part.trim();
+  if (!text || LT_VILLAGE.test(text) || /\s(k|mstl|vs)\.?\s*\d+\s?[A-Za-z]?$/i.test(text)) return { road: '', house: '' };
+  const numbered = /^(.*?\D)\s*(\d+\s?[A-Za-z]?(?:\s?\/\s?\d+)?)$/.exec(text);
+  if (numbered) return { road: (numbered[1] ?? '').replace(/[,\s]+$/, ''), house: (numbered[2] ?? '').replace(/\s+/g, '') };
+  return LT_STREET_NAME.test(text) ? { road: text, house: '' } : { road: '', house: '' };
+}
+
+/**
+ * The names a Lithuanian place may have on the map when the address gives it in the genitive:
+ * "Sudmantų" is Sudmantai, "Kakliniškių" is Kakliniškės, "Girkalnio" is Girkalnis, "Brazavo" is Brazavas.
+ */
+export function ltNominatives(place: string): string[] {
+  const words = place.split(' ');
+  const last = words.pop() ?? '';
+  const swap = (ending: RegExp, ...to: string[]) => (ending.test(last) ? to.map((t) => last.replace(ending, t)) : null);
+  const forms =
+    swap(/čių$/, 'čiai', 'tės') ??
+    swap(/džių$/, 'džiai', 'dės') ??
+    swap(/ių$/, 'iai', 'ės') ??
+    swap(/ų$/, 'ai', 'os') ??
+    swap(/čio$/, 'tis', 'tys') ??
+    swap(/džio$/, 'dis', 'dys') ??
+    swap(/io$/, 'is', 'ys') ??
+    swap(/o$/, 'as') ??
+    swap(/os$/, 'a') ??
+    swap(/ės$/, 'ė') ??
+    swap(/aus$/, 'us') ??
+    [];
+  return [...new Set([place, ...forms.map((form) => [...words, form].join(' '))])];
+}
+
+const fold = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+/** What is left of a place name once its ending is removed, so the genitive and the nominative compare equal. */
+const stem = (name: string) => fold(name.split(' ').pop() ?? '').replace(/(čių|džių|čio|džio|čiai|džiai|ių|iai|io|aus|ės|os|ai|as|is|ys|us|ų|o|a|ė)$/u, '');
 
 /** The newest reported price of each fuel at each station, as drafts waiting for a position. */
 export function buildLtDrafts(rows: LtRow[], now: Date): LtDraft[] {
@@ -214,15 +272,17 @@ export function buildLtDrafts(rows: LtRow[], now: Date): LtDraft[] {
     const prices: FeedStation['prices'] = {};
     for (const [kind, value] of fuels) prices[kind] = { p: value.p, at: ltReportedAt(value.day, now) };
     const village = villageName(where.town);
-    const isVillage = village !== where.town;
-    const lookups: LtDraft['lookups'] = [];
+    const municipality = ltMunicipality(row.municipality);
     // "Grigiškės, Kovo 11-osios g. 75": the street is the last part, the rest says which part of town.
-    const road = where.street.split(', ').pop() ?? '';
-    if (road && LT_STREET.test(` ${road}`)) {
-      lookups.push({ q: `${road}, ${village}`, minRank: LT_MIN_RANK });
-      if (where.postcode) lookups.push({ q: `${road}, ${where.postcode}`, minRank: LT_MIN_RANK });
+    const { road, house } = where.street.split(', ').map(ltRoad).reverse().find((part) => part.road) ?? { road: '', house: '' };
+    const lookups: string[] = [];
+    if (road) {
+      const line = house ? `${road} ${house}` : road;
+      if (where.postcode) lookups.push(`${line}, ${where.postcode}`);
+      for (const name of ltNominatives(village).slice(0, 2)) lookups.push(`${line}, ${name}, ${municipality}`);
+    } else {
+      for (const name of ltNominatives(village)) lookups.push(`${name}, ${municipality}`);
     }
-    if (isVillage || lookups.length === 0) lookups.push({ q: `${village}, ${row.municipality.replace(/\s+sav\.?$/i, ' savivaldybė')}`, minRank: LT_VILLAGE_RANK });
     drafts.push({
       station: {
         id: `lt-${hashId(key)}`,
@@ -238,6 +298,7 @@ export function buildLtDrafts(rows: LtRow[], now: Date): LtDraft[] {
       },
       query: row.address,
       lookups,
+      where: { municipality, place: village, road, house, postcode: where.postcode },
     });
   }
   return drafts;
@@ -258,15 +319,40 @@ export function placeLtDrafts(drafts: LtDraft[], places: LtPlaces, now: Date): {
   return { stations, todo };
 }
 
-/** Nominatim's answer as a position, or null when it is outside Lithuania or coarser than asked for. */
-export function ltLookupResult(body: unknown, minRank: number): { lat: number; lng: number; r: number } | null {
-  const first = asRecord(Array.isArray(body) ? body[0] : null);
-  if (!first) return null;
-  const lat = asNumber(first.lat);
-  const lng = asNumber(first.lon);
-  const r = asNumber(first.place_rank) ?? 0;
-  if (lat === null || lng === null || r < minRank || !inRegion('lt', lat, lng)) return null;
-  return { lat: roundCoord(lat), lng: roundCoord(lng), r };
+/**
+ * The first of Nominatim's answers that agrees with the published address, as a position; null when
+ * none does. A wrong pin is worse than a missing station, so an answer must be in the same
+ * municipality and then be one of: the same road and house number; a fuel station on the same road;
+ * the same road in the same village (r 26, somewhere along that road); or, for an address with no
+ * road, the village itself.
+ */
+export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; lng: number; r: number } | null {
+  for (const item of Array.isArray(body) ? body : []) {
+    const raw = asRecord(item);
+    const address = asRecord(raw?.address);
+    if (!raw || !address) continue;
+    const lat = asNumber(raw.lat);
+    const lng = asNumber(raw.lon);
+    if (lat === null || lng === null || !inRegion('lt', lat, lng)) continue;
+    if (!fold(String(raw.display_name ?? '')).includes(fold(where.municipality))) continue;
+    const places = ['city', 'town', 'village', 'hamlet', 'isolated_dwelling', 'suburb', 'neighbourhood', 'quarter', 'city_district'].map((key) => String(address[key] ?? '')).filter(Boolean);
+    const samePlace = places.some((name) => stem(name) === stem(where.place) || fold(name) === fold(where.place));
+    const samePostcode = Boolean(where.postcode) && String(address.postcode ?? '').replace(/\D/g, '') === where.postcode;
+    const at = { lat: roundCoord(lat), lng: roundCoord(lng) };
+    if (where.road) {
+      const theirs = fold(String(address.road ?? ''));
+      const ours = fold(where.road);
+      if (!theirs || !(theirs === ours || theirs.startsWith(ours) || ours.startsWith(theirs))) continue;
+      if (!samePlace && !samePostcode) continue;
+      const sameHouse = Boolean(where.house) && fold(String(address.house_number ?? '')) === fold(where.house);
+      if (sameHouse || raw.type === 'fuel') return { ...at, r: 30 };
+      if (samePlace && raw.category === 'highway') return { ...at, r: 26 };
+      continue;
+    }
+    const rank = asNumber(raw.place_rank) ?? 0;
+    if (raw.category === 'place' && samePlace && rank >= 18) return { ...at, r: rank };
+  }
+  return null;
 }
 
 /** The workbook through its public share link: the first answer sets a cookie and points to the file. */
@@ -346,9 +432,9 @@ export async function lookUpLt(todo: LtDraft[], places: LtPlaces, now: Date, lim
       let at: { lat: number; lng: number; r: number } | null = null;
       for (const attempt of draft.lookups) {
         asked += 1;
-        const response = await lookup(`${LT_GEOCODE_URL}?format=jsonv2&limit=1&countrycodes=lt&q=${encodeURIComponent(attempt.q)}`);
+        const response = await lookup(`${LT_GEOCODE_URL}?format=jsonv2&limit=5&addressdetails=1&countrycodes=lt&q=${encodeURIComponent(attempt)}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        at = ltLookupResult(await response.json(), attempt.minRank);
+        at = ltLookupResult(await response.json(), draft.where);
         if (at) break;
       }
       if (at) {

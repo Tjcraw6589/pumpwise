@@ -273,8 +273,8 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
   lt: {
     owner: 'Lithuanian Energy Agency (Lietuvos energetikos agentūra, LEA)',
     licence: 'Reuse permitted by the agency in writing on 19 November 2026, advertising included, with the source named and the operators credited. Pumpwise is independent and is not an official LEA system',
-    url: 'https://www.ena.lt/degalu-kainos/',
-    attribution: 'Data source: Lithuanian Energy Agency (LEA), https://www.ena.lt/degalu-kainos/. The original fuel price data is provided by fuel station operators, each named with its stations. Prices as reported by 10:00 each working day',
+    url: 'https://degalukainos.ena.lt/',
+    attribution: 'Data source: Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. The original fuel price data is provided by fuel station operators, each named with its stations. Prices as reported by 10:00 each working day',
     reuse: 'owner-terms',
   },
   tw: {
