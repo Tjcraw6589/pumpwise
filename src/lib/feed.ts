@@ -26,12 +26,12 @@ export type FuelKind = 'regular' | 'e10' | 'premium' | 'super' | 'diesel' | 'pre
 export const FUEL_KINDS: readonly FuelKind[] = ['regular', 'e10', 'premium', 'super', 'diesel', 'premium-diesel', 'lpg', 'e85', 'b10', 'b20', 'hvo'];
 
 /** Every place Pumpwise can cover. Which ones are live comes from `FeedMeta.regions`. */
-export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is' | 'qc' | 'tw' | 'it';
+export type RegionId = 'wa' | 'nsw' | 'tas' | 'qld' | 'uk' | 'es' | 'fr' | 'mx' | 'pt' | 'si' | 'hr' | 'dk' | 'is' | 'qc' | 'tw' | 'it' | 'lt';
 /**
  * In the order `regionAt` checks them: where boxes overlap, the first region wins (Spain before France,
  * Slovenia before Croatia).
  */
-export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it'];
+export const REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it', 'lt'];
 /** The regions Pumpwise 1.2 was built with; only these go into the version 4 feed. */
 // No 'uk': like 1.3, the 1.2 app calls its UK prices the government's Fuel Finder, which these are not.
 export const V4_REGION_IDS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'qld', 'es', 'fr', 'mx', 'pt', 'si', 'hr'];
@@ -151,6 +151,8 @@ export const REGION_BOUNDS: Record<RegionId, readonly Bounds[]> = {
     { minLat: 36.6, maxLat: 44.0, minLng: 7.5, maxLng: 18.6 }, // Liguria, the peninsula, Sardinia and most of Sicily
     { minLat: 35.4, maxLat: 36.6, minLng: 11.9, maxLng: 15.2 }, // southern Sicily, Pantelleria and Lampedusa
   ],
+  // Lithuania. The box takes in strips of Latvia, Belarus, Poland and Kaliningrad, none of which Pumpwise covers.
+  lt: [{ minLat: 53.89, maxLat: 56.46, minLng: 20.93, maxLng: 26.85 }],
   // Taiwan with Penghu, Kinmen and the Matsu islands.
   tw: [
     { minLat: 21.8, maxLat: 25.4, minLng: 119.3, maxLng: 122.1 },
@@ -267,6 +269,13 @@ export const REGION_LICENCES: Record<RegionId, RegionLicence> = {
     url: 'https://www.mimit.gov.it/it/open-data/elenco-dataset/carburanti-prezzi-praticati-e-anagrafica-degli-impianti',
     attribution: 'Fonte: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0). Prices as stations reported them to the Ministry, in force at 8:00 on the day of the file; the self service price is shown where a station has one',
     reuse: 'open',
+  },
+  lt: {
+    owner: 'Lithuanian Energy Agency (Lietuvos energetikos agentūra, LEA)',
+    licence: 'Reuse permitted by the agency in writing on 19 November 2026, advertising included, with the source named and the operators credited. Pumpwise is independent and is not an official LEA system',
+    url: 'https://www.ena.lt/degalu-kainos/',
+    attribution: 'Data source: Lithuanian Energy Agency (LEA), https://www.ena.lt/degalu-kainos/. The original fuel price data is provided by fuel station operators, each named with its stations. Prices as reported by 10:00 each working day',
+    reuse: 'owner-terms',
   },
   tw: {
     owner: 'CPC Corporation, Taiwan (台灣中油股份有限公司)',

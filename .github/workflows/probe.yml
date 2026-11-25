@@ -1,0 +1,16 @@
+name: probe
+on:
+  push:
+    branches: [probe-audit]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node .github/probe/lt.mts
