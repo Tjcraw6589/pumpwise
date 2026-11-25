@@ -25,6 +25,7 @@ import { fetchFr, FR_MIN_STATIONS } from './sources/fr.ts';
 import { fetchHr, HR_MIN_STATIONS } from './sources/hr.ts';
 import { fetchIs, IS_MIN_STATIONS } from './sources/is.ts';
 import { fetchIt, IT_MIN_STATIONS } from './sources/it.ts';
+import { fetchLt, LT_MIN_STATIONS } from './sources/lt.ts';
 import { fetchQc, QC_MIN_STATIONS } from './sources/qc.ts';
 import { fetchTw, TW_MIN_STATIONS } from './sources/tw.ts';
 import { fetchMx, MX_MIN_STATIONS } from './sources/mx.ts';
@@ -114,6 +115,8 @@ const SOURCES: Source[] = [
   { id: 'qc', regions: ['qc'], everyMinutes: 10, minStations: QC_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchQc(now), tomorrow: false }) },
   // Italy: the Ministry's two open files, published once each morning, through the relay in Frankfurt. Four checks a day are plenty.
   { id: 'it', regions: ['it'], everyMinutes: 350, minStations: IT_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIt(now), tomorrow: false }) },
+  // Lithuania: the Energy Agency's workbook, about 10 MB, with one new set of prices each working day after 10:00 in Vilnius.
+  { id: 'lt', regions: ['lt'], everyMinutes: 230, minStations: LT_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchLt(now), tomorrow: false }) },
   // Taiwan: CPC's station list and list prices. The price changes about once a week, so every three hours is plenty.
   { id: 'tw', regions: ['tw'], everyMinutes: 170, minStations: TW_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchTw(now), tomorrow: false }) },
   { id: 'is', regions: ['is'], everyMinutes: 25, minStations: IS_MIN_STATIONS, enabled: () => true, fetch: async (now) => ({ stations: await fetchIs(now), tomorrow: false }) },

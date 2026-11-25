@@ -150,6 +150,14 @@ const ES: Record<RegionId, RegionText> = {
     reportLabel: 'Consultarlo en Osservaprezzi',
     reportNote: 'Las gasolineras italianas deben comunicar sus precios al Ministerio cuando cambian y al menos una vez por semana.',
   },
+  lt: {
+    name: 'Lituania',
+    about:
+      'En Lituania cada operador de gasolineras comunica sus precios a la Agencia Lituana de Energía (LEA) antes de las 10:00 de cada día laborable, y la agencia los publica. Pumpwise recoge cada día el archivo público de la agencia y nombra al operador de cada gasolinera. Pumpwise es independiente: no es un servicio de la LEA y la agencia no responde de él.',
+    credit: 'Fuente de los datos: Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. Los precios originales los facilitan los operadores de las gasolineras.',
+    reportLabel: 'Consultarlo en el mapa de precios de la LEA',
+    reportNote: 'Los operadores lituanos comunican sus precios a la Agencia Lituana de Energía antes de las 10:00 de cada día laborable.',
+  },
 };
 
 const FR: Record<RegionId, RegionText> = {
@@ -299,6 +307,15 @@ const FR: Record<RegionId, RegionText> = {
     reportLabel: 'Vérifier sur Osservaprezzi',
     reportNote: 'Les stations italiennes doivent déclarer leurs prix au ministère à chaque changement et au moins une fois par semaine.',
   },
+  lt: {
+    name: 'Lituanie',
+    nameInSentence: 'la Lituanie',
+    about:
+      'En Lituanie, chaque exploitant de stations déclare ses prix à l’Agence lituanienne de l’énergie (LEA) avant 10 h chaque jour ouvré, et l’agence les publie. Pumpwise récupère chaque jour le fichier public de l’agence et nomme l’exploitant de chaque station. Pumpwise est indépendant : ce n’est pas un service de la LEA et l’agence n’en est pas responsable.',
+    credit: 'Source des données : Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. Les prix d’origine sont fournis par les exploitants des stations.',
+    reportLabel: 'Vérifier sur la carte des prix de la LEA',
+    reportNote: 'Les exploitants lituaniens déclarent leurs prix à l’Agence lituanienne de l’énergie avant 10 h chaque jour ouvré.',
+  },
 };
 
 const PT: Record<RegionId, RegionText> = {
@@ -443,6 +460,15 @@ const PT: Record<RegionId, RegionText> = {
     credit: 'Fonte: Ministero delle Imprese e del Made in Italy, Osservaprezzi carburanti (IODL 2.0)',
     reportLabel: 'Consultar no Osservaprezzi',
     reportNote: 'Os postos italianos têm de comunicar os preços ao Ministério sempre que mudam e pelo menos uma vez por semana.',
+  },
+  lt: {
+    name: 'Lituânia',
+    nameInSentence: 'a Lituânia',
+    about:
+      'Na Lituânia, cada operador de postos comunica os seus preços à Agência Lituana de Energia (LEA) até às 10h00 de cada dia útil, e a agência publica-os. O Pumpwise recolhe todos os dias o ficheiro público da agência e indica o operador de cada posto. O Pumpwise é independente: não é um serviço da LEA e a agência não é responsável por ele.',
+    credit: 'Fonte dos dados: Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. Os preços originais são fornecidos pelos operadores dos postos.',
+    reportLabel: 'Consultar no mapa de preços da LEA',
+    reportNote: 'Os operadores lituanos comunicam os preços à Agência Lituana de Energia até às 10h00 de cada dia útil.',
   },
 };
 

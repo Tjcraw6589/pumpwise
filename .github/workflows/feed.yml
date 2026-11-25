@@ -54,7 +54,7 @@ jobs:
       # The Stats page's history lives on the "stats" branch: one line of averages per day. It is checked
       # out here, read and updated by the price pages step, and committed back below. If the branch cannot
       # be checked out the page is drawn from today alone and nothing is saved.
-      # The same branch keeps dk-places.json: where the Danish stations that publish only an address are
+      # The same branch keeps dk-places.json and lt-places.json: where the Danish and Lithuanian stations that publish only an address are
       # (see scripts/feed/sources/dk.ts), so each address is looked up once.
       - name: Fetch the saved daily averages
         id: stats
@@ -90,11 +90,12 @@ jobs:
         run: |
           git add history.json
           if [ -f dk-places.json ]; then git add dk-places.json; fi
+          if [ -f lt-places.json ]; then git add lt-places.json; fi
           if git diff --cached --quiet; then exit 0; fi
           today=$(date -u +%F)
           last=$(git log -1 --format=%ct)
           # Newly found station positions are always saved, so no address is looked up twice.
-          if ! git diff --cached --quiet -- dk-places.json 2>/dev/null; then
+          if ! git diff --cached --quiet -- dk-places.json lt-places.json 2>/dev/null; then
             git -c user.name="Pumpwise feed" -c user.email="pumpwiseapp@gmail.com" commit -q -m "Station positions $today"
             git push -q origin HEAD:stats
           elif ! git log -1 --format=%s | grep -q "$today" || [ $(( $(date +%s) - last )) -gt 10800 ]; then

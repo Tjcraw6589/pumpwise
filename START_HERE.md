@@ -68,6 +68,8 @@ If that is fine with you, follow the checklist page's Queensland task. If not, Q
 
 ## Denmark and Iceland (added 16 November 2026, app version 1.3)
 
+**Lithuania was added to the website on 25 November 2026** (722 of the country's 759 stations, feed v6), with the Lithuanian Energy Agency's written permission. The rest have addresses the map cannot place safely, and the site says so. One thing to do each January: the agency publishes a new Excel file for the new year, and its link has to be pasted into `scripts/feed/sources/lt.ts` (see LEGAL.md). Ask Claude to do it.
+
 **Italy was added to the website on 18 November 2026** (about 24,000 stations, feed v6). Its files are fetched through a small free relay in Frankfurt, because the Ministry's site does not answer from outside Europe: see LEGAL.md.
 
 **Quebec and Taiwan were added to the website on 17 November 2026** (feed v6, so the app gets them in 1.4). Quebec is every station, with the Régie de l'énergie's written permission; Taiwan is the stations CPC runs itself, at CPC's list price. See LEGAL.md.

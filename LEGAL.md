@@ -183,6 +183,16 @@ GDPR as above; consumer information in Portuguese is expected for consumers in P
 | Victoria (Servo Saver API, CC BY 4.0) | Requires an application to Service Victoria and the prices are 24 hours old. Possible if the owner wants a "yesterday's prices" region. |
 | South Australia, Northern Territory | SA gives data to approved publishers only (application required); the NT has no confirmed live feed. |
 
+## Added 25 November 2026: Lithuania
+
+- **Permission:** Lina Daukšaitė (Lithuanian Energy Agency, lina.dauksaite@ena.lt) answered on 19 November 2026 (in the pumpwiseapp@gmail.com inbox, subject "Request to reuse degalukainos.ena.lt station prices in a free fuel price app"): reuse of the published fuel prices is permitted, also in free services with advertising. Required credit, word for word: "Data source: Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. The original fuel price data is provided by fuel station operators." Pumpwise must not look like an official LEA system or suggest LEA answers for it. The workbook's own note adds that the operating company must be named, so every station carries its operator's name as the agency prints it
+- **How it is read:** only the public Excel workbook linked from https://www.ena.lt/dk-pr-pr-duomenys/ ("Pranešimai ir pradiniai duomenys"), a few times a day. Never the price map's own interface: the agency plans an API and says automated access to it will need its authorisation
+- **The link changes each year.** The workbook is one file per year (DK-2026.xlsx). In January 2027 the agency will publish a new one: copy its link from the page above into `LT_WORKBOOK_URL` in `scripts/feed/sources/lt.ts`. Until then Lithuania simply shows no stations once the old file is a week stale
+- **Positions:** the workbook has addresses and no coordinates. Each address is looked up once on OpenStreetMap (Nominatim, at most one request a second) and saved in `lt-places.json` on the `stats` branch. An answer is used only when it agrees with the published address (same municipality, same road and house number, or the operator's own station found in the same village); otherwise the station is left out and tried again after 30 days. On 25 November 2026 that placed 722 of the 759 stations with prices (708 on the exact building or forecourt, 14 on the village their address names). So nearly every station is shown, not every one, and the site says so. OpenStreetMap is credited on the data licences page
+- **What is shown:** 95 petrol, diesel and LPG, as reported by 10:00 each working day. A station that did not report today keeps its last price for up to a week, with that day's date
+- **Still owed:** the agency asked for a visual example of how the prices are shown. A reply with a screenshot is to be drafted for the owner's approval
+- If the agency objects, switch `lt` off in `scripts/feed/build.ts`.
+
 ## Added 18 November 2026: Italy
 
 - **Permission:** Mario Barone (MIMIT, Direzione Generale Consumatori e Mercato, mario.barone@mise.gov.it) answered on 18 November 2026: the open files published each day are distributed under IODL 2.0; for the portal's own search service see its legal notes on automated access. So Pumpwise reads **only** the two open files (`prezzo_alle_8.csv`, `anagrafica_impianti_attivi.csv`) and never the portal's search service.

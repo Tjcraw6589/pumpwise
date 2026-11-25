@@ -13,7 +13,7 @@
 const PETROL = ['regular', 'e10', 'premium', 'super'];
 const DIESEL = ['diesel', 'premium-diesel'];
 /** Each region's currency, as the European Central Bank names it. */
-export const CURRENCY = { wa: 'AUD', nsw: 'AUD', tas: 'AUD', qld: 'AUD', uk: 'GBP', es: 'EUR', fr: 'EUR', pt: 'EUR', si: 'EUR', hr: 'EUR', mx: 'MXN', dk: 'DKK', is: 'ISK', qc: 'CAD', tw: 'TWD', it: 'EUR' };
+export const CURRENCY = { wa: 'AUD', nsw: 'AUD', tas: 'AUD', qld: 'AUD', uk: 'GBP', es: 'EUR', fr: 'EUR', pt: 'EUR', si: 'EUR', hr: 'EUR', mx: 'MXN', dk: 'DKK', is: 'ISK', qc: 'CAD', tw: 'TWD', it: 'EUR', lt: 'EUR' };
 const FILL = 50;
 const BRAND_MIN = 8;
 const TOWN_MIN = 3;

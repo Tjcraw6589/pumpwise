@@ -148,6 +148,7 @@ export const fr: Strings = {
   'country.CA': 'Canada',
   'country.TW': 'Taïwan',
   'country.IT': 'Italie',
+  'country.LT': 'Lituanie',
   'state.lookAround': (city: string) => `Voir ${city}`,
   'state.regionDownTitle': 'Les prix arrivent',
   'state.regionDownBody': (region: string) => `Prix indisponibles pour le moment (${region}). Ils reviennent en général dans l’heure.`,

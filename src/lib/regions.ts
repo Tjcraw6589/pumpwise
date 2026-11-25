@@ -873,6 +873,48 @@ const BASE_REGIONS: Record<RegionId, RegionInfo> = {
       { name: 'Bari', detail: 'Italy', lat: 41.1171, lng: 16.8719 },
     ],
   },
+  lt: {
+    id: 'lt',
+    name: 'Lithuania',
+    currency: '€',
+    currencyCode: 'EUR',
+    numberLocale: 'lt-LT',
+    priceUnit: 'c',
+    priceDecimals: 3,
+    decimalComma: true,
+    distanceUnit: 'km',
+    economyUnit: 'l100',
+    fuels: [
+      { kind: 'regular', label: '95 benzinas', pumpCode: '95', description: 'Unleaded 95 with up to 10% ethanol', common: true },
+      { kind: 'diesel', label: 'Dyzelinas', pumpCode: 'B7', description: 'Standard diesel', common: true },
+      { kind: 'lpg', label: 'Dujos (SND)', pumpCode: 'LPG', description: 'Autogas', common: true },
+    ],
+    radiusOptions: [2, 3, 5, 8, 10, 15, 25, 40],
+    economyOptions: [4, 5, 6, 7, 8, 9, 10, 12],
+    // Operators report by 10:00 each working day; each price carries that day.
+    priceMode: 'reported',
+    utcOffsetMinutes: (date) => (isEuropeanSummerTime(date) ? 180 : 120),
+    source: {
+      name: 'Lithuanian Energy Agency (LEA)',
+      url: 'https://degalukainos.ena.lt/',
+      credit: 'Data source: Lithuanian Energy Agency (LEA), https://degalukainos.ena.lt/. The original fuel price data is provided by fuel station operators.',
+    },
+    report: {
+      label: 'Check it on the LEA fuel price map',
+      url: 'https://degalukainos.ena.lt/',
+      note: 'Lithuanian station operators report their prices to the Lithuanian Energy Agency by 10:00 each working day.',
+    },
+    about:
+      'In Lithuania every fuel station operator reports its prices to the Lithuanian Energy Agency (LEA) by 10:00 each working day, and the agency publishes them. Pumpwise collects the agency’s public file each day and names the operator of every station. Pumpwise is independent: it is not an LEA service and the agency is not responsible for it.',
+    cities: [
+      { name: 'Vilnius', detail: 'Lithuania', lat: 54.6872, lng: 25.2797 },
+      { name: 'Kaunas', detail: 'Lithuania', lat: 54.8985, lng: 23.9036 },
+      { name: 'Klaipėda', detail: 'Lithuania', lat: 55.7033, lng: 21.1443 },
+      { name: 'Šiauliai', detail: 'Lithuania', lat: 55.9349, lng: 23.3137 },
+      { name: 'Panevėžys', detail: 'Lithuania', lat: 55.7348, lng: 24.3575 },
+      { name: 'Alytus', detail: 'Lithuania', lat: 54.3963, lng: 24.0459 },
+    ],
+  },
 };
 
 /** Every region, with its names and explanations in the phone's language. */
@@ -884,7 +926,7 @@ export const REGIONS: Record<RegionId, RegionInfo> = Object.fromEntries(
 export const DEFAULT_REGION: RegionId = 'wa';
 
 /** The country each region is in (ISO 3166 code), for headings when places from several countries are listed. */
-export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS' | 'CA' | 'TW' | 'IT'> = {
+export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' | 'GB' | 'SI' | 'HR' | 'DK' | 'IS' | 'CA' | 'TW' | 'IT' | 'LT'> = {
   wa: 'AU',
   nsw: 'AU',
   tas: 'AU',
@@ -901,6 +943,7 @@ export const REGION_COUNTRY: Record<RegionId, 'AU' | 'ES' | 'FR' | 'MX' | 'PT' |
   qc: 'CA',
   tw: 'TW',
   it: 'IT',
+  lt: 'LT',
 };
 
 /** "Western Australia · Australia", or just "Spain" where the region is the whole country. */
@@ -919,7 +962,7 @@ export function regionsHereFirst(live: readonly RegionId[], here: RegionId | nul
  * The regions this version of the app expects to be live, used for wording before the feed has
  * loaded (the welcome screens). Keep it in step with the feed's sources.
  */
-export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it'];
+export const EXPECTED_REGIONS: readonly RegionId[] = ['wa', 'nsw', 'tas', 'uk', 'es', 'fr', 'mx', 'pt', 'si', 'hr', 'dk', 'is', 'qc', 'tw', 'it', 'lt'];
 
 export function regionInfo(id: RegionId | null | undefined): RegionInfo {
   return REGIONS[id ?? DEFAULT_REGION];

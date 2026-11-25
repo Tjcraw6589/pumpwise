@@ -144,6 +144,7 @@ export const es: Strings = {
   'country.CA': 'Canadá',
   'country.TW': 'Taiwán',
   'country.IT': 'Italia',
+  'country.LT': 'Lituania',
   'state.lookAround': (city: string) => `Ver ${city}`,
   'state.regionDownTitle': 'Los precios están en camino',
   'state.regionDownBody': (region: string) => `No hemos podido recoger los precios de ${region} ahora mismo. Suelen volver en menos de una hora.`,
