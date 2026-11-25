@@ -71,6 +71,8 @@ export interface LtWhere {
   municipality: string;
   /** The town or village without "k.", in the form the operator wrote (often the genitive: "Sudmantų"). */
   place: string;
+  /** Other names the address gives for where it is ("Grigiškės" in "Vilnius, Grigiškės, Kovo 11-osios g. 75"). */
+  alsoIn: string[];
   /** "Vilniaus pl." without the house number; empty when the address has no street. */
   road: string;
   house: string;
@@ -247,9 +249,40 @@ export function ltNominatives(place: string): string[] {
   return [...new Set([place, ...forms.map((form) => [...words, form].join(' '))])];
 }
 
-const fold = (text: string) => text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
-/** What is left of a place name once its ending is removed, so the genitive and the nominative compare equal. */
-const stem = (name: string) => fold(name.split(' ').pop() ?? '').replace(/(čių|džių|čio|džio|čiai|džiai|ių|iai|io|aus|ės|os|ai|as|is|ys|us|ų|o|a|ė)$/u, '');
+/** Letters and digits only, lower case, without accents: operators write "Panevežys" and "Lėkėčių" for Panevėžys and Lekėčiai. */
+const fold = (text: string) =>
+  text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]/gu, '');
+/**
+ * What is left of a name's last word once its ending is removed, so the genitive and the nominative
+ * compare equal: "Sudmantų" and "Sudmantai", "Vilkaraisčio" and "Vilkaraistis" (č stands for t, dž for d).
+ */
+const stem = (name: string) =>
+  (name.trim().split(' ').pop() ?? '')
+    .toLowerCase()
+    .replace(/č(ių|io|iai)$/u, 't')
+    .replace(/dž(ių|io|iai)$/u, 'd')
+    .replace(/(ių|iai|io|aus|ės|os|ai|as|is|ys|us|ų|o|a|ė)$/u, '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]/gu, '');
+
+/** True when one of the comma separated parts of a map address names the place the operator wrote. */
+function namesPlace(parts: string[], where: LtWhere): boolean {
+  return [where.place, ...where.alsoIn].some((place) =>
+    parts.some((part) => {
+      // "Vilniaus miesto savivaldybė" is the city of Vilnius.
+      const name = part.replace(/\smiesto savivaldybė$/, '');
+      return fold(name) === fold(place) || (stem(name).length > 1 && stem(name) === stem(place));
+    }),
+  );
+}
+
+/** "Kauno rajono savivaldybė" and "Kauno miesto savivaldybė" both as "kauno": operators mix up a city and the district around it. */
+const municipalityKey = (name: string) => fold(name.replace(/\s(rajono|miesto)?\s?savivaldybė$/, ''));
 
 const LT_ROAD_WORDS = new Set(['g', 'gatvė', 'pl', 'plentas', 'pr', 'prospektas', 'al', 'alėja', 'kl', 'kel', 'kelias', 'aplinkl', 'aplinkkelis', 'aplinkkelio', 'tak', 'takas', 'skg', 'skersgatvis', 'a', 'aikštė']);
 
@@ -265,7 +298,15 @@ export function ltRoadKey(road: string): string {
     .map((word) => word.replace(/\.$/, ''))
     .filter((word) => word && !LT_ROAD_WORDS.has(word.toLowerCase()));
   const last = words.pop() ?? '';
-  return fold(words.join('')) + stem(last);
+  return [...words.map(fold), stem(last)].join(' ').trim();
+}
+
+/** True for the same road: the keys are equal, or one only adds first names ("Antano Skelčio g." is "A. Skelčio g."). */
+export function ltSameRoad(a: string, b: string): boolean {
+  const one = ltRoadKey(a);
+  const two = ltRoadKey(b);
+  if (!one || !two) return false;
+  return one === two || one.endsWith(` ${two}`) || two.endsWith(` ${one}`);
 }
 
 /** The newest reported price of each fuel at each station, as drafts waiting for a position. */
@@ -320,7 +361,15 @@ export function buildLtDrafts(rows: LtRow[], now: Date): LtDraft[] {
       },
       query: row.address,
       lookups,
-      where: { municipality, place: village, road, house, postcode: where.postcode, brand: ltShortName(row.company) },
+      where: {
+        municipality,
+        place: village,
+        alsoIn: where.street.split(', ').filter((part) => part && !ltRoad(part).road && !/\d/.test(part)),
+        road,
+        house,
+        postcode: where.postcode,
+        brand: ltShortName(row.company),
+      },
     });
   }
   return drafts;
@@ -344,9 +393,10 @@ export function placeLtDrafts(drafts: LtDraft[], places: LtPlaces, now: Date): {
 /**
  * The first of Nominatim's answers that agrees with the published address, as a position; null when
  * none does. A wrong pin is worse than a missing station, so an answer must be in the same
- * municipality and then be one of: the same road and house number; the operator's own fuel station
- * on the same road; the same road in the same village (r 26, kept only if the operator's station is
- * then found on it); or, for an address with no road, the village itself.
+ * municipality (city or district of that name) and then be one of: the same road and house number
+ * in the same place or postcode; the operator's own fuel station on the same road; the same road in
+ * the same place (r 26, kept only if the operator's station is then found on it); or, for an address
+ * with no road, the village itself.
  */
 export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; lng: number; r: number } | null {
   for (const item of Array.isArray(body) ? body : []) {
@@ -356,15 +406,14 @@ export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; ln
     const lat = asNumber(raw.lat);
     const lng = asNumber(raw.lon);
     if (lat === null || lng === null || !inRegion('lt', lat, lng)) continue;
-    if (!fold(String(raw.display_name ?? '')).includes(fold(where.municipality))) continue;
-    // The place is looked for in the whole written address: OpenStreetMap files a village under several different keys.
-    const named = String(raw.display_name ?? '').split(', ');
-    const samePlace = named.some((name) => fold(name) === fold(where.place) || (stem(name).length > 2 && stem(name) === stem(where.place)));
+    // Everything is looked for in the whole written address: OpenStreetMap files roads and villages under several different keys.
+    const parts = String(raw.display_name ?? '').split(', ');
+    if (!parts.some((part) => /savivaldybė$/.test(part) && municipalityKey(part) === municipalityKey(where.municipality))) continue;
+    const samePlace = namesPlace(parts, where);
     const samePostcode = Boolean(where.postcode) && String(address.postcode ?? '').replace(/\D/g, '') === where.postcode;
     const at = { lat: roundCoord(lat), lng: roundCoord(lng) };
     if (where.road) {
-      const theirs = ltRoadKey(String(address.road ?? ''));
-      if (!theirs || theirs !== ltRoadKey(where.road)) continue;
+      if (!parts.some((part) => ltSameRoad(part, where.road))) continue;
       if (!samePlace && !samePostcode) continue;
       const theirHouse = fold(String(address.house_number ?? ''));
       // A numbered building must be ours. A fuel station mapped without a number must carry the operator's name.
@@ -380,9 +429,8 @@ export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; ln
     }
     // A village is on the map as a place or as the boundary of the village (rank 16 and finer; a district is coarser).
     const rank = asNumber(raw.place_rank) ?? 0;
-    const name = String(raw.name ?? '');
     const isVillage = raw.category === 'place' || (raw.category === 'boundary' && raw.type === 'administrative');
-    if (isVillage && rank >= 16 && (fold(name) === fold(where.place) || stem(name) === stem(where.place))) return { ...at, r: rank };
+    if (isVillage && rank >= 16 && namesPlace([String(raw.name ?? '')], where)) return { ...at, r: rank };
   }
   return null;
 }
@@ -393,9 +441,10 @@ export function ltIsBrand(name: string, brand: string): boolean {
 }
 
 /**
- * The one fuel station near a village or along a road that carries the operator's name, from
- * Nominatim's list of fuel stations in a small box. Null when there is none or more than one:
- * then the village or the road itself stays as the position.
+ * The operator's own station among Nominatim's list of the fuel stations in a small box, for an
+ * address the map could not place exactly. It must carry the operator's name and stand in the same
+ * place, and for an address with a road it must also be on that road or have that house number.
+ * Null when there is none or more than one: two stations must never share a pin.
  */
 export function ltOwnStation(body: unknown, where: LtWhere): { lat: number; lng: number; r: number } | null {
   const mine: { lat: number; lng: number }[] = [];
@@ -405,12 +454,15 @@ export function ltOwnStation(body: unknown, where: LtWhere): { lat: number; lng:
     const lng = asNumber(raw?.lon);
     if (!raw || lat === null || lng === null || raw.type !== 'fuel' || !inRegion('lt', lat, lng)) continue;
     if (!ltIsBrand(String(raw.name ?? ''), where.brand)) continue;
-    // It must stand in the same village or town, or on the same road: the nearest station of that name may be the next town's.
-    const address = asRecord(raw.address);
-    const named = String(raw.display_name ?? '').split(', ');
-    const samePlace = named.some((name) => fold(name) === fold(where.place) || (stem(name).length > 2 && stem(name) === stem(where.place)));
-    const sameRoad = Boolean(where.road) && ltRoadKey(String(address?.road ?? '')) === ltRoadKey(where.road);
-    if (where.road ? sameRoad && samePlace : samePlace) mine.push({ lat: roundCoord(lat), lng: roundCoord(lng) });
+    const parts = String(raw.display_name ?? '').split(', ');
+    if (!namesPlace(parts, where)) continue;
+    if (where.road) {
+      const theirHouse = fold(String(asRecord(raw.address)?.house_number ?? ''));
+      const sameHouse = Boolean(where.house) && theirHouse === fold(where.house);
+      const sameRoad = parts.some((part) => ltSameRoad(part, where.road));
+      if (!(sameHouse || (sameRoad && !theirHouse))) continue;
+    }
+    mine.push({ lat: roundCoord(lat), lng: roundCoord(lng) });
   }
   return mine.length === 1 && mine[0] ? { ...mine[0], r: 30 } : null;
 }
@@ -497,13 +549,25 @@ export async function lookUpLt(todo: LtDraft[], places: LtPlaces, now: Date, lim
         at = ltLookupResult(await response.json(), draft.where);
         if (at) break;
       }
+      if (!at && draft.where.road) {
+        // The map does not know the road or the number. Find the town or village, to look for the operator's station there.
+        for (const name of ltNominatives(draft.where.place)) {
+          asked += 1;
+          const response = await lookup(`${LT_GEOCODE_URL}?format=jsonv2&limit=5&addressdetails=1&countrycodes=lt&q=${encodeURIComponent(`${name}, ${draft.where.municipality}`)}`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const town = ltLookupResult(await response.json(), { ...draft.where, road: '', house: '' });
+          // A town is no position for a street address: 26 marks it as one to drop unless the station itself is found.
+          if (town) at = { ...town, r: LT_ROAD_RANK };
+          if (at) break;
+        }
+      }
       if (at && at.r < 30) {
         // Only the village or the road is known: look for the operator's own station within about three kilometres.
         asked += 1;
         const box = `${at.lng - 0.05},${at.lat + 0.03},${at.lng + 0.05},${at.lat - 0.03}`;
         const response = await lookup(`${LT_GEOCODE_URL}?format=jsonv2&limit=20&addressdetails=1&countrycodes=lt&bounded=1&viewbox=${box}&q=${encodeURIComponent('[fuel]')}`);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        at = ltOwnStation(await response.json(), draft.where) ?? (at.r >= LT_ROAD_RANK ? null : at);
+        at = ltOwnStation(await response.json(), draft.where) ?? (draft.where.road ? null : at);
       }
       if (at) {
         places[draft.station.id] = { a: draft.query, ...at };
