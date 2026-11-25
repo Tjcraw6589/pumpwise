@@ -73,6 +73,8 @@ export interface LtWhere {
   road: string;
   house: string;
   postcode: string;
+  /** The operator's short name ("Viada"), to recognise its station among the fuel stations near a village. */
+  brand: string;
 }
 
 export type LtPlaces = Record<string, { a: string; lat?: number; lng?: number; r?: number; miss?: string }>;
@@ -211,7 +213,8 @@ export function ltMunicipality(short: string): string {
 
 /** "Vilniaus pl. 6" as the road and the house number. A part that names the village itself is not a road. */
 export function ltRoad(part: string): { road: string; house: string } {
-  const text = part.trim();
+  // "Beržų g. 24/Drąsiųjų g. 7": a corner plot, known by its first street.
+  const text = (part.split(/\s*\/\s*(?=\D)/)[0] ?? '').trim();
   if (!text || LT_VILLAGE.test(text) || /\s(k|mstl|vs)\.?\s*\d+\s?[A-Za-z]?$/i.test(text)) return { road: '', house: '' };
   const numbered = /^(.*?\D)\s*(\d+\s?[A-Za-z]?(?:\s?\/\s?\d+)?)$/.exec(text);
   if (numbered) return { road: (numbered[1] ?? '').replace(/[,\s]+$/, ''), house: (numbered[2] ?? '').replace(/\s+/g, '') };
@@ -298,7 +301,7 @@ export function buildLtDrafts(rows: LtRow[], now: Date): LtDraft[] {
       },
       query: row.address,
       lookups,
-      where: { municipality, place: village, road, house, postcode: where.postcode },
+      where: { municipality, place: village, road, house, postcode: where.postcode, brand: ltShortName(row.company) },
     });
   }
   return drafts;
@@ -335,8 +338,9 @@ export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; ln
     const lng = asNumber(raw.lon);
     if (lat === null || lng === null || !inRegion('lt', lat, lng)) continue;
     if (!fold(String(raw.display_name ?? '')).includes(fold(where.municipality))) continue;
-    const places = ['city', 'town', 'village', 'hamlet', 'isolated_dwelling', 'suburb', 'neighbourhood', 'quarter', 'city_district'].map((key) => String(address[key] ?? '')).filter(Boolean);
-    const samePlace = places.some((name) => stem(name) === stem(where.place) || fold(name) === fold(where.place));
+    // The place is looked for in the whole written address: OpenStreetMap files a village under several different keys.
+    const named = String(raw.display_name ?? '').split(', ');
+    const samePlace = named.some((name) => fold(name) === fold(where.place) || (stem(name).length > 2 && stem(name) === stem(where.place)));
     const samePostcode = Boolean(where.postcode) && String(address.postcode ?? '').replace(/\D/g, '') === where.postcode;
     const at = { lat: roundCoord(lat), lng: roundCoord(lng) };
     if (where.road) {
@@ -349,10 +353,30 @@ export function ltLookupResult(body: unknown, where: LtWhere): { lat: number; ln
       if (samePlace && raw.category === 'highway') return { ...at, r: 26 };
       continue;
     }
+    // A village is on the map as a place or as the boundary of the village (rank 16 and finer; a district is coarser).
     const rank = asNumber(raw.place_rank) ?? 0;
-    if (raw.category === 'place' && samePlace && rank >= 18) return { ...at, r: rank };
+    const name = String(raw.name ?? '');
+    const isVillage = raw.category === 'place' || (raw.category === 'boundary' && raw.type === 'administrative');
+    if (isVillage && rank >= 16 && (fold(name) === fold(where.place) || stem(name) === stem(where.place))) return { ...at, r: rank };
   }
   return null;
+}
+
+/**
+ * The one fuel station near a village or along a road that carries the operator's name, from
+ * Nominatim's list of fuel stations in a small box. Null when there is none or more than one:
+ * then the village or the road itself stays as the position.
+ */
+export function ltOwnStation(body: unknown, brand: string): { lat: number; lng: number; r: number } | null {
+  const mine: { lat: number; lng: number }[] = [];
+  for (const item of Array.isArray(body) ? body : []) {
+    const raw = asRecord(item);
+    const lat = asNumber(raw?.lat);
+    const lng = asNumber(raw?.lon);
+    if (!raw || lat === null || lng === null || raw.type !== 'fuel' || !inRegion('lt', lat, lng)) continue;
+    if (fold(brand).length > 2 && fold(String(raw.name ?? '')).includes(fold(brand))) mine.push({ lat: roundCoord(lat), lng: roundCoord(lng) });
+  }
+  return mine.length === 1 && mine[0] ? { ...mine[0], r: 30 } : null;
 }
 
 /** The workbook through its public share link: the first answer sets a cookie and points to the file. */
@@ -436,6 +460,14 @@ export async function lookUpLt(todo: LtDraft[], places: LtPlaces, now: Date, lim
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         at = ltLookupResult(await response.json(), draft.where);
         if (at) break;
+      }
+      if (at && at.r < 30) {
+        // Only the village or the road is known: look for the operator's own station within about three kilometres.
+        asked += 1;
+        const box = `${at.lng - 0.05},${at.lat + 0.03},${at.lng + 0.05},${at.lat - 0.03}`;
+        const response = await lookup(`${LT_GEOCODE_URL}?format=jsonv2&limit=20&countrycodes=lt&bounded=1&viewbox=${box}&q=${encodeURIComponent('[fuel]')}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        at = ltOwnStation(await response.json(), draft.where.brand) ?? at;
       }
       if (at) {
         places[draft.station.id] = { a: draft.query, ...at };
